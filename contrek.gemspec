@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.description = "Shape contour finder"
   s.authors = ["Emanuele Cesaroni"]
   s.email = "cesaroni.emanuele77@gmail.com"
-  s.homepage = "https://rubygems.org/gems/hola"
+  s.homepage = "https://github.com/runout77/contrek"
   s.license = "MIT"
   s.files = Dir.chdir(File.expand_path("..", __FILE__)) do
     `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(pkg|spec)/}) }
