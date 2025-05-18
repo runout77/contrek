@@ -1,0 +1,23 @@
+lib = File.expand_path("lib", __dir__)
+$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+require "contrek/version"
+Gem::Specification.new do |s|
+  s.name = "contrek"
+  s.version = Contrek::VERSION
+  s.summary = "Contour finder"
+  s.description = "Shape contour finder"
+  s.authors = ["Emanuele Cesaroni"]
+  s.email = "cesaroni.emanuele77@gmail.com"
+  s.homepage = "https://rubygems.org/gems/hola"
+  s.license = "MIT"
+  s.files = Dir.chdir(File.expand_path("..", __FILE__)) do
+    `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(pkg|spec)/}) }
+  end
+
+  s.add_development_dependency "rspec", "~> 3.10"
+  s.add_development_dependency "standard", "~> 1.49"
+  s.add_dependency "chunky_png", "~> 1.4"
+  s.add_dependency "rice", "~> 4.5"
+
+  s.extensions = %w[ext/cpp_polygon_finder/extconf.rb]
+end
