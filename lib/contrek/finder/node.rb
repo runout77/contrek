@@ -2,6 +2,7 @@ module Contrek
   module Finder
     class Node
       include Listable
+
       attr_reader :min_x, :max_x, :y, :name, :tangs, :tangs_sequence, :tangs_count, :data_pointer
       attr_accessor :track, :abs_x_index, :outer_index, :inner_index
 

@@ -17,8 +17,8 @@ Gem::Specification.new do |s|
     "homepage_uri" => "https://github.com/runout77/contrek"
   }
 
-  s.add_development_dependency "rspec", "~> 3.10"
-  s.add_development_dependency "standard", "~> 1.49"
+  s.add_development_dependency "rspec", "~> 3.12"
+  s.add_development_dependency "standard", "~> 1.51"
   s.add_dependency "chunky_png", "~> 1.4"
   s.add_dependency "rice", "~> 4.5"
 
