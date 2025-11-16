@@ -24,7 +24,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency "chunky_png", "~> 1.4"
   s.add_dependency "concurrent-ruby", "~> 1.3.5"
-  s.add_dependency "rice", "~> 4.5"
+  s.add_dependency "rice", "= 4.5.0"
 
   s.required_ruby_version = ">= 3.0.0"
 
