@@ -57,6 +57,10 @@ module Contrek
       def inspect
         "PngBitMap"
       end
+
+      def clear
+        @image = ChunkyPNG::Image.new(w, h, ChunkyPNG::Color.rgba(255, 255, 255, 255))
+      end
     end
   end
 end

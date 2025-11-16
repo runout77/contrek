@@ -1,8 +1,8 @@
 # Contrek
-Contrek is a Ruby library (C++ powered) to trace png bitmap areas polygonal contours. Manages png images usign png++ and picoPNG (version 20101224) libraries. 
+Contrek is a Ruby library (C++ powered) to trace png bitmap areas polygonal contours. Manages png images usign png++ and picoPNG (version 20101224) libraries and may work multithreading.
 
 ## About Contrek library
-Contrek (contour trekking) simply scans your png bitmap and returns shape contour as close polygonal lines, both for the external and internal sides. It can compute the nesting level of the polygons found with a tree structure. It supports various levels and modes of compression and approximation of the found coordinates.
+Contrek (**con**tour **trek**king) simply scans your png bitmap and returns shape contour as close polygonal lines, both for the external and internal sides. It can compute the nesting level of the polygons found with a tree structure. It supports various levels and modes of compression and approximation of the found coordinates. It is capable of multithreaded processing (currently only on the Ruby side), splitting the image into vertical strips and recombining the coordinates in pairs.
 
 In the following image all the non-white pixels have been examined and the result is the red polygon for the outer contour and the green one for the inner one
 ![alt text](contrek.png "Contour tracing")
@@ -43,7 +43,8 @@ result = Contrek.contour!(
   png_file_path: "labyrinth3.png",
   options: {
     class: "value_not_matcher",
-    color: {r: 255, g: 0, b: 0, a: 255}
+    color: {r: 255, g: 0, b: 0, a: 255},
+    finder: {treemap: true}
   }
 )
 ```
@@ -84,6 +85,67 @@ You can also read base64 png images
 ```ruby
 png_bitmap = CPPRemotePngBitMap.new("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+P+/HgAFhAJ/wlseKgAAAABJRU5ErkJggg==")
 ```
+
+Multithreaded contour processing is supported. However, on Ruby MRI (the standard Ruby implementation, at least up to 3.x), the Global Interpreter Lock (GIL) prevents more than one thread from executing Ruby code simultaneously. As a consequence, execution remains effectively serialized even on multicore systems, unless the gem is used under JRuby or TruffleRuby (not tested).
+
+The actual multithreaded implementation effort is therefore focused on the native C++ component, which is currently under development and is expected to provide substantially higher performance.
+
+```ruby
+result = Contrek.contour!(
+  png_file_path: "./spec/files/images/rectangle_8x8.png",
+  options: {
+    number_of_threads: 2,
+    native: false,
+    class: "value_not_matcher",
+    color: {r: 255, g: 255, b: 255, a: 255},
+    finder: {number_of_tiles: 2, compress: {uniq: true, linear: true}}
+  }
+)
+```
+The example uses 2 threads, and the image has been divided into 2 vertical bands. It is also possible to rely on the system to determine the maximum number of threads supported by your CPU (cores) by passing the appropriate parameter.
+
+```ruby
+  number_of_threads: nil
+```
+
+Regarding multithreading:
+
+- The algorithm splits the contour-detection workflow into multiple phases that can be executed in parallel. The initial contour extraction on each band and the subsequent merging of coordinates between adjacent bands—performed pairwise, recursively, and in a non-deterministic order—results in a final output that is not idempotent. Idempotence is guaranteed only when the exact same merging sequence is repeated.
+
+- The treemap option is currently ignored (multithreaded treemap support will be introduced in upcoming revisions).
+
+
+## Multithreaded approach
+
+The multithreaded contour-tracing implementation operates as follows:
+
+The input image is divided into multiple vertical bands—at least two—where each band shares a one-pixel-wide vertical strip with its adjacent bands.
+For example, if the image is 20 pixels wide and split into two bands, the first band may span from x=0 to x=9 (10 pixels), and the second from x=9 to x=19 (11 pixels).
+The vertical column at x=9 is therefore the shared region.
+
+```md
+01234567890123456789
+---------*----------
+```
+
+Each band is processed independently as if it were a standalone image, with its contour-tracing assigned to a dedicated thread.
+Whenever two adjacent bands have completed processing, they are assigned to an available thread that performs the merge of their coordinates.
+
+For example, with three bands
+B1 – B2 – B3
+the merging sequence might be:
+
+B1 + B2 → (B1+B2) + B3
+or
+
+B2 + B3 → B1 + (B2+B3)
+
+The order is therefore nondeterministic, constrained only by the possible combinations derived from the initial number of bands.
+
+The merging algorithm operates by splitting polygons that intersect the shared band into sequential subsets of coordinates—called parts—distinguishing between segments inside the shared region and those outside it.
+The first stage merges the outer boundary; the second stage merges the disconnected inner parts, which are inserted where needed into the outer sequences produced in the first stage.
+
+This process is applied recursively, merging bands until a single final band remains, upon which the coordinate-compression algorithms are executed.
 
 ## Performances native vs pure
 One of the most complex test you can find under the spec folder is named "scans poly 1200x800", scans this [image](spec/files/images/sample_1200x800.png) computing coordinates to draw polygons drawn in this [result](spec/files/stored_samples/sample_1200x800.png).

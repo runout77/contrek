@@ -76,20 +76,33 @@ module Contrek
         end
       end
 
+      def inspect
+        ""
+      end
+
+      def start_x
+        0
+      end
+
+      def end_x
+        @source_bitmap.w
+      end
+
       private
 
       # image scan
       def scan
         last_color = nil
         matching = false
-        min_x = 0
-        max_x = 0
-        @source_bitmap.scan do |x, y, color|
+        min_x = start_x
+        max_x = start_x
+        @source_bitmap.scan(start_x: start_x, end_x: end_x) do |x, y, color|
+          # puts "#{x} #{y}"
           if @matcher.match?(color) && matching == false
             min_x = x
             last_color = color
             matching = true
-            if x == (@source_bitmap.w - 1)
+            if x == (end_x - 1)
               max_x = x
               Contrek::Finder::Node.new(@node_cluster, min_x, max_x, y, last_color)
               matching = false
@@ -98,7 +111,7 @@ module Contrek
             max_x = x - 1
             Contrek::Finder::Node.new(@node_cluster, min_x, max_x, y, last_color)
             matching = false
-          elsif x == (@source_bitmap.w - 1) && matching == true
+          elsif x == (end_x - 1) && matching == true
             max_x = x
             Contrek::Finder::Node.new(@node_cluster, min_x, max_x, y, last_color)
             matching = false
