@@ -4,8 +4,8 @@ require "contrek/version"
 Gem::Specification.new do |s|
   s.name = "contrek"
   s.version = Contrek::VERSION
-  s.summary = "Png image shapes contour finder"
-  s.description = "Contrek is a Ruby library (C++ powered) to trace png bitmap areas polygonal contours."
+  s.summary = "Fast PNG contour tracing and shape detection for Ruby"
+  s.description = "Contrek is a Ruby gem with a C++ core for fast contour tracing and edge detection in PNG images. It extracts polygonal contours from bitmap shapes, enabling image processing, shape analysis, and raster-to-vector workflows such as PNG to SVG conversion."
   s.authors = ["Emanuele Cesaroni"]
   s.email = "cesaroni.emanuele77@gmail.com"
   s.homepage = "https://github.com/runout77/contrek"
@@ -14,7 +14,10 @@ Gem::Specification.new do |s|
     `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(pkg|spec)/}) }
   end
   s.metadata = {
-    "homepage_uri" => "https://github.com/runout77/contrek"
+    "homepage_uri" => "https://github.com/runout77/contrek",
+    "source_code_uri" => "https://github.com/runout77/contrek",
+    "documentation_uri" => "https://github.com/runout77/contrek#readme",
+    "changelog_uri" => "https://github.com/runout77/contrek/blob/main/CHANGELOG.md"
   }
 
   s.add_development_dependency "rspec", "~> 3.12"

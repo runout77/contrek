@@ -5,18 +5,25 @@ module Contrek
 
       TRACKED_OUTER = 1 << 0
       TRACKED_INNER = 1 << 1
-      Bounds = Struct.new(:min_x, :max_x, :min_y, :max_y)
 
       attr_reader :raw, :name, :min_y, :max_y, :next_tile_eligible_shapes
       attr_accessor :shape, :tile
 
-      def initialize(tile:, polygon:, shape: nil)
+      def initialize(tile:, polygon:, shape: nil, bounds: nil)
         @tile = tile
         @name = tile.shapes.count
         @raw = polygon
         @shape = shape
         @flags = 0
-        find_boundary
+
+        if bounds.nil?
+          find_boundary
+        else
+          @min_x = bounds[:min_x]
+          @max_x = bounds[:max_x]
+          @min_y = bounds[:min_y]
+          @max_y = bounds[:max_y]
+        end
       end
 
       def inspect
@@ -40,7 +47,7 @@ module Contrek
       end
 
       def intersection(other)
-        (@raw.compact & other.raw.compact)
+        @raw & other.raw
       end
 
       def empty?
@@ -53,10 +60,6 @@ module Contrek
 
       def clear!
         @raw = []
-      end
-
-      def vert_intersect?(other)
-        !(@max_y < other.min_y || other.max_y < @min_y)
       end
 
       def width
@@ -75,19 +78,18 @@ module Contrek
         }
       end
 
+      def vert_intersect?(other)
+        !(@max_y < other.min_y || other.max_y < @min_y)
+      end
+
       private
 
       def find_boundary
         return if @raw.empty?
 
-        bounds = @raw.compact.each_with_object(Bounds.new(Float::INFINITY, -Float::INFINITY, Float::INFINITY, -Float::INFINITY)) do |c, b|
-          x, y = c[:x], c[:y]
-          b.min_x = x if x < b.min_x
-          b.max_x = x if x > b.max_x
-          b.min_y = y if y < b.min_y
-          b.max_y = y if y > b.max_y
+        bounds = @raw.each_with_object(Bounds.empty) do |c, b|
+          b.expand(x: c[:x], y: c[:y])
         end
-
         @min_x, @max_x, @min_y, @max_y = bounds.values
       end
     end

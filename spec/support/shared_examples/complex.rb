@@ -6,7 +6,7 @@ RSpec.shared_examples "complex" do
                "A0B0C0D0E0F0G0H0I0J0K0L0M0N0O0P0Q0R0S0T0U0V0W0X0Y0A0B0C0D0E0F0G0H0I0J0K0L0M0N0O0P0Q0R0S0T0U0V0W0X0Y0A0B0C0D0E0F0G0H0I0J0K0L0M0N0O0P0Q0R0S0T0U0V0W0X0Y0A0B0C0D0E0F0G0H0I0J0K0L0M0N0O0P0Q0R0S0T0U0V0W0X0Y0" \
                "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ" \
                "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 200), @matcher).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 200), @matcher, nil, {named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("AZYZXZWZVZUZTZSZRZQZPZOZNZMZLZKZJZIZHZGZFZEZDZCZBZAZYZXZWZVZUZTZSZRZQZPZOZNZMZLZKZJZIZHZGZFZEZDZCZBZAZYZXZWZVZUZTZSZRZQZPZOZNZMZLZKZJZIZHZGZFZEZDZCZBZAZYZXZWZVZUZTZSZRZQZPZOZNZMZLZKZJZIZHZGZFZEZDZCZBZA")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([{outer: [{x: 0, y: 1}, {x: 0, y: 2}, {x: 199, y: 2}, {x: 198, y: 1}, {x: 198, y: 1}, {x: 196, y: 1}, {x: 196, y: 1}, {x: 194, y: 1}, {x: 194, y: 1}, {x: 192, y: 1}, {x: 192, y: 1}, {x: 190, y: 1}, {x: 190, y: 1}, {x: 188, y: 1}, {x: 188, y: 1}, {x: 186, y: 1}, {x: 186, y: 1}, {x: 184, y: 1}, {x: 184, y: 1}, {x: 182, y: 1}, {x: 182, y: 1}, {x: 180, y: 1}, {x: 180, y: 1}, {x: 178, y: 1}, {x: 178, y: 1}, {x: 176, y: 1}, {x: 176, y: 1}, {x: 174, y: 1}, {x: 174, y: 1}, {x: 172, y: 1}, {x: 172, y: 1}, {x: 170, y: 1}, {x: 170, y: 1}, {x: 168, y: 1}, {x: 168, y: 1}, {x: 166, y: 1}, {x: 166, y: 1}, {x: 164, y: 1}, {x: 164, y: 1}, {x: 162, y: 1}, {x: 162, y: 1}, {x: 160, y: 1}, {x: 160, y: 1}, {x: 158, y: 1}, {x: 158, y: 1}, {x: 156, y: 1}, {x: 156, y: 1}, {x: 154, y: 1}, {x: 154, y: 1}, {x: 152, y: 1}, {x: 152, y: 1}, {x: 150, y: 1}, {x: 150, y: 1}, {x: 148, y: 1}, {x: 148, y: 1}, {x: 146, y: 1}, {x: 146, y: 1}, {x: 144, y: 1}, {x: 144, y: 1}, {x: 142, y: 1}, {x: 142, y: 1}, {x: 140, y: 1}, {x: 140, y: 1}, {x: 138, y: 1}, {x: 138, y: 1}, {x: 136, y: 1}, {x: 136, y: 1}, {x: 134, y: 1}, {x: 134, y: 1}, {x: 132, y: 1}, {x: 132, y: 1}, {x: 130, y: 1}, {x: 130, y: 1}, {x: 128, y: 1}, {x: 128, y: 1}, {x: 126, y: 1}, {x: 126, y: 1}, {x: 124, y: 1}, {x: 124, y: 1}, {x: 122, y: 1}, {x: 122, y: 1}, {x: 120, y: 1}, {x: 120, y: 1}, {x: 118, y: 1}, {x: 118, y: 1}, {x: 116, y: 1}, {x: 116, y: 1}, {x: 114, y: 1}, {x: 114, y: 1}, {x: 112, y: 1}, {x: 112, y: 1}, {x: 110, y: 1}, {x: 110, y: 1}, {x: 108, y: 1}, {x: 108, y: 1}, {x: 106, y: 1}, {x: 106, y: 1}, {x: 104, y: 1}, {x: 104, y: 1}, {x: 102, y: 1}, {x: 102, y: 1}, {x: 100, y: 1}, {x: 100, y: 1}, {x: 98, y: 1}, {x: 98, y: 1}, {x: 96, y: 1}, {x: 96, y: 1}, {x: 94, y: 1}, {x: 94, y: 1}, {x: 92, y: 1}, {x: 92, y: 1}, {x: 90, y: 1}, {x: 90, y: 1}, {x: 88, y: 1}, {x: 88, y: 1}, {x: 86, y: 1}, {x: 86, y: 1}, {x: 84, y: 1}, {x: 84, y: 1}, {x: 82, y: 1}, {x: 82, y: 1}, {x: 80, y: 1}, {x: 80, y: 1}, {x: 78, y: 1}, {x: 78, y: 1}, {x: 76, y: 1}, {x: 76, y: 1}, {x: 74, y: 1}, {x: 74, y: 1}, {x: 72, y: 1}, {x: 72, y: 1}, {x: 70, y: 1}, {x: 70, y: 1}, {x: 68, y: 1}, {x: 68, y: 1}, {x: 66, y: 1}, {x: 66, y: 1}, {x: 64, y: 1}, {x: 64, y: 1}, {x: 62, y: 1}, {x: 62, y: 1}, {x: 60, y: 1}, {x: 60, y: 1}, {x: 58, y: 1}, {x: 58, y: 1}, {x: 56, y: 1}, {x: 56, y: 1}, {x: 54, y: 1}, {x: 54, y: 1}, {x: 52, y: 1}, {x: 52, y: 1}, {x: 50, y: 1}, {x: 50, y: 1}, {x: 48, y: 1}, {x: 48, y: 1}, {x: 46, y: 1}, {x: 46, y: 1}, {x: 44, y: 1}, {x: 44, y: 1}, {x: 42, y: 1}, {x: 42, y: 1}, {x: 40, y: 1}, {x: 40, y: 1}, {x: 38, y: 1}, {x: 38, y: 1}, {x: 36, y: 1}, {x: 36, y: 1}, {x: 34, y: 1}, {x: 34, y: 1}, {x: 32, y: 1}, {x: 32, y: 1}, {x: 30, y: 1}, {x: 30, y: 1}, {x: 28, y: 1}, {x: 28, y: 1}, {x: 26, y: 1}, {x: 26, y: 1}, {x: 24, y: 1}, {x: 24, y: 1}, {x: 22, y: 1}, {x: 22, y: 1}, {x: 20, y: 1}, {x: 20, y: 1}, {x: 18, y: 1}, {x: 18, y: 1}, {x: 16, y: 1}, {x: 16, y: 1}, {x: 14, y: 1}, {x: 14, y: 1}, {x: 12, y: 1}, {x: 12, y: 1}, {x: 10, y: 1}, {x: 10, y: 1}, {x: 8, y: 1}, {x: 8, y: 1}, {x: 6, y: 1}, {x: 6, y: 1}, {x: 4, y: 1}, {x: 4, y: 1}, {x: 2, y: 1}, {x: 2, y: 1}, {x: 0, y: 1}], inner: []}])
@@ -19,7 +19,7 @@ RSpec.shared_examples "complex" do
                "0DDDD0GG00000000" \
                "00EEEEEE00000000" \
                "000FF00000000000"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("ABCDEFEGHGEDCBAILIA")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([
@@ -35,7 +35,7 @@ RSpec.shared_examples "complex" do
                   "0000000000000000" \
                   "0000000000000000" \
                   "0000000000000000"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("ABCDEDCBA")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([
@@ -51,7 +51,7 @@ RSpec.shared_examples "complex" do
                   "0000000000000000" \
                   "0000000000000000" \
                   "0000000000000000"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {versus: :o}).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {versus: :o, named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("ABCDEDCBA")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([
@@ -67,7 +67,7 @@ RSpec.shared_examples "complex" do
                  "000DDDDDDDDDDD00" \
                  "0000000000000000" \
                  "0000000000000000"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("ABCDCEFECBA")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([
@@ -83,7 +83,7 @@ RSpec.shared_examples "complex" do
                "0000000000000000" \
                "0000000000000000" \
                "0000000000000000"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("ABCBADEDA")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([{outer: [{x: 3, y: 1}, {x: 3, y: 2}, {x: 3, y: 3}, {x: 6, y: 3}, {x: 6, y: 2}, {x: 10, y: 2}, {x: 10, y: 3}, {x: 13, y: 3}, {x: 13, y: 2}, {x: 13, y: 1}],
@@ -97,7 +97,7 @@ RSpec.shared_examples "complex" do
                "0000000000000000" \
                "0000000000000000" \
                "0000000000000000"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {versus: :o}).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {versus: :o, named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("ADEDABCBA")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([{outer: [{x: 3, y: 1}, {x: 3, y: 2}, {x: 3, y: 3}, {x: 6, y: 3}, {x: 6, y: 2}, {x: 10, y: 2}, {x: 10, y: 3}, {x: 13, y: 3}, {x: 13, y: 2}, {x: 13, y: 1}].reverse,
@@ -111,7 +111,7 @@ RSpec.shared_examples "complex" do
                  "0000000000000000" \
                  "0000000000000000" \
                  "0000000000000000"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("ABCDA")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([{outer: [{x: 6, y: 1}, {x: 5, y: 2}, {x: 6, y: 3}, {x: 8, y: 3}, {x: 10, y: 2}, {x: 8, y: 1}], inner: [[{x: 6, y: 2}, {x: 8, y: 2}]]}])
@@ -124,7 +124,7 @@ RSpec.shared_examples "complex" do
                  "00DDDD00FFFFF000" \
                  "0000EEEEEEEE0000" \
                  "0000000000000000"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("ABCDEFGHA")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([{outer: [{x: 3, y: 1}, {x: 3, y: 2}, {x: 3, y: 3}, {x: 2, y: 4}, {x: 4, y: 5}, {x: 11, y: 5}, {x: 12, y: 4}, {x: 12, y: 3}, {x: 13, y: 2}, {x: 13, y: 1}],
@@ -138,7 +138,7 @@ RSpec.shared_examples "complex" do
                  "0000BBBBB0000DD0" \
                  "0000000CCCCCCC00" \
                  "0000000000000000"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("ABCDEDCBA")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([
@@ -154,7 +154,7 @@ RSpec.shared_examples "complex" do
                  "0000BBBBB0000EE0" \
                  "0000000CCCCCCC00" \
                  "00000000DDDDD000"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("ABCDCEFECBA")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([{outer: [{x: 2, y: 3}, {x: 4, y: 4}, {x: 7, y: 5}, {x: 8, y: 6}, {x: 12, y: 6}, {x: 13, y: 5}, {x: 14, y: 4}, {x: 13, y: 3}, {x: 13, y: 3}, {x: 13, y: 4}, {x: 8, y: 4}, {x: 7, y: 3}],
@@ -168,7 +168,7 @@ RSpec.shared_examples "complex" do
                 "0000000000000000" \
                 "0000000000000000" \
                 "0000000000000000"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("ABACADA")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([
@@ -184,7 +184,7 @@ RSpec.shared_examples "complex" do
                 "0000000000000000" \
                 "0000000000000000" \
                 "0000000000000000"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("ABDBCBA")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([{outer: [{x: 3, y: 1}, {x: 3, y: 2}, {x: 12, y: 2}, {x: 12, y: 1}, {x: 12, y: 1}, {x: 7, y: 1}, {x: 7, y: 1}, {x: 3, y: 1}],
@@ -198,7 +198,7 @@ RSpec.shared_examples "complex" do
                 "00000000000000E0" \
                 "0000000000000000" \
                 "0000000000000000"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("BAEADACAB")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([{outer: [{x: 3, y: 2}, {x: 3, y: 3}, {x: 14, y: 4}, {x: 14, y: 4}, {x: 14, y: 3}, {x: 12, y: 2}, {x: 12, y: 2}, {x: 6, y: 2}, {x: 6, y: 2}, {x: 3, y: 2}],
@@ -212,7 +212,7 @@ RSpec.shared_examples "complex" do
                  "0000HH00DDDDDD00" \
                  "0000000000000000" \
                  "0000000000000000"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("ABCDEFGHGFEDCBA")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([{outer: [{x: 12, y: 1}, {x: 12, y: 2}, {x: 12, y: 3}, {x: 9, y: 3}, {x: 9, y: 2}, {x: 4, y: 2}, {x: 4, y: 3}, {x: 4, y: 4}, {x: 5, y: 4}, {x: 5, y: 3}, {x: 8, y: 3}, {x: 8, y: 4}, {x: 13, y: 4}, {x: 13, y: 3}, {x: 13, y: 2}, {x: 13, y: 1}],
@@ -226,7 +226,7 @@ RSpec.shared_examples "complex" do
                  "0000HH00DDDDDD00" \
                  "0000000000000000" \
                  "0000000000000000"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {versus: :o}).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {versus: :o, named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("ABCDEFGHGFEDCBA")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([{outer: [{x: 12, y: 1}, {x: 12, y: 2}, {x: 12, y: 3}, {x: 9, y: 3}, {x: 9, y: 2}, {x: 4, y: 2}, {x: 4, y: 3}, {x: 4, y: 4}, {x: 5, y: 4}, {x: 5, y: 3}, {x: 8, y: 3}, {x: 8, y: 4}, {x: 13, y: 4}, {x: 13, y: 3}, {x: 13, y: 2}, {x: 13, y: 1}].reverse,
@@ -240,7 +240,7 @@ RSpec.shared_examples "complex" do
                "0000CC00EEEEEE00" \
                "0000000000000000" \
                "0000000000000000"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("ABCBADEFGFEDA")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([{outer: [{x: 4, y: 2}, {x: 4, y: 3}, {x: 4, y: 4}, {x: 5, y: 4}, {x: 5, y: 3}, {x: 8, y: 3}, {x: 8, y: 4}, {x: 13, y: 4}, {x: 13, y: 3}, {x: 13, y: 2}, {x: 12, y: 2}, {x: 12, y: 3}, {x: 9, y: 3}, {x: 9, y: 2}],
@@ -254,7 +254,7 @@ RSpec.shared_examples "complex" do
                "000NNN0HHH0DDD00" \
                "0000000000000000" \
                "0000000000000000"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("ABCDEFGHILMNOPONMLIHGFEDCBA")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([{outer: [{x: 13, y: 1}, {x: 13, y: 2}, {x: 13, y: 3}, {x: 11, y: 3}, {x: 11, y: 2}, {x: 9, y: 2}, {x: 9, y: 3}, {x: 7, y: 3}, {x: 7, y: 2}, {x: 5, y: 2}, {x: 5, y: 3}, {x: 3, y: 3}, {x: 3, y: 2}, {x: 3, y: 2}, {x: 3, y: 3}, {x: 3, y: 4}, {x: 5, y: 4}, {x: 5, y: 3}, {x: 7, y: 3}, {x: 7, y: 4}, {x: 9, y: 4}, {x: 9, y: 3}, {x: 11, y: 3}, {x: 11, y: 4}, {x: 13, y: 4}, {x: 13, y: 3}, {x: 13, y: 2}, {x: 13, y: 1}],
@@ -268,7 +268,7 @@ RSpec.shared_examples "complex" do
               "I0QQQQQQQQQQQQ0E" \
               "H00000000000000F" \
               "GGGGGGGGGGGGGGGG"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("ABCDEFGHILMNOPQRQPONMLIHGFEDCBA")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([{outer: [{x: 15, y: 0}, {x: 15, y: 1}, {x: 15, y: 2}, {x: 15, y: 3}, {x: 15, y: 4}, {x: 15, y: 5}, {x: 0, y: 5}, {x: 0, y: 4}, {x: 0, y: 3}, {x: 0, y: 2}, {x: 13, y: 2}, {x: 13, y: 3}, {x: 2, y: 3}, {x: 2, y: 3}, {x: 2, y: 4}, {x: 13, y: 4}, {x: 13, y: 3}, {x: 13, y: 2}, {x: 13, y: 1}, {x: 0, y: 1}, {x: 0, y: 2}, {x: 0, y: 3}, {x: 0, y: 4}, {x: 0, y: 5}, {x: 0, y: 6}, {x: 15, y: 6}, {x: 15, y: 5}, {x: 15, y: 4}, {x: 15, y: 3}, {x: 15, y: 2}, {x: 15, y: 1}, {x: 15, y: 0}],
@@ -282,7 +282,7 @@ RSpec.shared_examples "complex" do
                "000EEEEEEEEEEE00" \
                "0000000000000000" \
                "0000000000000000"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("ABCDEFEDCBA")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([{outer: [{x: 0, y: 0}, {x: 8, y: 1}, {x: 10, y: 2}, {x: 10, y: 3}, {x: 6, y: 3}, {x: 3, y: 3}, {x: 3, y: 4}, {x: 13, y: 4}, {x: 13, y: 3}, {x: 13, y: 2}, {x: 10, y: 1}, {x: 8, y: 0}],
@@ -296,7 +296,7 @@ RSpec.shared_examples "complex" do
                "000EEEEEEEEEEE00" \
                "0000000000000000" \
                "0000000000000000"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {versus: :o}).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {versus: :o, named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("ABCDEFEDCBA")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([{outer: [{x: 0, y: 0}, {x: 8, y: 1}, {x: 10, y: 2}, {x: 10, y: 3}, {x: 6, y: 3}, {x: 3, y: 3}, {x: 3, y: 4}, {x: 13, y: 4}, {x: 13, y: 3}, {x: 13, y: 2}, {x: 10, y: 1}, {x: 8, y: 0}].reverse,
@@ -310,7 +310,7 @@ RSpec.shared_examples "complex" do
                "000CCCCCCCCCCC00" \
                "0000000000000000" \
                "0000000000000000"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("ABCDCBA")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([{outer: [{x: 10, y: 2}, {x: 10, y: 3}, {x: 6, y: 3}, {x: 3, y: 3}, {x: 3, y: 4}, {x: 13, y: 4}, {x: 13, y: 3}, {x: 13, y: 2}],
@@ -324,7 +324,7 @@ RSpec.shared_examples "complex" do
                  "000000000000EE00" \
                  "0000000000000FF0" \
                  "00000000000000GG"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("ABCDEFGFEDCBA")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([{outer: [{x: 0, y: 0}, {x: 1, y: 1}, {x: 2, y: 2}, {x: 3, y: 3}, {x: 12, y: 4}, {x: 13, y: 5}, {x: 14, y: 6}, {x: 15, y: 6}, {x: 14, y: 5}, {x: 13, y: 4}, {x: 12, y: 3}, {x: 3, y: 2}, {x: 2, y: 1}, {x: 1, y: 0}],
@@ -338,7 +338,7 @@ RSpec.shared_examples "complex" do
                  "000000000000EE00" \
                  "0000000000000FF0" \
                  "00000000000000GG"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("ABCDEFGFEDCBA")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([{outer: [{x: 14, y: 0}, {x: 13, y: 1}, {x: 12, y: 2}, {x: 0, y: 3}, {x: 12, y: 4}, {x: 13, y: 5}, {x: 14, y: 6}, {x: 15, y: 6}, {x: 14, y: 5}, {x: 13, y: 4}, {x: 12, y: 3}, {x: 13, y: 2}, {x: 14, y: 1}, {x: 15, y: 0}],
@@ -352,7 +352,7 @@ RSpec.shared_examples "complex" do
                  "00DDDD00000GGG00" \
                  "000EE0000000H000" \
                  "0000000000000000"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("ABCDEDCBFGHGFBA")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([{outer: [{x: 7, y: 1}, {x: 5, y: 2}, {x: 3, y: 3}, {x: 2, y: 4}, {x: 3, y: 5}, {x: 4, y: 5}, {x: 5, y: 4}, {x: 6, y: 3}, {x: 9, y: 3}, {x: 11, y: 4}, {x: 12, y: 5}, {x: 12, y: 5}, {x: 13, y: 4}, {x: 15, y: 3}, {x: 10, y: 2}, {x: 9, y: 1}],
@@ -366,7 +366,7 @@ RSpec.shared_examples "complex" do
                  "00DDDD00000GGG00" \
                  "000EE0000000H000" \
                  "0000000000000000"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {versus: :o}).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {versus: :o, named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("ABFGHGFBCDEDCBA")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([{outer: [{x: 7, y: 1}, {x: 5, y: 2}, {x: 3, y: 3}, {x: 2, y: 4}, {x: 3, y: 5}, {x: 4, y: 5}, {x: 5, y: 4}, {x: 6, y: 3}, {x: 9, y: 3}, {x: 11, y: 4}, {x: 12, y: 5}, {x: 12, y: 5}, {x: 13, y: 4}, {x: 15, y: 3}, {x: 10, y: 2}, {x: 9, y: 1}].reverse,
@@ -381,7 +381,7 @@ RSpec.shared_examples "complex" do
                "000EEEE00GGGG000" \
                "0000FF0000HH0000" \
                "0000000000000000"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("ABCDEFEDGHGDCILICBA")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([{outer: [{x: 4, y: 1}, {x: 3, y: 2}, {x: 2, y: 3}, {x: 2, y: 4}, {x: 3, y: 5}, {x: 4, y: 6}, {x: 5, y: 6}, {x: 6, y: 5}, {x: 9, y: 5}, {x: 10, y: 6}, {x: 11, y: 6}, {x: 12, y: 5}, {x: 13, y: 4}, {x: 13, y: 3}, {x: 12, y: 2}, {x: 11, y: 1}, {x: 10, y: 1}, {x: 9, y: 2}, {x: 6, y: 2}, {x: 6, y: 1}],
@@ -396,7 +396,7 @@ RSpec.shared_examples "complex" do
                "000HHHH00LLLL000" \
                "0000II0000MM0000" \
                "0000000000000000"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("ABCDEFEDGHIHGLMLGDCBA")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([{outer: [{x: 10, y: 0}, {x: 10, y: 1}, {x: 9, y: 2}, {x: 6, y: 2}, {x: 6, y: 1}, {x: 4, y: 1}, {x: 3, y: 2}, {x: 2, y: 3}, {x: 2, y: 4}, {x: 3, y: 5}, {x: 4, y: 6}, {x: 5, y: 6}, {x: 6, y: 5}, {x: 9, y: 5}, {x: 10, y: 6}, {x: 11, y: 6}, {x: 12, y: 5}, {x: 13, y: 4}, {x: 13, y: 3}, {x: 12, y: 2}, {x: 11, y: 1}, {x: 11, y: 0}],
@@ -411,7 +411,7 @@ RSpec.shared_examples "complex" do
                "000HHHH00LLLL000" \
                "0000II0000MM0000" \
                "0000000000000000"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {compress: {visvalingam: {tolerance: 1.5}}}).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true, compress: {visvalingam: {tolerance: 1.5}}}).process_info
       expect(result[:named_sequence]).to eq("ABCDEFEDGHIHGLMLGDCBA")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([{outer: [{x: 10, y: 0}, {x: 9, y: 2}, {x: 4, y: 1}, {x: 2, y: 3}, {x: 4, y: 6}, {x: 9, y: 5}, {x: 11, y: 6}, {x: 13, y: 4}, {x: 11, y: 0}],
@@ -425,7 +425,7 @@ RSpec.shared_examples "complex" do
                "000DDDD00FFFFF00" \
                "0000EE0000GG0000" \
                "0000000000000000"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("ABCDEDCFGFCHIHCBA")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([{outer: [{x: 4, y: 1}, {x: 3, y: 2}, {x: 2, y: 3}, {x: 3, y: 4}, {x: 4, y: 5}, {x: 5, y: 5}, {x: 6, y: 4}, {x: 9, y: 4}, {x: 10, y: 5}, {x: 11, y: 5}, {x: 13, y: 4}, {x: 13, y: 3}, {x: 13, y: 2}, {x: 12, y: 1}, {x: 10, y: 1}, {x: 9, y: 2}, {x: 6, y: 2}, {x: 6, y: 1}],
@@ -439,7 +439,7 @@ RSpec.shared_examples "complex" do
               "0000000000000000" \
               "0000000000000000" \
               "0000000000000000"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("ABCFGFCDEDCBA")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([{outer: [{x: 0, y: 1}, {x: 0, y: 2}, {x: 0, y: 3}, {x: 14, y: 3}, {x: 14, y: 2}, {x: 14, y: 1}, {x: 12, y: 1}, {x: 12, y: 2}, {x: 8, y: 2}, {x: 8, y: 1}, {x: 6, y: 1}, {x: 6, y: 2}, {x: 2, y: 2}, {x: 2, y: 1}],
@@ -453,7 +453,7 @@ RSpec.shared_examples "complex" do
               "0000000000000000" \
               "0000000000000000" \
               "0000000000000000"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("ABCBADEDAFGFA")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([{outer: [{x: 0, y: 1}, {x: 0, y: 2}, {x: 0, y: 3}, {x: 2, y: 3}, {x: 2, y: 2}, {x: 6, y: 2}, {x: 6, y: 3}, {x: 8, y: 3}, {x: 8, y: 2}, {x: 12, y: 2}, {x: 12, y: 3}, {x: 14, y: 3}, {x: 14, y: 2}, {x: 14, y: 1}],
@@ -467,7 +467,7 @@ RSpec.shared_examples "complex" do
               "DD00II00PP000FF0" \
               "EEEEEEEEEEEEEEE0" \
               "0000000000000000"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("ABCDEFGHA")
       expect(result[:groups]).to eq(1)
       # puts result[:polygons]
@@ -489,7 +489,7 @@ RSpec.shared_examples "complex" do
               "0EE00LLLLLLLLLL0" \
               "0FF00MMMMMMMMMM0" \
               "0GGGGGGGGGGGGGG0"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("ABCDEFGMLDIHA")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([
@@ -509,7 +509,7 @@ RSpec.shared_examples "complex" do
               "DD00II00PP000FF0" \
               "EEEEEEEEEEEEEEE0" \
               "0000000000000000"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("ABCDEFGHA")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([
@@ -529,7 +529,7 @@ RSpec.shared_examples "complex" do
               "HHHHHHHHHHHHHHHH" \
               "0000000000000000" \
               "0000000000000000"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {versus: :a}).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {versus: :a, named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("ABDIHGFCA")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([{outer: [{x: 0, y: 0}, {x: 0, y: 1}, {x: 0, y: 2}, {x: 0, y: 3}, {x: 0, y: 4}, {x: 15, y: 4}, {x: 15, y: 3}, {x: 15, y: 2}, {x: 15, y: 1}, {x: 15, y: 0}],
@@ -544,7 +544,7 @@ RSpec.shared_examples "complex" do
                "EEEE000000IIIIII" \
                "FFFFFFF00HHHHHHH" \
                "GGGGGGGGGGGGGGGG"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("ABCDEFGHILMNA")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([
@@ -560,7 +560,7 @@ RSpec.shared_examples "complex" do
                "EEEE000000IIIIII" \
                "FFFFFFF00HHHHHHH" \
                "GGGGGGGGGGGGGGGG"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {versus: :o}).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {versus: :o, named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("ANMLIHGFEDCBA")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([
@@ -577,7 +577,7 @@ RSpec.shared_examples "complex" do
                 "0EE000II00RR00P0" \
                 "00FF00HHH0000QQ0" \
                 "000GGGGGGGGGGG00"
-      finder = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher)
+      finder = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true})
       result = finder.process_info
       expect(result[:named_sequence]).to eq("ABCDEFGQPONMA-SRS")
       expect(result[:groups]).to eq(2)
@@ -598,7 +598,7 @@ RSpec.shared_examples "complex" do
               "0JJJJJJJJJJJJ0KKK00000000000000" \
               "0000LLLLLLLLLL0MM00000000000000" \
               "0000NNN0OOOOOOOOOO0000000000000"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 31), @matcher).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 31), @matcher, nil, {named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("ACEHJGDBDGJLNLOMKIFCA")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([{outer: [{x: 8, y: 0}, {x: 7, y: 1}, {x: 8, y: 2}, {x: 8, y: 3}, {x: 5, y: 3}, {x: 5, y: 2}, {x: 4, y: 1}, {x: 0, y: 1}, {x: 1, y: 2}, {x: 1, y: 3}, {x: 1, y: 4}, {x: 4, y: 5}, {x: 4, y: 6}, {x: 6, y: 6}, {x: 8, y: 6}, {x: 17, y: 6}, {x: 16, y: 5}, {x: 16, y: 4}, {x: 15, y: 3}, {x: 14, y: 2}, {x: 14, y: 1}, {x: 13, y: 0}], inner: [[{x: 9, y: 2}, {x: 11, y: 2}], [{x: 15, y: 5}, {x: 13, y: 5}, {x: 12, y: 4}, {x: 11, y: 3}, {x: 13, y: 3}, {x: 14, y: 4}]]}])
@@ -618,7 +618,7 @@ RSpec.shared_examples "complex" do
                 "0HH000IIIIIIIII0" \
                 "00LL00LLLLLLLLL0" \
                 "000MMMMMMMMMMMM0"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {treemap: true}).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {treemap: true, named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("ABCDEFNPQGHLMLIGQPNFEDLMA-RSR")
       expect(result[:groups]).to eq(2)
       expect(result[:treemap]).to eq([[-1, -1], [0, 1]])
@@ -646,7 +646,7 @@ RSpec.shared_examples "complex" do
                 "1111111111111111111"
       dest = @bitmap_class.new(chunk, 19)
       dest.clear(" ")
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 19), @matcher, dest, {versus: :a}).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 19), @matcher, dest, {versus: :a, named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("1-1-1-1111111111AD1111111111111111111111111111111C1111111111111111111-1-111-1-1")
       expect(result[:groups]).to eq(8)
       expect(result[:polygons]).to eq(
@@ -675,7 +675,7 @@ RSpec.shared_examples "complex" do
       filename = "labyrinth2.png"
       png_bitmap = @png_bitmap_class.new("./spec/files/images/#{filename}")
       rgb_matcher = @png_not_matcher.new(@png_not_matcher_color)
-      polygonfinder = @polygon_finder_class.new(png_bitmap, rgb_matcher, nil, {versus: :a, compress: {uniq: true, linear: true}})
+      polygonfinder = @polygon_finder_class.new(png_bitmap, rgb_matcher, nil, {versus: :a, named_sequences: true, compress: {uniq: true, linear: true}})
       result = polygonfinder.process_info
       saved_poly = YAML.load_file("./spec/files/coordinates/#{filename}.yml")
       expect(result[:polygons]).to eq(saved_poly)
@@ -685,7 +685,7 @@ RSpec.shared_examples "complex" do
       filename = "sample_270x257.png"
       png_bitmap = @png_bitmap_class.new("./spec/files/images/#{filename}")
       rgb_matcher = @png_not_matcher.new(@png_not_matcher_color)
-      polygonfinder = @polygon_finder_class.new(png_bitmap, rgb_matcher, nil, {versus: :a, compress: {uniq: true, linear: true}})
+      polygonfinder = @polygon_finder_class.new(png_bitmap, rgb_matcher, nil, {versus: :a, named_sequences: true, compress: {uniq: true, linear: true}})
       result = polygonfinder.process_info
       saved_poly = YAML.load_file("./spec/files/coordinates/#{filename}.yml")
       expect(result[:polygons]).to eq(saved_poly)
@@ -715,7 +715,7 @@ RSpec.shared_examples "complex" do
                 "KKKKKKKKKKKKKKKKKKKKK"
       dest = @bitmap_class.new(chunk, 21)
       dest.clear(" ")
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 21), @matcher, dest, {versus: :a, compress: {uniq: true, linear: true}}).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 21), @matcher, dest, {versus: :a, named_sequences: true, compress: {uniq: true, linear: true}}).process_info
       expect(result[:named_sequence]).to eq("ABCDEFGHIJKLMNOPQRSTA")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([{outer: [{x: 0, y: 0}, {x: 0, y: 10}, {x: 20, y: 10}, {x: 20, y: 0}],
@@ -733,7 +733,7 @@ RSpec.shared_examples "complex" do
                 "00000000IIIIIII0LLL"
       dest = @bitmap_class.new(chunk, 19)
       dest.clear(" ")
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 19), @matcher, dest, {versus: :a}).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 19), @matcher, dest, {versus: :a, named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("ABDGIHLHFCA")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([{outer: [{x: 4, y: 0}, {x: 4, y: 1}, {x: 5, y: 2}, {x: 6, y: 3}, {x: 8, y: 4}, {x: 14, y: 4}, {x: 16, y: 4}, {x: 18, y: 4}, {x: 18, y: 3}, {x: 18, y: 2}, {x: 17, y: 1}, {x: 13, y: 0}],
@@ -750,7 +750,7 @@ RSpec.shared_examples "complex" do
                 "00000000IIIIIII0LLL"
       dest = @bitmap_class.new(chunk, 19)
       dest.clear(" ")
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 19), @matcher, dest, {versus: :o}).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 19), @matcher, dest, {versus: :o, named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("ACFHLHIGDBA")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([{outer: [{x: 13, y: 0}, {x: 17, y: 1}, {x: 18, y: 2}, {x: 18, y: 3}, {x: 18, y: 4}, {x: 16, y: 4}, {x: 14, y: 4}, {x: 8, y: 4}, {x: 6, y: 3}, {x: 5, y: 2}, {x: 4, y: 1}, {x: 4, y: 0}],
@@ -772,7 +772,7 @@ RSpec.shared_examples "complex" do
                "0000NNN0OOOOOOOOOO0000000000000"
       dest = @bitmap_class.new(chunk, 31)
       dest.clear(" ")
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 31), @matcher, dest, {versus: :a}).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 31), @matcher, dest, {versus: :a, named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("ACEHJGDBDGJLNLOMKIFCA")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([{outer: [{x: 8, y: 0}, {x: 7, y: 1}, {x: 8, y: 2}, {x: 8, y: 3}, {x: 5, y: 3}, {x: 5, y: 2}, {x: 4, y: 1},
@@ -822,7 +822,7 @@ RSpec.shared_examples "complex" do
 
       dest = @bitmap_class.new(chunk, 35)
       dest.clear(" ")
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 35), @matcher, dest, {versus: :a}).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 35), @matcher, dest, {versus: :a, named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("ACEJLNP11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111H1H111111111111111111111111OM1MKFCA-BDGDB-I11111I-1111111-1-1-1111111111111111111-1-1-111-1-1-1-1-1-1-1-111-1-1-1-1-1-1-1")
       expect(result[:groups]).to eq(25)
       expect(result[:polygons]).to eq([{outer: [{x: 15, y: 1}, {x: 14, y: 2}, {x: 12, y: 3}, {x: 12, y: 4}, {x: 11, y: 5}, {x: 10, y: 6}, {x: 9, y: 7}, {x: 8, y: 8}, {x: 7, y: 9}, {x: 6, y: 10}, {x: 5, y: 11}, {x: 4, y: 12}, {x: 3, y: 13}, {x: 3, y: 14}, {x: 3, y: 15}, {x: 3, y: 16}, {x: 2, y: 17}, {x: 0, y: 18}, {x: 3, y: 19}, {x: 4, y: 20}, {x: 4, y: 21}, {x: 4, y: 22}, {x: 5, y: 22}, {x: 7, y: 22}, {x: 6, y: 23}, {x: 6, y: 24}, {x: 6, y: 25}, {x: 6, y: 26}, {x: 6, y: 27}, {x: 4, y: 28}, {x: 6, y: 29}, {x: 6, y: 30}, {x: 5, y: 31}, {x: 6, y: 32}, {x: 7, y: 33}, {x: 7, y: 33}, {x: 8, y: 32}, {x: 9, y: 31}, {x: 8, y: 30}, {x: 9, y: 29}, {x: 9, y: 28}, {x: 9, y: 27}, {x: 9, y: 26}, {x: 9, y: 25}, {x: 11, y: 25}, {x: 11, y: 26}, {x: 12, y: 27}, {x: 13, y: 28}, {x: 15, y: 29}, {x: 15, y: 30}, {x: 17, y: 30}, {x: 17, y: 29}, {x: 17, y: 28}, {x: 18, y: 27}, {x: 17, y: 26}, {x: 16, y: 25}, {x: 15, y: 24}, {x: 14, y: 23}, {x: 17, y: 23}, {x: 17, y: 24}, {x: 17, y: 24}, {x: 19, y: 23}, {x: 21, y: 23}, {x: 20, y: 24}, {x: 20, y: 25}, {x: 20, y: 26}, {x: 20, y: 27}, {x: 20, y: 28}, {x: 20, y: 28}, {x: 24, y: 28}, {x: 26, y: 29}, {x: 29, y: 29}, {x: 31, y: 29}, {x: 31, y: 30}, {x: 31, y: 30}, {x: 33, y: 29}, {x: 34, y: 28}, {x: 32, y: 27}, {x: 31, y: 26}, {x: 32, y: 25}, {x: 32, y: 24}, {x: 31, y: 23}, {x: 30, y: 22}, {x: 31, y: 21}, {x: 32, y: 20}, {x: 34, y: 20}, {x: 34, y: 21}, {x: 34, y: 22}, {x: 34, y: 22}, {x: 34, y: 21}, {x: 34, y: 20}, {x: 34, y: 19}, {x: 34, y: 18}, {x: 34, y: 17}, {x: 34, y: 16}, {x: 34, y: 15}, {x: 34, y: 14}, {x: 34, y: 14}, {x: 34, y: 15}, {x: 24, y: 15}, {x: 25, y: 14}, {x: 26, y: 13}, {x: 34, y: 12}, {x: 34, y: 11}, {x: 34, y: 10}, {x: 34, y: 9}, {x: 34, y: 8}, {x: 32, y: 8}, {x: 32, y: 9}, {x: 28, y: 9}, {x: 29, y: 8}, {x: 30, y: 7}, {x: 30, y: 6}, {x: 30, y: 5}, {x: 30, y: 4}, {x: 30, y: 3}, {x: 29, y: 2}, {x: 29, y: 2}, {x: 28, y: 3}, {x: 27, y: 4}, {x: 26, y: 5}, {x: 26, y: 6}, {x: 26, y: 7}, {x: 27, y: 8}, {x: 27, y: 9}, {x: 25, y: 9}, {x: 25, y: 8}, {x: 24, y: 8}, {x: 23, y: 9}, {x: 23, y: 10}, {x: 23, y: 11}, {x: 24, y: 12}, {x: 23, y: 13}, {x: 23, y: 14}, {x: 21, y: 14}, {x: 21, y: 13}, {x: 22, y: 12}, {x: 21, y: 11}, {x: 20, y: 10}, {x: 21, y: 9}, {x: 22, y: 8}, {x: 23, y: 7}, {x: 23, y: 6}, {x: 22, y: 5}, {x: 21, y: 4}, {x: 21, y: 4}, {x: 19, y: 4}, {x: 20, y: 3}, {x: 20, y: 2}, {x: 19, y: 1}], inner: [[{x: 13, y: 4}, {x: 15, y: 4}, {x: 15, y: 5}, {x: 14, y: 6}, {x: 13, y: 7}, {x: 16, y: 7}, {x: 19, y: 7}, {x: 17, y: 8}, {x: 15, y: 9}, {x: 15, y: 10}, {x: 19, y: 11}, {x: 20, y: 12}, {x: 17, y: 12}, {x: 17, y: 12}, {x: 15, y: 12}, {x: 13, y: 11}, {x: 13, y: 10}, {x: 13, y: 9}, {x: 13, y: 9}, {x: 13, y: 10}, {x: 11, y: 10}, {x: 11, y: 9}, {x: 12, y: 8}, {x: 11, y: 7}, {x: 11, y: 6}, {x: 12, y: 5}], [{x: 4, y: 13}, {x: 6, y: 13}, {x: 6, y: 14}, {x: 6, y: 15}, {x: 4, y: 15}, {x: 4, y: 14}], [{x: 9, y: 17}, {x: 14, y: 17}], [{x: 8, y: 19}, {x: 11, y: 19}, {x: 12, y: 20}, {x: 9, y: 20}], [{x: 23, y: 23}, {x: 23, y: 22}, {x: 24, y: 21}, {x: 25, y: 20}, {x: 28, y: 19}, {x: 31, y: 19}, {x: 30, y: 20}, {x: 26, y: 21}, {x: 26, y: 22}, {x: 27, y: 23}, {x: 25, y: 23}, {x: 25, y: 23}], [{x: 24, y: 25}, {x: 26, y: 25}, {x: 26, y: 26}, {x: 27, y: 27}, {x: 25, y: 27}, {x: 24, y: 26}], [{x: 31, y: 27}, {x: 29, y: 27}], [{x: 30, y: 24}, {x: 27, y: 24}], [{x: 28, y: 17}, {x: 26, y: 18}, {x: 17, y: 18}, {x: 17, y: 17}], [{x: 26, y: 12}, {x: 24, y: 12}], [{x: 17, y: 14}, {x: 12, y: 15}, {x: 8, y: 15}, {x: 8, y: 14}, {x: 8, y: 13}, {x: 13, y: 13}, {x: 13, y: 13}, {x: 15, y: 13}], [{x: 18, y: 3}, {x: 15, y: 3}], [{x: 14, y: 17}, {x: 16, y: 17}]]}, {outer: [{x: 22, y: 1}, {x: 22, y: 2}, {x: 23, y: 3}, {x: 25, y: 3}, {x: 25, y: 2}, {x: 25, y: 1}], inner: []}, {outer: [{x: 32, y: 3}, {x: 32, y: 4}, {x: 32, y: 5}, {x: 34, y: 6}, {x: 34, y: 6}, {x: 34, y: 5}, {x: 34, y: 4}, {x: 34, y: 3}], inner: []}, {outer: [{x: 3, y: 6}, {x: 3, y: 7}, {x: 3, y: 8}, {x: 4, y: 9}, {x: 5, y: 9}, {x: 5, y: 8}, {x: 6, y: 7}, {x: 5, y: 6}], inner: []}, {outer: [{x: 0, y: 21}, {x: 0, y: 22}, {x: 0, y: 23}, {x: 0, y: 24}, {x: 0, y: 25}, {x: 0, y: 26}, {x: 0, y: 27}, {x: 0, y: 28}, {x: 0, y: 29}, {x: 1, y: 30}, {x: 1, y: 30}, {x: 2, y: 29}, {x: 2, y: 28}, {x: 2, y: 27}, {x: 2, y: 26}, {x: 0, y: 25}, {x: 2, y: 24}, {x: 2, y: 23}, {x: 2, y: 22}, {x: 0, y: 21}], inner: []}, {outer: [{x: 34, y: 25}, {x: 34, y: 26}, {x: 34, y: 26}, {x: 34, y: 25}], inner: []}, {outer: [{x: 10, y: 33}, {x: 10, y: 34}, {x: 10, y: 34}, {x: 10, y: 33}], inner: []}])

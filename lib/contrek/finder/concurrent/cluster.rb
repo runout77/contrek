@@ -51,8 +51,8 @@ module Contrek
                 new_outer = cursor.join_outers!
               end.real
               tot_inner += Benchmark.measure do
-                new_inner_seq = cursor.join_inners!(new_outer)
-                new_inners += new_inner_seq if new_inner_seq.any?
+                new_inner_sequences = cursor.join_inners!(new_outer)
+                new_inners += new_inner_sequences.map { |s| s.to_a } if new_inner_sequences.any?
                 new_inners += cursor.orphan_inners
               end.real
 

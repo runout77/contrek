@@ -6,14 +6,16 @@
  *      Copyright 2025 Emanuele Cesaroni
  */
 
-#ifndef POLYGON_FINDER_NODECLUSTER_H_
-#define POLYGON_FINDER_NODECLUSTER_H_
+#pragma once
 #include <list>
 #include <vector>
 #include <map>
 #include <string>
+#include <utility>
 #include "PolygonFinder.h"
 #include "Lists.h"
+#include "RectBounds.h"
+#include "Polygon.h"
 
 class Node;
 struct Point;
@@ -21,39 +23,36 @@ struct pf_Options;
 
 class NodeCluster {
  private:
-  void plot_node(Node *node, Node *start_node, int versus);
-  void plot_inner_node(Node *node, int versus, Node *stop_at, Node *start_node);
-  std::list<Node*> *plot_sequence;
+  void plot_node(std::vector<Point*>& sequence_coords, Node *node, Node *start_node, int versus, RectBounds& bounds);
+  void plot_inner_node(std::vector<Point*>& sequence_coords, Node *node, int versus, Node *stop_at, Node *start_node);
+  std::vector<Node*> plot_sequence;
   List *inner_plot;
-  std::list<Point*> *sequence_coords;
   List *inner_new;
   int versus_inverter[2];
   int count = 0;
   int nodes;
-  pf_Options *options;
+  std::vector<Point> points;
 
  public:
-  std::list<int*> treemap;
-  int *test_in_hole_a(Node *node);
-  int *test_in_hole_o(Node *node);
-  std::vector<Node*> *vert_nodes;
+  pf_Options *options;
+  std::vector<std::pair<int, int>> treemap;  // [a,b] a = index of parent outer, b = index of inner of parent outer
+  std::pair<int, int> test_in_hole_a(Node* node);
+  std::pair<int, int> test_in_hole_o(Node* node);
+  std::vector<std::vector<Node>> vert_nodes;
   void list_track(Node *node, std::list<Node*> *list);
   void list_delete(Node *node, std::list<Node*> *list);
   bool list_present(Node *node, std::list<Node*> *list);
-  void compress_coords(pf_Options options);
+  void compress_coords(std::list<Polygon>& polygons, pf_Options options);
   List *root_nodes;
-  int height;
-  std::list<std::map<std::string, std::list<std::list<Point*>*>>> polygons;
-  NodeCluster(int h, pf_Options *options);
+  int height, width;
+  std::list<Polygon> polygons;
+  NodeCluster(int h, int w, pf_Options *options);
   virtual ~NodeCluster();
-  void add_node(Node *node);
+  Node* add_node(int min_x, int max_x, int y, char name);
   void calc_root_nodes();
   void build_tangs_sequence();
   void plot(int versus);
   Lists lists;
   std::list<Node*>::iterator exam(std::list<Node*>::iterator inode, Node *node, Node *father, Node *root_node);
-  std::list<Point*>* get_coords();
-  std::list<std::list<Node*>*> *sequences;
+  std::vector<std::vector<Node*>> sequences;
 };
-
-#endif /* POLYGON_FINDER_NODECLUSTER_H_ */

@@ -5,6 +5,8 @@ require "contrek/bitmaps/chunky_bitmap"
 require "contrek/bitmaps/png_bitmap"
 require "contrek/bitmaps/custom_bitmap"
 require "contrek/bitmaps/rgb_color"
+require "contrek/finder/bounds"
+require "contrek/bitmaps/sample_generator"
 require "contrek/finder/list"
 require "contrek/finder/list_entry"
 require "contrek/finder/listable"
@@ -38,6 +40,7 @@ require "contrek/reducers/linear_reducer"
 require "contrek/reducers/uniq_reducer"
 require "contrek/reducers/visvalingam_reducer"
 require "cpp_polygon_finder"
+require "contrek/cpp/cpp_concurrent_finder"
 
 module Contrek
   class << self
@@ -54,7 +57,12 @@ module Contrek
       rgb_matcher_klass = (options[:class] == "value_not_matcher") ? CPPRGBNotMatcher : CPPRGBMatcher
       rgb_matcher = rgb_matcher_klass.new(color.to_rgb_raw)
       if options.key?(:number_of_threads) || options[:finder]&.key?(:number_of_tiles)
-        raise "Multithreading on native cpp code is not supported yet. Will be ASAP!"
+        Contrek::Cpp::CPPConcurrentFinder.new(
+          number_of_threads: options.dig(:number_of_threads) || 0,
+          bitmap: png_bitmap,
+          matcher: rgb_matcher,
+          options: {versus: :a}.merge(options[:finder] || {})
+        ).process_info
       else
         CPPPolygonFinder.new(png_bitmap,
           rgb_matcher,

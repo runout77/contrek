@@ -79,11 +79,11 @@ module Contrek
       def assign_raw_polygons!(raw_polylines)
         @shapes = []
         raw_polylines.each do |raw_polyline|
+          next if raw_polyline[:bounds][:max_x] - raw_polyline[:bounds][:min_x] == 0
           @shapes << Shape.new.tap do |shape|
-            shape.outer_polyline = Polyline.new(tile: self, polygon: raw_polyline[:outer], shape: shape)
+            shape.outer_polyline = Polyline.new(tile: self, polygon: raw_polyline[:outer], shape: shape, bounds: raw_polyline[:bounds])
             shape.inner_polylines = raw_polyline[:inner]
-          end.then { _1.outer_polyline.width.zero? ? nil : _1 }
-          @shapes.compact!
+          end
         end
       end
     end

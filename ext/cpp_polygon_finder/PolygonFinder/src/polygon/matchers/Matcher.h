@@ -6,18 +6,15 @@
  *      Copyright 2025 Emanuele Cesaroni
  */
 
-#ifndef POLYGON_MATCHERS_MATCHER_H_
-#define POLYGON_MATCHERS_MATCHER_H_
+#pragma once
 
 class Matcher {
  protected:
-  char value;
+  unsigned int value;
 
  public:
-  Matcher(char value);
-  virtual bool match(char value);
-  virtual bool unmatch(char value);
+  explicit Matcher(unsigned int value);
+  virtual bool match(unsigned int value);
+  virtual bool unmatch(unsigned int value);
   virtual ~Matcher();
 };
-
-#endif /* POLYGON_MATCHERS_MATCHER_H_ */

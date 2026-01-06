@@ -136,6 +136,25 @@ RSpec.describe Contrek::Concurrent::Listable, type: :class do
       expect(list.intersect_with?(list2)).to be true
     end
 
+    it "iterate on a list" do
+      a = TestNode.new("a")
+      b = TestNode.new("b")
+      c = TestNode.new("c")
+      list = TestList.new
+      list.add(a)
+      list.add(b)
+      list.add(c)
+      expect(list.iterator).to eq a
+      list.forward!
+      expect(list.iterator).to eq b
+      list.forward!
+      expect(list.iterator).to eq c
+      list.forward!
+      expect(list.iterator).to be nil
+      list.rewind!
+      expect(list.iterator).to eq a
+    end
+
     it "iterate and remove 2" do
       a = TestNode.new("a")
       b = TestNode.new("b")

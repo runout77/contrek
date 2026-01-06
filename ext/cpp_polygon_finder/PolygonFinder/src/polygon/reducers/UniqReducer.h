@@ -6,16 +6,12 @@
  *      Copyright 2025 Emanuele Cesaroni
  */
 
-#ifndef POLYGON_REDUCERS_UNIQREDUCER_H_
-#define POLYGON_REDUCERS_UNIQREDUCER_H_
-
+#pragma once
+#include <vector>
 #include "Reducer.h"
 
 class UniqReducer : public Reducer {
  public:
-  UniqReducer(std::list<Point*> *list_of_points);
-  virtual ~UniqReducer();
+  explicit UniqReducer(std::vector<Point*>& list_of_points);
   void reduce();
 };
-
-#endif /* POLYGON_REDUCERS_UNIQREDUCER_H_ */

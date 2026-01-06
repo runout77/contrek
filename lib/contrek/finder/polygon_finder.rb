@@ -1,8 +1,5 @@
 require "benchmark"
-# todo
-# - builtin png decoder which makes blocks to pass vert_nodes
-# - work only in clockwise (no more :o e :a); finally for coords use push_back on :a and
-#   push_front on :o
+
 module Contrek
   module Finder
     class PolygonFinder

@@ -9,12 +9,12 @@
 #include "ValueNotMatcher.h"
 #include <iostream>
 
-ValueNotMatcher::ValueNotMatcher(char value) : Matcher(value) {
+ValueNotMatcher::ValueNotMatcher(unsigned int value) : Matcher(value) {
 }
 
 ValueNotMatcher::~ValueNotMatcher() {
 }
 
-bool ValueNotMatcher::match(char value) {
+bool ValueNotMatcher::match(unsigned int value) {
   return(this->value != value);
 }

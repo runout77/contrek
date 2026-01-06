@@ -6,14 +6,15 @@
  *      Copyright 2025 Emanuele Cesaroni
  */
 
-#ifndef TESTS_H_
-#define TESTS_H_
+#pragma once
 
 class Tests {
  public:
   Tests();
   virtual ~Tests();
   virtual void test_a();
+  virtual void test_b();
+  virtual void test_c();
+  virtual void test_d();
+  virtual void test_e();
 };
-
-#endif /* TESTS_H_ */

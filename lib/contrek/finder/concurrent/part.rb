@@ -25,13 +25,13 @@ module Contrek
         @type == type
       end
 
-      def add_position(position, n)
+      def add_position(position)
         add(Position.new(position: position, hub: polyline.tile.cluster.hub))
       end
 
       def next_position(force_position = nil)
         if force_position
-          move_to_this = reverse_each { |pos| break pos if pos.payload == force_position }
+          move_to_this = reverse_each { |pos| break pos if pos.payload == force_position.payload }
           next_of!(move_to_this)
           force_position
         else

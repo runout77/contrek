@@ -1,8 +1,8 @@
 # Contrek
-Contrek is a Ruby library (C++ powered) to trace png bitmap areas polygonal contours. Manages png images usign png++ and picoPNG (version 20101224) libraries and may work multithreading.
+Contrek is a Ruby library (C++ powered) to trace png bitmap areas polygonal contours. Manages png images usign libspng (version 0.7.4) library. May work multithreading.
 
 ## About Contrek library
-Contrek (**con**tour **trek**king) simply scans your png bitmap and returns shape contour as close polygonal lines, both for the external and internal sides. It can compute the nesting level of the polygons found with a tree structure. It supports various levels and modes of compression and approximation of the found coordinates. It is capable of multithreaded processing (currently only on the Ruby side), splitting the image into vertical strips and recombining the coordinates in pairs.
+Contrek (**con**tour **trek**king) simply scans your png bitmap and returns shape contour as close polygonal lines, both for the external and internal sides. It can compute the nesting level of the polygons found with a tree structure. It supports various levels and modes of compression and approximation of the found coordinates. It is capable of multithreaded processing, splitting the image into vertical strips and recombining the coordinates in pairs.
 
 In the following image all the non-white pixels have been examined and the result is the red polygon for the outer contour and the green one for the inner one
 ![alt text](contrek.png "Contour tracing")
@@ -19,21 +19,7 @@ And then execute:
 
     bundle install
 
-This will install the gem and compile the native extensions. If you get
-`fatal error: png++/png.hpp: No such file or directory`
-
-means that you have to install png++ on your system which Contrek C++ code depends on; visit http://download.savannah.nongnu.org/releases/pngpp/
-Grab the lattest file (here 0.2.9) 
-Go to download directory. Extract to /usr/src with 
-
-    sudo tar -zxf png++-0.2.9.tar.gz -C /usr/src
-Change directory to
-
-    cd /usr/src/png++-0.2.9/
-Do make and make install
-
-    make
-    make install
+This will install the gem and compile the native extensions.
 
 ## Usage
 In this example we are asking to examine any pixel that does not have the red color.
@@ -88,8 +74,6 @@ png_bitmap = CPPRemotePngBitMap.new("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcS
 
 Multithreaded contour processing is supported. However, on Ruby MRI (the standard Ruby implementation, at least up to 3.x), the Global Interpreter Lock (GIL) prevents more than one thread from executing Ruby code simultaneously. As a consequence, execution remains effectively serialized even on multicore systems, unless the gem is used under JRuby or TruffleRuby (not tested).
 
-The actual multithreaded implementation effort is therefore focused on the native C++ component, which is currently under development and is expected to provide substantially higher performance.
-
 ```ruby
 result = Contrek.contour!(
   png_file_path: "./spec/files/images/rectangle_8x8.png",
@@ -114,7 +98,26 @@ Regarding multithreading:
 
 - The treemap option is currently ignored (multithreaded treemap support will be introduced in upcoming revisions).
 
+By not declaring native option CPP Multithreading optimized code is used. In the above example a [105 MP image](spec/files/images/sample_10240x10240.png) is examined by 2 thread working on 2 tiles (total compute time about 2 secs).
 
+```ruby
+result = Contrek.contour!(
+  png_file_path: "./spec/files/images/sample_10240x10240.png",
+  options: {
+    number_of_threads: 2,
+    class: "value_not_matcher",
+    color: {r: 255, g: 255, b: 255, a: 255},
+    finder: {number_of_tiles: 2, compress: {uniq: true}}
+  }
+)
+puts result[:benchmarks].inspect
+
+{"compress"=>14.596786999999999,
+  "init"=>2078.745861,
+  "inner"=>1183.143734,
+  "outer"=>118.94489599999999,
+  "total"=>2093.342648}
+```
 ## Multithreaded approach
 
 The multithreaded contour-tracing implementation operates as follows:
@@ -151,22 +154,23 @@ This process is applied recursively, merging bands until a single final band rem
 One of the most complex test you can find under the spec folder is named "scans poly 1200x800", scans this [image](spec/files/images/sample_1200x800.png) computing coordinates to draw polygons drawn in this [result](spec/files/stored_samples/sample_1200x800.png).
 On pure ruby implementation kept time
 ```ruby
-{ :scan=>1063.146,
-  :build_tangs_sequence=>287.114,
-  :plot=>79.329,
-  :compress=>0.001,
-  :total=>1429.59}
+{ :scan=>801.494,
+  :build_tangs_sequence=>160.491,
+  :plot=>86.633,
+  :compress=>0.002,
+  :total=>1048.62}
 ```
 This the one for the native C++
 ```ruby
-{ :scan=>43.521,
-  :build_tangs_sequence=>44.105,
-  :plot=>35.718,
-  :compress=>0.001,
-  :total=>123.34500000000001}
+{ scan: 7.1146329999999995,
+  build_tangs_sequence: 3.063812,
+  plot: 4.474851999999999,
+  compress: 0.0031999999999999997
+  total: 14.656496999999998
+}
 ```
 
-About 10 x faster. Times are in microseconds; system: AMD Ryzen 7 3700X 8-Core Processor (BogoMIPS: 7199,99). 
+About 75x faster. Times are in microseconds; system: AMD Ryzen 7 3700X 8-Core Processor (BogoMIPS: 7199,99) on Ubuntu distro. 
 
 ## License
 

@@ -6,17 +6,24 @@
  *      Copyright 2025 Emanuele Cesaroni
  */
 
-#ifndef POLYGON_FINDER_NODE_H_
-#define POLYGON_FINDER_NODE_H_
+#pragma once
 #include <string>
 #include <vector>
 #include <list>
 #include <map>
 #include "List.h"
 
+class NodeCluster;
 struct Point {
   int x;
   int y;
+  std::string toString() const {
+    return "[x:" + std::to_string(x) + ",y:" + std::to_string(y) + "]";
+  }
+  bool operator==(const Point& other) const {
+    return x == other.x && y == other.y;
+  }
+  Point(int x_, int y_) : x(x_), y(y_) {}
 };
 struct Tangent {
   Point   *point;
@@ -42,7 +49,7 @@ class Node : public  Listable {
   static const int OUTER = 0;
   static const int INNER = 1;
 
-  std::list<Node*> tangs[2];
+  std::vector<Node*> tangs[2];
   int y;
   int abs_x_index;
   int up_indexer, down_indexer;
@@ -52,7 +59,7 @@ class Node : public  Listable {
   int outer_index, inner_index;
   bool tangs_with(Node *node);
   void add_intersection(Node *other_node);
-  std::vector<NodeDescriptor*> *tangs_sequence;
+  std::vector<NodeDescriptor> tangs_sequence;
   Point* coords_entering_to(Node *enter_to, int mode, int tracking);
   Node* my_next_outer(Node *last, int versus);
   Node* my_next_inner(Node *last, int versus);
@@ -67,14 +74,12 @@ class Node : public  Listable {
  public:
   int min_x, max_x;
   Node(int min_x, int max_x, int y, char name);
-  virtual ~Node();
-  void precalc_tangs_sequences();
+  void precalc_tangs_sequences(std::vector<Point>& points);
+  bool processed = false;
 };
 
 struct NodeDescriptor {
   Node  *node;
-  Tangent *a;
-  Tangent *o;
+  Tangent a;
+  Tangent o;
 };
-
-#endif /* POLYGON_FINDER_NODE_H_ */

@@ -6,13 +6,13 @@
  *      Copyright 2025 Emanuele Cesaroni
  */
 
-#include "Node.h"
-#include <string>
 #include <string.h>
+#include <string>
 #include <iostream>
 #include <algorithm>
 #include <vector>
 #include <list>
+#include "Node.h"
 
 Node::Node(int min_x, int max_x, int y, char name) {
   this->name = name;
@@ -28,9 +28,6 @@ Node::Node(int min_x, int max_x, int y, char name) {
   this->inner_index = -1;
 }
 
-Node::~Node() {
-}
-
 bool Node::get_trackmax() {
   return((this->track & OMAX) != 0);
 }
@@ -44,39 +41,48 @@ bool Node::track_uncomplete() {
 bool Node::tangs_with(Node *node) {
   return(this->min_x <= node->max_x && node->min_x <= this->max_x);
 }
+
 void Node::add_intersection(Node *other_node) {
-  if (other_node->y < this->y)
-  { tangs[T_UP].push_back(other_node);
-  } else {
-    tangs[T_DOWN].push_back(other_node);
-  }
+  if (other_node->y < this->y) tangs[T_UP].push_back(other_node);
+  else                         tangs[T_DOWN].push_back(other_node);
 }
 
-void Node::precalc_tangs_sequences() {
-  this->tangs_sequence = new std::vector<NodeDescriptor*>(tangs[T_UP].size() + tangs[T_DOWN].size());
+void Node::precalc_tangs_sequences(std::vector<Point>& points) {
+  this->tangs_sequence.clear();
+  this->tangs_sequence.reserve(tangs[T_UP].size() + tangs[T_DOWN].size());
+  std::vector<Node*> up_copy = tangs[T_UP];
+  std::vector<Node*> down_copy = tangs[T_DOWN];
 
-  std::list<Node*> tangs_seq;
-  int n = 0;
-  // clockwise
-  tangs_seq = tangs[T_UP];
-  tangs_seq.sort(sort_min_x);
-  if (tangs_seq.size() > 0) this->up_indexer = -tangs_seq.front()->abs_x_index;
-  for (std::list<Node*>::iterator t_node = tangs_seq.begin(); t_node != tangs_seq.end(); ++t_node)
-  { (*this->tangs_sequence)[n++] = new NodeDescriptor({ *t_node,
-        new Tangent({new Point({(*t_node)->max_x, (*t_node)->y}), OMAX}),
-        new Tangent({new Point({(*t_node)->min_x, (*t_node)->y}), OMIN})});
+  // --- CLOCKWISE (UP) ---
+  std::sort(up_copy.begin(), up_copy.end(), sort_min_x);
+  if (!up_copy.empty()) {
+    this->up_indexer = -up_copy.front()->abs_x_index;
   }
-  tangs_seq = tangs[T_DOWN];
-  tangs_seq.sort(sort_max_x);
-  tangs_seq.reverse();
-  if (tangs_seq.size() > 0) this->down_indexer = (tangs_seq.back()->abs_x_index + tangs[T_UP].size() + tangs[T_DOWN].size() - 1);
-  for (std::list<Node*>::iterator t_node = tangs_seq.begin(); t_node != tangs_seq.end(); ++t_node)
-  { (*this->tangs_sequence)[n++] = new NodeDescriptor({ *t_node,
-        new Tangent({new Point({(*t_node)->min_x, (*t_node)->y}), OMIN}),
-        new Tangent({new Point({(*t_node)->max_x, (*t_node)->y}), OMAX})});
+  for (Node* t_node : up_copy) {
+    tangs_sequence.push_back(NodeDescriptor{
+      t_node,
+      Tangent{ &points.emplace_back(t_node->max_x, t_node->y), OMAX},
+      Tangent{ &points.emplace_back(t_node->min_x, t_node->y), OMIN}
+    });
   }
-  this->tangs_count = this->tangs_sequence->size();
+
+  // --- COUNTER-CLOCKWISE (DOWN) ---
+  std::sort(down_copy.begin(), down_copy.end(), sort_max_x);
+  std::reverse(down_copy.begin(), down_copy.end());
+  if (!down_copy.empty()) {
+    this->down_indexer = (down_copy.back()->abs_x_index +
+                         tangs[T_UP].size() + tangs[T_DOWN].size() - 1);
+  }
+  for (Node* t_node : down_copy) {
+    tangs_sequence.push_back(NodeDescriptor{
+      t_node,
+      Tangent{&points.emplace_back(t_node->min_x, t_node->y), OMIN},
+      Tangent{&points.emplace_back(t_node->max_x, t_node->y), OMAX}
+    });
+  }
+  this->tangs_count = this->tangs_sequence.size();
 }
+
 bool Node::sort_min_x(Node *a, Node *b) {
   return(a->min_x <= b->min_x);
 }
@@ -87,25 +93,25 @@ Node* Node::my_next_inner(Node *last, int versus) {
   unsigned int last_node_index;
   if (last->y < this->y)       last_node_index = last->abs_x_index + this->up_indexer;
   else            last_node_index = this->down_indexer - last->abs_x_index;
-  if (versus == Node::O) last_node_index == 0 ? last_node_index = this->tangs_sequence->size() - 1 : last_node_index--;
-  else          last_node_index == this->tangs_sequence->size() - 1 ? last_node_index = 0 : last_node_index++;
-  return((*this->tangs_sequence)[last_node_index]->node);
+  if (versus == Node::O) last_node_index == 0 ? last_node_index = this->tangs_sequence.size() - 1 : last_node_index--;
+  else          last_node_index == this->tangs_sequence.size() - 1 ? last_node_index = 0 : last_node_index++;
+  return((this->tangs_sequence)[last_node_index].node);
 }
 Node* Node::my_next_outer(Node *last, int versus) {
   unsigned int last_node_index;
   if (last->y < this->y) last_node_index = last->abs_x_index + this->up_indexer;
   else                   last_node_index = this->down_indexer - last->abs_x_index;
-  if (versus == Node::O) last_node_index == this->tangs_sequence->size() - 1 ? last_node_index = 0 : last_node_index++;
-  else                   last_node_index == 0 ? last_node_index = this->tangs_sequence->size() - 1 : last_node_index--;
-  return((*this->tangs_sequence)[last_node_index]->node);
+  if (versus == Node::O) last_node_index == this->tangs_sequence.size() - 1 ? last_node_index = 0 : last_node_index++;
+  else                   last_node_index == 0 ? last_node_index = this->tangs_sequence.size() - 1 : last_node_index--;
+  return((this->tangs_sequence)[last_node_index].node);
 }
 
 Point* Node::coords_entering_to(Node *enter_to, int mode, int tracking) {
   int enter_to_index;
   if (enter_to->y < this->y) enter_to_index = enter_to->abs_x_index + this->up_indexer;
   else                       enter_to_index = this->down_indexer - enter_to->abs_x_index;
-  NodeDescriptor *ds = (*this->tangs_sequence)[enter_to_index];
-  Tangent *t = (mode == Node::O ? ds->o : ds->a);
-  enter_to->track |= TURNER[tracking][t->mode - 1];
-  return(t->point);
+  NodeDescriptor ds = (this->tangs_sequence)[enter_to_index];
+  Tangent t = (mode == Node::O ? ds.o : ds.a);
+  enter_to->track |= TURNER[tracking][t.mode - 1];
+  return(t.point);
 }

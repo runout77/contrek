@@ -3,8 +3,11 @@ require "rake"
 desc "compiles c++ extension"
 task :compile do |t|
   Dir.chdir("ext/cpp_polygon_finder") do
+    Dir.glob("**/*.o").each { |f| File.delete(f) }
+    File.delete("Makefile") if File.exist?("Makefile")
     system "ruby", "extconf.rb"
     system "make", "-B"
+    Dir.glob("**/*.o").each { |f| File.delete(f) }
     system "cp cpp_polygon_finder.so ./../../lib"
   end
 end

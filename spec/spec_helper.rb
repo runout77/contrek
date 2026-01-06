@@ -4,6 +4,9 @@ require "tempfile"
 require "ruby-prof"
 
 RSpec.configure do |config|
+  # config.before(:example) do |example|
+  #  puts "Running: #{example.full_description}"
+  # end
   Dir["./spec/support/**/*.rb"].sort.each { |f| require f }
   # Enable flags like --only-failures and --next-failure
   config.example_status_persistence_file_path = ".rspec_status"

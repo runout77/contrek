@@ -8,7 +8,7 @@ RSpec.shared_examples "simples" do
                  "0000000000000000" \
                  "0000000000000000" \
                  "0000000000000000"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("A")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([])
@@ -21,7 +21,7 @@ RSpec.shared_examples "simples" do
               "0000000000000000" \
               "0000000000000000" \
               "B00000000000000C"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("A-B-C")
       expect(result[:groups]).to eq(3)
       expect(result[:polygons]).to eq([])
@@ -34,7 +34,7 @@ RSpec.shared_examples "simples" do
                  "0000000000000000" \
                  "0000000000000000" \
                  "0000000000000000"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("")
       expect(result[:groups]).to eq(0)
       expect(result[:polygons]).to eq([])
@@ -47,7 +47,7 @@ RSpec.shared_examples "simples" do
                  "EEEEEEEEEEEEEEEE" \
                  "FFFFFFFFFFFFFFFF" \
                  "GGGGGGGGGGGGGGGG"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("ABCDEFGFEDCBA")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([
@@ -63,7 +63,7 @@ RSpec.shared_examples "simples" do
                  "EEEEEEEEEEEEEEEE" \
                  "FFFFFFFFFFFFFFFF" \
                  "GGGGGGGGGGGGGGGG"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {compress: {linear: true}}).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true, compress: {linear: true}}).process_info
       expect(result[:named_sequence]).to eq("ABCDEFGFEDCBA")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([
@@ -80,7 +80,7 @@ RSpec.shared_examples "simples" do
                 "0EE000II00RR00P0" \
                 "00FF00HHH0000QQ0" \
                 "000GGGGGGGGGGG00"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("ABCDEFGQPONMA-SRS")
       expect(result[:groups]).to eq(2)
       expect(result[:polygons]).to eq(
@@ -110,7 +110,7 @@ RSpec.shared_examples "simples" do
                 "0HH000IIIIIIIII0" \
                 "00LL00LLLLLLLLL0" \
                 "000MMMMMMMMMMMM0"
-      pf = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher)
+      pf = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true})
       result = pf.process_info
       expect(result[:named_sequence]).to eq("ABCDEFNPQGHLMLIGQPNFEDLMA-RSR")
       expect(result[:groups]).to eq(2)
@@ -125,7 +125,7 @@ RSpec.shared_examples "simples" do
                  "EEEEEEEEEEEEEEEE" \
                  "FFFFFFFFFFFFFFFF" \
                  "GGGGGGGGGGGGGGGG"
-      pf = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {compress: {linear: true}})
+      pf = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true, compress: {linear: true}})
       result = pf.process_info
       expect(result[:named_sequence]).to eq("ABCDEFGFEDCBA")
       expect(result[:groups]).to eq(1)
@@ -143,7 +143,7 @@ RSpec.shared_examples "simples" do
                  "EEE0000000000000" \
                  "FF00000000000000" \
                  "G000000000000000"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("ABCDEFGFEDCBA")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([
@@ -160,7 +160,7 @@ RSpec.shared_examples "simples" do
                  "EEE0000000000000" \
                  "FF00000000000000" \
                  "G000000000000000"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {compress: {uniq: true, linear: true}}).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true, compress: {uniq: true, linear: true}}).process_info
       expect(result[:named_sequence]).to eq("ABCDEFGFEDCBA")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([
@@ -177,7 +177,7 @@ RSpec.shared_examples "simples" do
                  "000000DD00000000" \
                  "0000000000000000" \
                  "0000000000000000"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("ABCDCBA")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([
@@ -193,7 +193,7 @@ RSpec.shared_examples "simples" do
                  "000000DD00000000" \
                  "0000000000000000" \
                  "0000000000000000"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {versus: :o}).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {versus: :o, named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("ABCDCBA")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([
@@ -209,7 +209,7 @@ RSpec.shared_examples "simples" do
                  "00EEEEEEEEEEEE00" \
                  "0000000000000000" \
                  "0000000000000000"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("AHGFEDCBA-I")
       expect(result[:groups]).to eq(2)
       expect(result[:polygons]).to eq([
@@ -225,7 +225,7 @@ RSpec.shared_examples "simples" do
                  "00EEEEEEEEEEEE00" \
                  "0000000000000000" \
                  "0000000000000000"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {versus: :a}).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {versus: :a, named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("AHGFEDCBA-I")
       expect(result[:groups]).to eq(2)
       expect(result[:polygons]).to eq([
@@ -241,7 +241,7 @@ RSpec.shared_examples "simples" do
                  "00EEEEEEEEEEEE00" \
                  "0000000000000000" \
                  "0000000000000000"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("AHGFEDCBA")
       expect(result[:groups]).to eq(1)
       expect(result[:polygons]).to eq([
@@ -257,7 +257,7 @@ RSpec.shared_examples "simples" do
                  "0000000000000000" \
                  "0000000EEE000000" \
                  "0000000000000000"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result[:named_sequence]).to eq("ABA-CDC-E")
       expect(result[:groups]).to eq(3)
       expect(result[:polygons]).to eq([

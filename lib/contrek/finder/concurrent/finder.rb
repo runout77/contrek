@@ -24,7 +24,7 @@ module Contrek
         @initialize_time = Benchmark.measure do
           @block = block
           @tiles = Queue.new
-          @bitmap = bitmap
+          @whole_tile = nil
           @options = options
           @clusters = []
           @maximum_width = bitmap.w
@@ -45,7 +45,7 @@ module Contrek
               finder = ClippedPolygonFinder.new(
                 bitmap: bitmap,
                 matcher: matcher,
-                options: {versus: current_versus},
+                options: {versus: current_versus, bounds: true},
                 start_x: payload[:tile_start_x],
                 end_x: payload[:tile_end_x]
               )
@@ -61,12 +61,12 @@ module Contrek
 
             x = tile_end_x - 1
           end
-          @tile = process_tiles!(bitmap)
+          process_tiles!(bitmap)
         end.real
       end
 
       def process_info(bitmap = nil)
-        raw_polygons = @tile.to_raw_polygons
+        raw_polygons = @whole_tile.to_raw_polygons
 
         compress_time = Benchmark.measure do
           if @options.has_key?(:compress)
@@ -78,8 +78,8 @@ module Contrek
          benchmarks: {
            total: ((@initialize_time + compress_time) * 1000).round(3),
            init: (@initialize_time * 1000).round(3),
-           outer: (@tile.benchmarks[:outer] * 1000).round(3),
-           inner: (@tile.benchmarks[:inner] * 1000).round(3),
+           outer: (@whole_tile.benchmarks[:outer] * 1000).round(3),
+           inner: (@whole_tile.benchmarks[:inner] * 1000).round(3),
            compress: ((compress_time * 1000).round(3) if @options.has_key?(:compress))
          }.compact}
       end
@@ -90,8 +90,10 @@ module Contrek
         arriving_tiles = []
         loop do
           tile = @tiles.pop
-          return tile if tile.whole?
-
+          if tile.whole?
+            @whole_tile = tile
+            return
+          end
           if (twin_tile = arriving_tiles.find { |b| (b.start_x == (tile.end_x - 1)) || ((b.end_x - 1) == tile.start_x) })
             cluster = Cluster.new(finder: self, height: bitmap.h, width: bitmap.w)
             if twin_tile.start_x == (tile.end_x - 1)
@@ -112,7 +114,6 @@ module Contrek
           end
           arriving_tiles << tile
         end
-        nil
       end
     end
   end

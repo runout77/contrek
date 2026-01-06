@@ -57,6 +57,7 @@ module Contrek
         @polylines_sequence.each do |polyline|
           missing_shapes.each do |missing_shape|
             outer_polyline = missing_shape.outer_polyline
+            next unless polyline.vert_intersect?(outer_polyline)
             if (intersection = polyline.intersection(outer_polyline)).any?
               inject_sequences_left, inject_sequences_right = polyline.sew!(intersection, outer_polyline)
               combine!(inject_sequences_right, inject_sequences_left).each do |sewn_sequence|
@@ -85,7 +86,6 @@ module Contrek
       def traverse_outer(act_part, all_parts, polylines, shapes, outer_joined_polyline)
         all_parts << act_part if all_parts.last != act_part
         shapes << act_part.polyline.shape if !shapes.include?(act_part.polyline.shape)
-
         if act_part.is?(Part::EXCLUSIVE)
           return if act_part.size == 0
           while (position = act_part.next_position)
@@ -109,7 +109,7 @@ module Contrek
                     break if map.size == 1 && map.first == Part::SEAM
                   end
                   polylines << part.polyline.shape.outer_polyline
-                  part.next_position(new_position.payload)
+                  part.next_position(new_position)
                   traverse_outer(part, all_parts, polylines, shapes, outer_joined_polyline)
                   return
                 end
@@ -135,16 +135,14 @@ module Contrek
               range_of_bounds = (bounds[:min]..bounds[:max])
 
               retme_sequence = Sequence.new
-              all_parts.map do |part|
+              all_parts.each do |part|
                 part.touch!
-
                 retme_sequence.move_from(part) do |pos|
                   next false if part.is?(Part::ADDED) && !(range_of_bounds === pos.payload[:y])
                   !(polyline.tile.tg_border?(pos.payload) && pos.end_point.queues.include?(outer_seq))
                 end
-              end.flatten
-              raw_sequence = retme_sequence.to_a
-              return_sequences << raw_sequence if raw_sequence.map { _1[:x] }.uniq.take(2).size > 1
+              end
+              return_sequences << retme_sequence if retme_sequence.is_not_vertical
             end
           end
         end
@@ -172,7 +170,9 @@ module Contrek
                     link_seq = duplicates_intersection(dest_part, act_part)
                     if link_seq.any?
                       ins_part = Part.new(Part::ADDED, act_part.polyline)
-                      link_seq.each { |pos| ins_part.add(Position.new(position: pos, hub: @cluster.hub)) }
+                      link_seq.each do |pos|
+                        ins_part.add(Position.new(position: pos, hub: @cluster.hub))
+                      end
                       all_parts << ins_part
                     end
                     traverse_inner(dest_part.circular_next, all_parts, bounds)

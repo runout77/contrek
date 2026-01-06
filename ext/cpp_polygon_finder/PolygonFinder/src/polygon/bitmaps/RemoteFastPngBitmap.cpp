@@ -16,15 +16,32 @@
 #include <string>
 #include "../matchers/RGBMatcher.h"
 #include "../matchers/RGBNotMatcher.h"
+#include "spng.h"
 
 RemoteFastPngBitmap::RemoteFastPngBitmap(std::string *dataurl) : FastPngBitmap("") {
-  buffer = base64_decode(*dataurl);
-  int error = decodePNG(image, width, height, buffer.empty() ? 0 : &buffer[0], (unsigned long) buffer.size(), true);
-    if (error != 0) std::cout << "error: " << error << std::endl;
-    this->last_red = &image[0];
+    buffer = base64_decode(*dataurl);
+    if (buffer.empty()) {
+      this->png_error = 1;
+      return;
+    }
+    spng_ctx *ctx = spng_ctx_new(0);
+    spng_set_png_buffer(ctx, buffer.data(), buffer.size());
+    struct spng_ihdr ihdr;
+    int error = spng_get_ihdr(ctx, &ihdr);
+    if (!error) {
+      this->width = ihdr.width;
+      this->height = ihdr.height;
+      size_t out_size;  // RGBA8 dimension
+      spng_decoded_image_size(ctx, SPNG_FMT_RGBA8, &out_size);
+      this->image.resize(out_size);
+      error = spng_decode_image(ctx, image.data(), out_size, SPNG_FMT_RGBA8, SPNG_DECODE_TRNS);
+    }
+    if (error != 0) {
+      std::cout << "spng error: " << spng_strerror(error) << std::endl;
+    }
     this->png_error = error;
+    spng_ctx_free(ctx);
 }
 
 RemoteFastPngBitmap::~RemoteFastPngBitmap() {
 }
-

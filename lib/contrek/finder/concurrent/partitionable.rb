@@ -49,7 +49,7 @@ module Contrek
           if n > 0 && @raw[n - 1] == position
             current_part.inverts = true
           end
-          current_part.add_position(position, n)
+          current_part.add_position(position)
         end
         add_part(current_part)
 

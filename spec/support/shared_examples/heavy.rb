@@ -30,6 +30,16 @@ RSpec.shared_examples "heavy" do
       saved_poly = YAML.load_file("./spec/files/coordinates/#{filename}.yml")
       expect(result[:polygons]).to eq(saved_poly)
     end
+    it "scans poly 3000x3000", sample_3000x3000: true do
+      skip
+      filename = "sample_3000x3000.png"
+      png_bitmap = @png_bitmap_class.new("./spec/files/images/#{filename}")
+      rgb_matcher = @png_not_matcher.new(png_bitmap.rgb_value_at(0, 0))
+      polygonfinder = @polygon_finder_class.new(png_bitmap, rgb_matcher, nil, {versus: :a})
+      result = polygonfinder.process_info
+      puts result[:benchmarks].inspect
+      expect(result[:polygons]).to eq(JSON.parse(File.read("./spec/files/coordinates/#{filename}.json"), symbolize_names: true))
+    end
   end
 
   def store_sample(polygonfinder, filename, result)

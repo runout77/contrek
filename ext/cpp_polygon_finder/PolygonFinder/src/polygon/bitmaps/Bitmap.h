@@ -6,8 +6,7 @@
  *      Copyright 2025 Emanuele Cesaroni
  */
 
-#ifndef POLYGON_BITMAPS_BITMAP_H_
-#define POLYGON_BITMAPS_BITMAP_H_
+#pragma once
 #include <string>
 
 class Matcher;
@@ -27,6 +26,6 @@ class Bitmap {
   void print();
   void clear(char value);
   virtual bool pixel_match(int x, int y, Matcher *matcher);
+  virtual const unsigned char* get_row_ptr(int y) const;
+  virtual int get_bytes_per_pixel() const;
 };
-
-#endif /* POLYGON_BITMAPS_BITMAP_H_ */

@@ -6,20 +6,16 @@
  *      Copyright 2025 Emanuele Cesaroni
  */
 
-#ifndef POLYGON_REDUCERS_REDUCER_H_
-#define POLYGON_REDUCERS_REDUCER_H_
-
+#pragma once
 #include <list>
+#include <vector>
 #include "../finder/Node.h"
 
 struct Point;
 class Reducer {
  public:
-  Reducer(std::list<Point*> *list_of_points);
-  virtual ~Reducer();
+  explicit Reducer(std::vector<Point*>& list_of_points);
   virtual void reduce();
  protected:
-  std::list<Point*> *points;
+  std::vector<Point*> &points;
 };
-
-#endif /* POLYGON_REDUCERS_REDUCER_H_ */

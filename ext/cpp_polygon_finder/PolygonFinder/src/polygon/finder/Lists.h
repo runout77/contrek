@@ -6,9 +6,9 @@
  *      Copyright 2025 Emanuele Cesaroni
  */
 
-#ifndef POLYGON_FINDER_LISTS_H_
-#define POLYGON_FINDER_LISTS_H_
+#pragma once
 #include <list>
+#include <vector>
 #include "List.h"
 class List;
 class Listable;
@@ -19,12 +19,10 @@ struct Link {
 
 class Lists {
  public:
-  Lists();
+  Lists() {}
   virtual ~Lists();
   List *add_list();
-  Link *get_data_pointer();
+  std::vector<Link> get_data_pointer();
  private:
-  std::list<List*> *lists;
+  std::list<List*> lists;
 };
-
-#endif /* POLYGON_FINDER_LISTS_H_ */

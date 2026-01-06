@@ -55,9 +55,11 @@ module Contrek
         index_order = 0
         while @root_nodes.size > 0
           root_node = @root_nodes.shift
+
           root_node.outer_index = index_order
           @plot_sequence = []
           @sequence_coords = []
+          bounds = Bounds.empty
           # external polygon
           @plot_sequence << root_node
           next_node_nd = if versus == :a
@@ -68,13 +70,16 @@ module Contrek
           #---------------
           if !next_node_nd.nil?
             next_node = next_node_nd.node
-            @sequence_coords << next_node.coords_entering_to(root_node, VERSUS_INVERTER[versus], Contrek::Finder::Node::OUTER)
+            coord = next_node.coords_entering_to(root_node, VERSUS_INVERTER[versus], Contrek::Finder::Node::OUTER)
+            @sequence_coords << coord
+            bounds.expand(x: coord[:x], y: coord[:y])
           end
           #---------------
-          plot_node(next_node, root_node, versus) if @nodes > 0 && !next_node_nd.nil?
+
+          plot_node(next_node, root_node, bounds, versus) if @nodes > 0 && !next_node_nd.nil?
 
           draw_sequence(bitmap, "X") unless bitmap.nil?
-          @polygons << {outer: @sequence_coords, inner: []} if @sequence_coords.size >= 2
+          @polygons << {outer: @sequence_coords, inner: [], bounds: (bounds.to_h if @options[:bounds])}.compact if @sequence_coords.size >= 2
           @sequences << @plot_sequence
 
           @count = 0
@@ -215,7 +220,7 @@ module Contrek
       end
 
       # contour tracing core logic loop
-      def plot_node(node, start_node, versus = :a)
+      def plot_node(node, start_node, bounds, versus = :a)
         @root_nodes.delete(node)
 
         node.outer_index = start_node.outer_index
@@ -232,12 +237,15 @@ module Contrek
 
         # coord
         if plot
-          @sequence_coords << last_node.coords_entering_to(node, versus, Contrek::Finder::Node::OUTER)
-
+          c = last_node.coords_entering_to(node, versus, Contrek::Finder::Node::OUTER)
+          @sequence_coords << c
+          bounds.expand(x: c[:x], y: c[:y])
           if node != start_node
             @inner_plot.contains(node) ? @inner_plot.delete(node) : @inner_plot << node
             if last_node.y == next_node.y
-              @sequence_coords << next_node.coords_entering_to(node, VERSUS_INVERTER[versus], Contrek::Finder::Node::OUTER)
+              c = next_node.coords_entering_to(node, VERSUS_INVERTER[versus], Contrek::Finder::Node::OUTER)
+              @sequence_coords << c
+              bounds.expand(x: c[:x], y: c[:y])
               @inner_plot.contains(node) ? @inner_plot.delete(node) : @inner_plot << node
             end
           end
@@ -247,7 +255,7 @@ module Contrek
         if node == start_node
           return if node.track_complete
         end
-        plot_node(next_node, start_node, versus)
+        plot_node(next_node, start_node, bounds, versus)
       end
 
       def add_node(node)

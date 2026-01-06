@@ -6,25 +6,22 @@
  *      Copyright 2025 Emanuele Cesaroni
  */
 
+#include <vector>
+#include <algorithm>
+#include <iostream>
 #include "UniqReducer.h"
 #include "Reducer.h"
-#include "algorithm"
-#include "list"
-#include "iterator"
-#include "iostream"
 
-UniqReducer::UniqReducer(std::list<Point*> *list_of_points) : Reducer(list_of_points) {
-}
-
-UniqReducer::~UniqReducer() {
+UniqReducer::UniqReducer(std::vector<Point*>& list_of_points) : Reducer(list_of_points) {
 }
 
 struct is_near {
-  bool operator() (Point *first, Point *second)
-  { return (first->x == second->x && first->y == second->y); }
+  bool operator() (Point* first, Point* second) const {
+    return first->x == second->x && first->y == second->y;
+  }
 };
 
 void UniqReducer::reduce() {
-  this->points->unique(is_near());
+  auto last = std::unique(points.begin(), points.end(), is_near());
+  points.erase(last, points.end());
 }
-

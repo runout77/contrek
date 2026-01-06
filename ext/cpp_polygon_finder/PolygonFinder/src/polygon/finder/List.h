@@ -6,20 +6,19 @@
  *      Copyright 2025 Emanuele Cesaroni
  */
 
-#ifndef POLYGON_FINDER_LIST_H_
-#define POLYGON_FINDER_LIST_H_
+#pragma once
 
+#include <vector>
 #include "Lists.h"
 struct Link;
 class Listable {
  public:
-  Link *data_pointer;
+  std::vector<Link> data_pointer;
 };
 
 class List {
  public:
-  List(int id);
-  virtual ~List();
+  explicit List(int id);
   void push_back(Listable *entry);
   void remove(Listable *entry);
   void grab(List *source_list);
@@ -36,5 +35,3 @@ class List {
   int   isize;
   int   idd;
 };
-
-#endif /* POLYGON_FINDER_LIST_H_ */

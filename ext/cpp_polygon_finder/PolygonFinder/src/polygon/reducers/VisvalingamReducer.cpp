@@ -6,45 +6,44 @@
  *      Copyright 2025 Emanuele Cesaroni
  */
 
-#include <iostream>
-#include <list>
+#include <vector>
 #include "VisvalingamReducer.h"
-#include "Reducer.h"
 
-VisvalingamReducer::VisvalingamReducer(std::list<Point*> *list_of_points, float tolerance) : Reducer(list_of_points) {
+VisvalingamReducer::VisvalingamReducer(std::vector<Point*>& list_of_points, float tolerance)
+  : Reducer(list_of_points) {
   this->tolerance = tolerance * tolerance;
 }
 
-VisvalingamReducer::~VisvalingamReducer() {
-}
+VisvalingamReducer::~VisvalingamReducer() {}
 
 void VisvalingamReducer::reduce() {
-  std::list<Point*> *new_points = this->simplify();
-  this->points->assign(new_points->begin(), new_points->end());
+  std::vector<Point*> new_points = this->simplify();
+  points.assign(new_points.begin(), new_points.end());
 }
-std::list<Point*> *VisvalingamReducer::simplify() {
-  Vertex *vwLine = VisvalingamReducer::Vertex::buildLine(this->points);
+
+std::vector<Point*> VisvalingamReducer::simplify() {
+  Vertex* vwLine = Vertex::buildLine(points);
   float minArea = this->tolerance;
   for (;;) {
-    minArea = this->simplifyVertex(vwLine);
-    if (minArea >= this->tolerance) break;
+      minArea = simplifyVertex(vwLine);
+      if (minArea >= this->tolerance) break;
   }
-  std::list<Point*> *simp = vwLine->getCoordinates();
-  return(simp);
+  return Vertex::getCoordinates(vwLine);
 }
-float VisvalingamReducer::simplifyVertex(VisvalingamReducer::Vertex *vwLine) {
-  VisvalingamReducer::Vertex *curr = vwLine;
+
+float VisvalingamReducer::simplifyVertex(Vertex* vwLine) {
+  Vertex* curr = vwLine;
   float minArea = curr->getArea();
-  VisvalingamReducer::Vertex *minVertex = nullptr;
-  while (curr != nullptr) {
-    float area = curr->getArea();
-    if (area < minArea) {
-      minArea = area;
-      minVertex = curr;
-    }
-    curr = curr->get_next();
+  Vertex* minVertex = nullptr;
+  while (curr) {
+      float area = curr->getArea();
+      if (area < minArea) {
+          minArea = area;
+          minVertex = curr;
+      }
+      curr = curr->get_next();
   }
-  if (minVertex != nullptr  && minArea < this->tolerance) minVertex->remove();
-  if (!vwLine->isLiving())    return -1;
-  return(minArea);
+  if (minVertex && minArea < this->tolerance) minVertex->remove();
+  if (!vwLine->isLiving()) return -1;
+  return minArea;
 }

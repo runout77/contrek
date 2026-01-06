@@ -6,18 +6,14 @@
  *      Copyright 2025 Emanuele Cesaroni
  */
 
-#ifndef POLYGON_MATCHERS_RGBMATCHER_H_
-#define POLYGON_MATCHERS_RGBMATCHER_H_
-
+#pragma once
 #include "Matcher.h"
 
 class RGBMatcher : public Matcher {
  public:
-  RGBMatcher(unsigned int rgb_value);
+  explicit RGBMatcher(unsigned int rgb_value);
   virtual ~RGBMatcher();
-  bool match(unsigned int value);
+  bool match(unsigned int value) override;
  private:
   unsigned int rgb_value;
 };
-
-#endif /* POLYGON_MATCHERS_RGBMATCHER_H_ */

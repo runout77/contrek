@@ -6,18 +6,16 @@
  *      Copyright 2025 Emanuele Cesaroni
  */
 
-#ifndef POLYGON_REDUCERS_LINEARREDUCER_H_
-#define POLYGON_REDUCERS_LINEARREDUCER_H_
-
+#pragma once
+#include <vector>
+#include <array>
 #include "Reducer.h"
 
 class LinearReducer : public Reducer {
  public:
-  LinearReducer(std::list<Point*> *list_of_points);
-  virtual ~LinearReducer();
+  explicit LinearReducer(std::vector<Point*>& list_of_points);
   void reduce();
- private:
-  int *seq_dir(Point *a, Point *b);
-};
 
-#endif /* POLYGON_REDUCERS_LINEARREDUCER_H_ */
+ private:
+  std::array<int, 2> seq_dir(Point *a, Point *b);
+};

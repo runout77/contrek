@@ -9,28 +9,28 @@
 #include "Lists.h"
 #include "List.h"
 #include <list>
+#include <vector>
 struct Link;
 class List;
-Lists::Lists() {
-  this->lists = new std::list<List*>();
-}
 
 Lists::~Lists() {
+  for (auto* list : this->lists)
+  { delete list;
+  }
 }
 
 List *Lists::add_list() {
-  List *list = new List(this->lists->size());
-  lists->push_back(list);
+  List *list = new List(this->lists.size());
+  lists.push_back(list);
   return(list);
 }
 
-Link *Lists::get_data_pointer() {
-  Link *data_pointer = new Link[this->lists->size()];
-  Link *dt = data_pointer;
-  for (unsigned int i = 0; i < this->lists->size(); ++i, dt++)
-  { dt->inside = false;
-    dt->next = nullptr;
-    dt->prev = nullptr;
+std::vector<Link> Lists::get_data_pointer() {
+  std::vector<Link> data(this->lists.size());
+  for (auto& dt : data) {
+    dt.inside = false;
+    dt.next = nullptr;
+    dt.prev = nullptr;
   }
-  return(data_pointer);
+  return data;
 }

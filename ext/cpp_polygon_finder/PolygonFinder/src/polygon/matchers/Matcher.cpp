@@ -8,16 +8,16 @@
 
 #include "Matcher.h"
 #include <iostream>
-Matcher::Matcher(char value) {
+Matcher::Matcher(unsigned int value) {
   this->value = value;
 }
 
 Matcher::~Matcher() {
 }
 
-bool Matcher::match(char value) {
+bool Matcher::match(unsigned int value) {
   return(this->value == value);
 }
-bool Matcher::unmatch(char value) {
+bool Matcher::unmatch(unsigned int value) {
   return(!match(value));
 }

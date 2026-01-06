@@ -5,7 +5,6 @@
  *      Author: ema
  *      Copyright 2025 Emanuele Cesaroni
  */
-// https://github.com/mapnik/Ruby-Mapnik/blob/master/ext/ruby_mapnik/_mapnik_map.rb.cpp
 
 #include <iostream>
 #include <list>
@@ -25,10 +24,9 @@
 #include "PolygonFinder/src/polygon/finder/List.h"
 #include "PolygonFinder/src/polygon/finder/Lists.cpp"
 #include "PolygonFinder/src/polygon/finder/Lists.h"
+#include "PolygonFinder/src/polygon/finder/Polygon.h"
 #include "PolygonFinder/src/polygon/bitmaps/Bitmap.h"
 #include "PolygonFinder/src/polygon/bitmaps/Bitmap.cpp"
-#include "PolygonFinder/src/polygon/bitmaps/PngBitmap.h"
-#include "PolygonFinder/src/polygon/bitmaps/PngBitmap.cpp"
 #include "PolygonFinder/src/polygon/bitmaps/FastPngBitmap.h"
 #include "PolygonFinder/src/polygon/bitmaps/FastPngBitmap.cpp"
 #include "PolygonFinder/src/polygon/bitmaps/RemoteFastPngBitmap.h"
@@ -50,39 +48,67 @@
 #include "PolygonFinder/src/polygon/reducers/VisvalingamReducer.cpp"
 #include "PolygonFinder/src/polygon/reducers/VisvalingamReducer.h"
 #include "png++/png.hpp"
+#include "PolygonFinder/src/polygon/finder/concurrent/Finder.h"
+#include "PolygonFinder/src/polygon/finder/concurrent/Finder.cpp"
+#include "PolygonFinder/src/polygon/finder/concurrent/Poolable.h"
+#include "PolygonFinder/src/polygon/finder/concurrent/Poolable.cpp"
+#include "PolygonFinder/src/polygon/finder/FinderUtils.h"
+#include "PolygonFinder/src/polygon/finder/FinderUtils.cpp"
+#include "PolygonFinder/src/polygon/finder/concurrent/ClippedPolygonFinder.h"
+#include "PolygonFinder/src/polygon/finder/concurrent/ClippedPolygonFinder.cpp"
+#include "PolygonFinder/src/polygon/finder/concurrent/Tile.h"
+#include "PolygonFinder/src/polygon/finder/concurrent/Tile.cpp"
+#include "PolygonFinder/src/polygon/finder/concurrent/Polyline.h"
+#include "PolygonFinder/src/polygon/finder/concurrent/Polyline.cpp"
+#include "PolygonFinder/src/polygon/finder/concurrent/Partitionable.h"
+#include "PolygonFinder/src/polygon/finder/concurrent/Partitionable.cpp"
+#include "PolygonFinder/src/polygon/finder/concurrent/Shape.h"
+#include "PolygonFinder/src/polygon/finder/concurrent/Shape.cpp"
+#include "PolygonFinder/src/polygon/finder/concurrent/FakeCluster.h"
+#include "PolygonFinder/src/polygon/finder/concurrent/FakeCluster.cpp"
+#include "PolygonFinder/src/polygon/finder/concurrent/Cluster.h"
+#include "PolygonFinder/src/polygon/finder/concurrent/Cluster.cpp"
+#include "PolygonFinder/src/polygon/finder/concurrent/Hub.h"
+#include "PolygonFinder/src/polygon/finder/concurrent/Hub.cpp"
+#include "PolygonFinder/src/polygon/finder/concurrent/Part.h"
+#include "PolygonFinder/src/polygon/finder/concurrent/Part.cpp"
+#include "PolygonFinder/src/polygon/finder/concurrent/Position.h"
+#include "PolygonFinder/src/polygon/finder/concurrent/Position.cpp"
+#include "PolygonFinder/src/polygon/finder/concurrent/EndPoint.h"
+#include "PolygonFinder/src/polygon/finder/concurrent/EndPoint.cpp"
+#include "PolygonFinder/src/polygon/finder/concurrent/Cursor.h"
+#include "PolygonFinder/src/polygon/finder/concurrent/Cursor.cpp"
+#include "PolygonFinder/src/polygon/finder/concurrent/Sequence.h"
+#include "PolygonFinder/src/polygon/finder/concurrent/Sequence.cpp"
+#include "PolygonFinder/src/polygon/finder/concurrent/PartPool.h"
+#include "PolygonFinder/src/polygon/finder/concurrent/PartPool.cpp"
+extern "C" {
+  #include "PolygonFinder/src/polygon/bitmaps/spng.h"
+}
 
 using namespace Rice;
 
 namespace Rice::detail
 { template<>
-  class To_Ruby<std::list<Point*> >
+  class To_Ruby<std::vector<Point*>>
   { public:
-      VALUE convert(std::list<Point*> const & x)
-      { return Rice::Array(x.begin(), x.end());
+      VALUE convert(const std::vector<Point*>& x)
+      { Rice::Array arr;
+        for (Point* p : x)
+          arr.push(p);
+        return arr;
       }
   };
 
   template<>
-  class To_Ruby<std::list<std::list<Point*>>>
+  class To_Ruby<std::list<std::vector<Point*>>>
   { public:
-      VALUE convert(std::list<std::list<Point*>> const & x)
-      { return Rice::Array(x.begin(), x.end());
-      }
-  };
-
-  template<>
-  class To_Ruby<std::list<Point*>*>
-  { public:
-      VALUE convert(std::list<Point*>* const & x)
-      { return Rice::Array(x->begin(), x->end());
-      }
-  };
-
-  template<>
-  class To_Ruby<std::list<std::list<Point*>*>>
-  { public:
-      VALUE convert(std::list<std::list<Point*>*> const & x)
-      { return Rice::Array(x.begin(), x.end());
+      VALUE convert(const std::list<std::vector<Point*>>& x)
+      { Rice::Array arr;
+        for (const std::vector<Point*>& vec : x)
+        { arr.push(vec);
+        }
+        return arr;
       }
   };
 
@@ -177,21 +203,22 @@ namespace Rice::detail
       return_me[Symbol("groups")] = pr->groups;
       return_me[Symbol("named_sequence")] = pr->named_sequence;
       Rice::Array out;
-      for (std::list<std::map<std::string, std::list<std::list<Point*>*>>>::iterator x = pr->polygons.begin(); x != pr->polygons.end(); ++x)
+      for (Polygon& x : pr->polygons)
       { Rice::Hash h = Rice::Hash();
-        h[Symbol("outer")] = (*x)["outer"].front();
-        h[Symbol("inner")] = (*x)["inner"];
+        h[Symbol("outer")] = x.outer;
+        h[Symbol("inner")] = x.inner;
         out.push(h);
       }
       return_me[Symbol("polygons")] = out;
       Rice::Array tmapout;
-      for (std::list<int*>::iterator tm = pr->treemap.begin(); tm != pr->treemap.end(); ++tm)
-      { Rice::Array tmentry;
-        tmentry.push((*tm)[0]);
-        tmentry.push((*tm)[1]);
+      for (const auto& tm : pr->treemap) {
+        Rice::Array tmentry;
+        tmentry.push(tm.first);   // outer
+        tmentry.push(tm.second);  // inner
         tmapout.push(tmentry);
       }
       return_me[Symbol("treemap")] = tmapout;
+      delete pr;
       return(return_me);
     }
   };
@@ -257,4 +284,9 @@ void Init_cpp_polygon_finder() {
     .define_constructor(Constructor<PolygonFinder, Bitmap*, Matcher*, Bitmap*, std::vector<std::string>*>(), Arg("bitmap"), Arg("matcher"), Arg("test_bitmap") = nullptr, Arg("options") = nullptr)
     .define_method("get_shapelines", &PolygonFinder::get_shapelines)
     .define_method("process_info", &PolygonFinder::process_info);
+
+  Data_Type<Finder> rb_cFinder =
+    define_class<Finder>("CPPFinder")
+    .define_constructor(Constructor<Finder, int, Bitmap*, Matcher*, std::vector<std::string>*>(), Arg("number_of_threads"), Arg("bitmap"), Arg("matcher"), Arg("options") = nullptr)
+    .define_method("process_info", &Finder::process_info);
 }

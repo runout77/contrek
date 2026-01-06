@@ -6,198 +6,113 @@
  *      Copyright 2025 Emanuele Cesaroni
  */
 
-
 #include <iostream>
 #include <list>
 #include <map>
 #include <ctime>
 #include <typeinfo>
 #include <string>
-#include <ctime>
 #include <vector>
+#include <utility>
 #include "PolygonFinder.h"
 #include "../bitmaps/Bitmap.h"
 #include "../matchers/Matcher.h"
 #include "../matchers/RGBMatcher.h"
+#include "../matchers/RGBNotMatcher.h"
 #include "optionparser.h"
 #include "NodeCluster.h"
 #include "Node.h"
+#include "FinderUtils.h"
 
-PolygonFinder::PolygonFinder(Bitmap *bitmap, Matcher *matcher, Bitmap *test_bitmap, std::vector<std::string> *options) {
-  source_bitmap = bitmap;
-  this->matcher = matcher;
-  if (options != nullptr) sanitize_options(options);
-  this->node_cluster = new NodeCluster(source_bitmap->h(), &this->options);
+PolygonFinder::PolygonFinder(Bitmap *bitmap,
+                             Matcher *matcher,
+                             Bitmap *test_bitmap,
+                             std::vector<std::string> *options,
+                             int start_x,
+                             int end_x)
+    : source_bitmap(bitmap),
+      matcher(matcher),
+      start_x(start_x),
+      end_x(end_x == -1 ? bitmap->w() : end_x)
+{ this->rgb_matcher = dynamic_cast<RGBMatcher*>(matcher);
+  if (options != nullptr) FinderUtils::sanitize_options(this->options, options);
+  this->node_cluster = new NodeCluster(source_bitmap->h(), source_bitmap->w(), &this->options);
 
   //= SCAN ==============//
-  start_timer();
+  cpu_timer.start();
   scan();
-  reports["scan"] = end_timer();
+  reports["scan"] = cpu_timer.stop();
   //=====================//
 
   //= BUILD_TANGS_SEQUENCE ===//
-  start_timer();
+  cpu_timer.start();
   node_cluster->build_tangs_sequence();
-  reports["build_tangs_sequence"] = end_timer();
+  reports["build_tangs_sequence"] = cpu_timer.stop();
   //=====================//
 
   //= PLOT ===//
-  start_timer();
+  cpu_timer.start();
   node_cluster->plot(this->options.versus);
-  reports["plot"] = end_timer();
+  reports["plot"] = cpu_timer.stop();
   //=====================//
 
   //= COMPRESS_COORDS ===//
-  start_timer();
-  node_cluster->compress_coords(this->options);
-  reports["compress"] = end_timer();
+  cpu_timer.start();
+  node_cluster->compress_coords(this->node_cluster->polygons, this->options);
+  reports["compress"] = cpu_timer.stop();
   //=====================//
   reports["total"] = reports["scan"] + reports["build_tangs_sequence"] + reports["plot"] + reports["compress"];
 }
 
 std::list<ShapeLine*> *PolygonFinder::get_shapelines() {
   std::list<ShapeLine*> *sll = new std::list<ShapeLine*>();
-  for (int line = 0; line < this->node_cluster->height; line++)
-  { for (std::vector<Node*>::iterator node = this->node_cluster->vert_nodes[line].begin(); node != this->node_cluster->vert_nodes[line].end(); ++node)
-    { ShapeLine *sl = new ShapeLine({(*node)->min_x, (*node)->max_x, (*node)->y});
+  for (int line = 0; line < this->node_cluster->height; line++) {
+    for (Node& node : this->node_cluster->vert_nodes[line]) {
+      ShapeLine *sl = new ShapeLine({node.min_x, node.max_x, node.y});
       sll->push_back(sl);
     }
   }
-  return(sll);
-}
-
-void PolygonFinder::sanitize_options(std::vector<std::string> *incoming_options)
-{ std::vector<char*> argv0;
-  for (const auto& arg : *incoming_options)
-  argv0.push_back((char*)arg.data());
-  argv0.push_back(nullptr);
-  char** argv = &argv0[0];
-  int argc = argv0.size() -1;
-
-  enum  optionIndex { COMPRESS_UNIQ, VERSUS, COMPRESS_VISVALINGAM, COMPRESS_LINEAR, COMPRESS_VISVALINGAM_TOLERANCE, TREEMAP};
-  const option::Descriptor usage[] = {
-     //  {UNKNOWN, 0,"" , ""    ,option::Arg::None, 0},
-     {COMPRESS_VISVALINGAM, 0, "" , "compress_visvalingam", option::Arg::None, 0},
-     {COMPRESS_LINEAR, 0, "" , "compress_linear", option::Arg::None, 0},
-     {COMPRESS_VISVALINGAM_TOLERANCE, 0, "" , "compress_visvalingam_tolerance", option::Arg::Optional, 0},
-     {COMPRESS_UNIQ, 0, "", "compress_uniq", option::Arg::None, 0},
-     {TREEMAP, 0, "", "treemap", option::Arg::None, 0},
-     {VERSUS, 0, "v", "versus", option::Arg::Optional, 0},
-     {0, 0, 0, 0, 0, 0}
-  };
-
-  option::Stats  stats(usage, argc, argv);
-  option::Option ioptions[stats.options_max], buffer[stats.buffer_max];
-  option::Parser parse(usage, argc, argv, ioptions, buffer);
-
-  if (parse.error())  return;
-  // VERSUS
-  if (ioptions[VERSUS].count() > 0)
-  { for (option::Option* opt = ioptions[VERSUS]; opt; opt = opt->next())
-    { std::string opts = opt->arg;
-      this->options.versus = (opts.compare("a") == 0 ? Node::A : Node::O);
-      break;
-    }
-  }
-  // COMPRESS UNIQ
-  if (ioptions[COMPRESS_UNIQ].count() > 0)
-  { this->options.compress_uniq = true;
-  }
-  // TREEMAP
-  if (ioptions[TREEMAP].count() > 0)
-  { this->options.treemap = true;
-  }
-  // COMPRESS LINEAR
-  if (ioptions[COMPRESS_LINEAR].count() > 0)
-  { this->options.compress_linear = true;
-  }
-  // COMPRESS UNIQ
-  if (ioptions[COMPRESS_VISVALINGAM].count() > 0)
-  { this->options.compress_visvalingam = true;
-  }
-  if (ioptions[COMPRESS_VISVALINGAM_TOLERANCE].count() > 0)
-  { this->options.compress_visvalingam = true;
-    for (option::Option* opt = ioptions[COMPRESS_VISVALINGAM_TOLERANCE]; opt; opt = opt->next())
-    { std::string opts = opt->arg;
-      this->options.compress_visvalingam_tolerance = strtof(opt->arg, 0);
-      break;
-    }
-  }
-  /*std::cout << "-----------" << std::endl;
-  std::cout << "versus" << this->options.versus << std::endl;
-  std::cout << "uniq" << this->options.compress_uniq << std::endl;
-  std::cout << "linear" << this->options.compress_linear << std::endl;
-  std::cout << "visvalingam" << this->options.compress_visvalingam << std::endl;
-  std::cout << this->options.compress_visvalingam_tolerance << std::endl;
-  std::cout << "-----------" << std::endl;*/
-}
-
-void PolygonFinder::start_timer() {
-  timer_start = std::clock();
-}
-
-double PolygonFinder::end_timer() {
-  std::clock_t c_end = std::clock();
-  return 1000.0 * (c_end - timer_start) / CLOCKS_PER_SEC;
+  return sll;
 }
 
 PolygonFinder::~PolygonFinder() {
+  delete this->node_cluster;
 }
 
 void PolygonFinder::scan() {
-  char last_color = 0, color = 0;
-  int min_x = 0;
-  int max_x = 0;
-  bool match;
-  bool matching = false;
+    int bpp = this->source_bitmap->get_bytes_per_pixel();
 
-  for (int y = 0; y < this->source_bitmap->h(); y++)
-  { for (int x = 0; x < this->source_bitmap->w(); x++)
-    { color = this->source_bitmap->value_at(x, y);
-      match = this->source_bitmap->pixel_match(x, y, this->matcher);
-      if (match && matching == false)
-      { min_x = x;
-        last_color = color;
-        matching = true;
-        if (x == (this->source_bitmap->w() - 1) )
-        { max_x = x;
-          this->node_cluster->add_node(new Node(min_x, max_x, y, last_color));
-          matching = false;
-        }
-      } else {
-        if (!match && matching == true)
-        { max_x = x - 1;
-          this->node_cluster->add_node(new Node(min_x, max_x, y, last_color));
-          matching = false;
-        } else {
-                  if (x == (this->source_bitmap->w()-1) && matching == true)
-                  { max_x = x;
-                    this->node_cluster->add_node(new Node(min_x, max_x, y, last_color));
-                    matching = false;
-                  }
-                }
-      }
+    RGBMatcher* rgb_m = dynamic_cast<RGBMatcher*>(this->matcher);
+
+    if (bpp == 1) {
+      auto fetcher = [](const unsigned char* p) { return static_cast<unsigned int>(p[0]); };
+      if (rgb_m) run_loop(rgb_m, fetcher);
+      else       run_loop(this->matcher, fetcher);
+    } else {
+      auto fetcher = [](const unsigned char* p) { return p[0] | (p[1] << 8) | (p[2] << 16); };
+      if (rgb_m) run_loop(rgb_m, fetcher);
+      else       run_loop(this->matcher, fetcher);
     }
-  }
 }
 
 ProcessResult* PolygonFinder::process_info() {
   ProcessResult *pr = new ProcessResult();
-  pr->groups = this->node_cluster->sequences->size();
-  pr->polygons = this->node_cluster->polygons;
-  pr->benchmarks = this->reports;
+  pr->groups = this->node_cluster->sequences.size();
+  pr->polygons = std::move(this->node_cluster->polygons);
+  pr->benchmarks = std::move(this->reports);
   pr->treemap = this->node_cluster->treemap;
 
-  if (typeid(*this->source_bitmap) == typeid(Bitmap))
+  if (this->node_cluster->options->named_sequences && typeid(*this->source_bitmap) == typeid(Bitmap))
   { std::string sequence;
     int n = 0;
-    for (std::list<std::list<Node*>*>::iterator list = this->node_cluster->sequences->begin(); list != this->node_cluster->sequences->end(); ++list, n++)
-    { std::string seq;
-      for (std::list<Node*>::iterator node = (*list)->begin(); node != (*list)->end(); ++node)
-      { seq += (*node)->name;
+    for (const auto& seq_list : this->node_cluster->sequences) {
+      std::string seq;
+      for (Node* node : seq_list) {
+        seq += node->name;
       }
       if (n != 0) sequence += '-';
       sequence += seq;
+      n++;
     }
     pr->named_sequence = sequence;
   }

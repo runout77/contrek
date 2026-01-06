@@ -18,9 +18,6 @@ List::List(int id) {
   this->idd = id;
 }
 
-List::~List() {
-}
-
 Listable *List::first() {
   return(this->start);
 }

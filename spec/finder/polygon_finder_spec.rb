@@ -17,6 +17,9 @@ RSpec.describe Contrek::Finder::PolygonFinder, type: :class do
   end
 
   describe "shared_test", treemap: true do
+    before do
+      @matcher = Contrek::Matchers::ValueNotMatcher.new(" ")
+    end
     include_examples "treemap"
   end
 

@@ -3,9 +3,10 @@
 # rspec failure tracking
 .rspec_status
 
-/ext/cpp_polygon_finder/PolygonFinder/Debug/*
-/ext/cpp_polygon_finder/.metadata/
-/ext/cpp_polygon_finder/RemoteSystemsTempFiles/
+/ext/cpp_polygon_finder/PolygonFinder/build/
+/ext/cpp_polygon_finder/PolygonFinder/contrek
+/ext/cpp_polygon_finder/PolygonFinder/build/*.o
+/ext/cpp_polygon_finder/PolygonFinder/build/*.d
 /ext/cpp_polygon_finder/Makefile
 /ext/cpp_polygon_finder/cpp_polygon_finder.o
 /ext/cpp_polygon_finder/cpp_polygon_finder.so

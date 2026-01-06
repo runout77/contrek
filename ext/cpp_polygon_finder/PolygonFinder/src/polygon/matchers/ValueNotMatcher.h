@@ -6,16 +6,12 @@
  *      Copyright 2025 Emanuele Cesaroni
  */
 
-#ifndef POLYGON_MATCHERS_VALUENOTMATCHER_H_
-#define POLYGON_MATCHERS_VALUENOTMATCHER_H_
-
+#pragma once
 #include "Matcher.h"
 
 class ValueNotMatcher : public Matcher {
  public:
-  ValueNotMatcher(char value);
+  explicit ValueNotMatcher(unsigned int value);
   virtual ~ValueNotMatcher();
-  bool match(char value);
+  bool match(unsigned int value);
 };
-
-#endif /* POLYGON_MATCHERS_VALUENOTMATCHER_H_ */

@@ -50,3 +50,11 @@ bool Bitmap::pixel_match(int x, int y, Matcher *matcher)
 void Bitmap::clear(char value = '0')
 { for (unsigned int i = 0; i < raw.length(); i++) raw[i] = value;
 }
+
+const unsigned char* Bitmap::get_row_ptr(int y) const {
+  return reinterpret_cast<const unsigned char*>(raw.data()) + (y * module);
+}
+
+int Bitmap::get_bytes_per_pixel() const {
+  return 1;
+}

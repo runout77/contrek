@@ -8,13 +8,13 @@
 
 #include "RGBNotMatcher.h"
 #include <iostream>
-RGBNotMatcher::RGBNotMatcher(int rgb_value) : Matcher(0L) {
+RGBNotMatcher::RGBNotMatcher(unsigned int rgb_value) : Matcher(0L) {
   this->rgb_value = rgb_value;
 }
 
 RGBNotMatcher::~RGBNotMatcher() {
 }
 
-bool RGBNotMatcher::match(int value) {
+bool RGBNotMatcher::match(unsigned int value) {
   return(this->rgb_value != value);
 }

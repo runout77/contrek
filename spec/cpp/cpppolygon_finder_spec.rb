@@ -19,7 +19,7 @@ RSpec.describe CPPPolygonFinder, type: :class do
                   "0000000000000000"
       bitmap = CPPBitMap.new(chunk, 16)
       matcher = CPPValueNotMatcher.new("0")
-      polygonfinder = CPPPolygonFinder.new(bitmap, matcher, nil, {versus: "o", compress: {linear: true, visvalingam: {tolerance: 1}}})
+      polygonfinder = CPPPolygonFinder.new(bitmap, matcher, nil, {versus: "o", named_sequences: true, compress: {linear: true, visvalingam: {tolerance: 1}}})
       pi = polygonfinder.process_info
 
       expect(pi[:groups]).to eq 1
@@ -40,6 +40,9 @@ RSpec.describe CPPPolygonFinder, type: :class do
   end
 
   describe "shared_test", treemap: true do
+    before do
+      @matcher = CPPValueNotMatcher.new(" ")
+    end
     include_examples "treemap"
   end
 end
