@@ -23,9 +23,9 @@ RSpec.describe Contrek::Finder::PolygonFinder, type: :class do
           bitmap.to_terminal
           raise e
         else
-          expect(result[:named_sequence]).not_to be(nil)
-          expect(result[:groups]).not_to eq(0)
-          expect(result[:polygons]).not_to be_empty
+          expect(result.metadata[:named_sequence]).not_to be(nil)
+          expect(result.metadata[:groups]).not_to eq(0)
+          expect(result.points).not_to be_empty
         end
       end
     end
@@ -51,9 +51,9 @@ RSpec.describe Contrek::Finder::PolygonFinder, type: :class do
           bitmap.to_terminal
           raise e
         else
-          expect(result[:named_sequence]).not_to be(nil)
-          expect(result[:groups]).not_to eq(0)
-          expect(result[:polygons]).not_to be_empty
+          expect(result.metadata[:named_sequence]).not_to be(nil)
+          expect(result.metadata[:groups]).not_to eq(0)
+          expect(result.points).not_to be_empty
         end
       end
     end

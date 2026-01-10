@@ -26,7 +26,7 @@ RSpec.shared_examples "finder" do
         nil,
         {versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([
+      expect(result.points).to eq([
         {outer: [{x: 6, y: 1}, {x: 6, y: 3}, {x: 2, y: 3}, {x: 2, y: 1}],
          inner: []}
       ])
@@ -35,7 +35,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([
+      expect(result.points).to eq([
         {inner: [],
          outer: [{x: 3, y: 1}, {x: 6, y: 1}, {x: 6, y: 3}, {x: 3, y: 3}, {x: 2, y: 3}, {x: 2, y: 1}]}
       ])
@@ -52,7 +52,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([
+      expect(result.points).to eq([
         {inner: [],
          outer: [{x: 3, y: 1}, {x: 6, y: 1}, {x: 6, y: 3}, {x: 0, y: 3}, {x: 0, y: 1}]}
       ])
@@ -62,7 +62,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :a, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([
+      expect(result.points).to eq([
         {outer: [{x: 0, y: 1}, {x: 0, y: 3}, {x: 6, y: 3}, {x: 6, y: 1}, {x: 3, y: 1}], inner: []}
       ])
     end
@@ -78,7 +78,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([
+      expect(result.points).to eq([
         {outer: [{x: 3, y: 1}, {x: 8, y: 1}, {x: 8, y: 3}, {x: 3, y: 3}, {x: 2, y: 3}, {x: 2, y: 1}],
          inner: []}
       ])
@@ -87,7 +87,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :a, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([
+      expect(result.points).to eq([
         {outer: [{x: 2, y: 1}, {x: 2, y: 3}, {x: 3, y: 3}, {x: 8, y: 3}, {x: 8, y: 1}, {x: 3, y: 1}],
          inner: []}
       ])
@@ -104,7 +104,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([
+      expect(result.points).to eq([
         {outer: [{x: 3, y: 1}, {x: 8, y: 1}, {x: 8, y: 3}, {x: 3, y: 3}, {x: 0, y: 3}, {x: 0, y: 1}],
          inner: []}
       ])
@@ -113,7 +113,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :a, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([
+      expect(result.points).to eq([
         {outer: [{x: 0, y: 1}, {x: 0, y: 3}, {x: 3, y: 3}, {x: 8, y: 3}, {x: 8, y: 1}, {x: 3, y: 1}],
          inner: []}
       ])
@@ -141,7 +141,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :a, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([
+      expect(result.points).to eq([
         {outer: [{x: 0, y: 0}, {x: 0, y: 5}, {x: 3, y: 5}, {x: 3, y: 4}, {x: 5, y: 4}, {x: 5, y: 5},
           {x: 8, y: 5}, {x: 8, y: 0}, {x: 5, y: 0}, {x: 5, y: 1}, {x: 3, y: 1}, {x: 3, y: 0}],
          inner: []}
@@ -152,7 +152,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([
+      expect(result.points).to eq([
         {outer: [
            {x: 3, y: 0}, {x: 3, y: 1}, {x: 5, y: 1}, {x: 5, y: 0}, {x: 8, y: 0}, {x: 8, y: 5},
           {x: 5, y: 5}, {x: 5, y: 4}, {x: 3, y: 4}, {x: 3, y: 5}, {x: 0, y: 5}, {x: 0, y: 0}
@@ -175,7 +175,7 @@ RSpec.shared_examples "finder" do
         nil,
         {versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([
+      expect(result.points).to eq([
         {outer: [{x: 11, y: 1}, {x: 11, y: 4}, {x: 4, y: 4}, {x: 4, y: 1}],
          inner: [[{x: 10, y: 2}, {x: 5, y: 2}, {x: 5, y: 3}, {x: 10, y: 3}]]}
       ])
@@ -185,7 +185,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([
+      expect(result.points).to eq([
         {outer: [{x: 7, y: 1}, {x: 11, y: 1}, {x: 11, y: 4}, {x: 7, y: 4}, {x: 4, y: 4}, {x: 4, y: 1}],
          inner: [[{x: 5, y: 2}, {x: 5, y: 3}, {x: 10, y: 3}, {x: 10, y: 2}]]}
       ])
@@ -210,7 +210,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([
+      expect(result.points).to eq([
         {outer: [{x: 7, y: 0}, {x: 11, y: 0}, {x: 11, y: 5}, {x: 7, y: 5}, {x: 4, y: 5}, {x: 4, y: 0}],
          inner: [
            [{x: 5, y: 2}, {x: 5, y: 3}, {x: 10, y: 3}, {x: 10, y: 2}]
@@ -246,7 +246,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([
+      expect(result.points).to eq([
         {outer: [{x: 7, y: 1}, {x: 11, y: 1}, {x: 11, y: 6}, {x: 7, y: 6}, {x: 4, y: 6}, {x: 4, y: 1}],
          inner: [[{x: 5, y: 3}, {x: 5, y: 4}, {x: 10, y: 4}, {x: 10, y: 3}]]}
       ])
@@ -268,7 +268,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([
+      expect(result.points).to eq([
         {outer: [{x: 7, y: 1}, {x: 11, y: 1}, {x: 11, y: 8}, {x: 7, y: 8}, {x: 4, y: 8},
           {x: 4, y: 1}],
          inner: [[{x: 5, y: 4}, {x: 5, y: 5}, {x: 10, y: 5}, {x: 10, y: 4}]]}
@@ -298,7 +298,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([
+      expect(result.points).to eq([
         {outer: [{x: 7, y: 1}, {x: 11, y: 1}, {x: 11, y: 4}, {x: 7, y: 4}, {x: 4, y: 4}, {x: 4, y: 1}],
          inner: []}
       ])
@@ -317,7 +317,7 @@ RSpec.shared_examples "finder" do
         nil,
         {compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([
+      expect(result.points).to eq([
         {outer: [{x: 4, y: 1}, {x: 4, y: 4}, {x: 11, y: 4}, {x: 11, y: 2}, {x: 6, y: 1}],
          inner: []}
       ])
@@ -327,7 +327,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :a, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([
+      expect(result.points).to eq([
         {outer: [{x: 4, y: 1}, {x: 4, y: 4}, {x: 7, y: 4}, {x: 11, y: 4}, {x: 11, y: 2},
           {x: 7, y: 2}, {x: 6, y: 1}], inner: []}
       ])
@@ -356,7 +356,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :o, compress: {uniq: true}}
       ).process_info
-      expect(result[:polygons]).to eq([
+      expect(result.points).to eq([
         {inner: [],
          outer: [{x: 6, y: 1}, {x: 7, y: 2}, {x: 11, y: 2}, {x: 11, y: 3}, {x: 11, y: 4}, {x: 7, y: 4}, {x: 4, y: 4}, {x: 4, y: 3}, {x: 4, y: 2}, {x: 4, y: 1}]}
       ])
@@ -393,7 +393,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([
+      expect(result.points).to eq([
         {outer: [{x: 7, y: 1}, {x: 13, y: 1}, {x: 13, y: 8}, {x: 7, y: 8}, {x: 2, y: 8}, {x: 2, y: 1}],
          inner: [
            [{x: 3, y: 2}, {x: 3, y: 3}, {x: 12, y: 3}, {x: 12, y: 2}],
@@ -413,7 +413,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :a, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([{outer: [{x: 5, y: 0}, {x: 5, y: 4}, {x: 7, y: 4}, {x: 11, y: 4}, {x: 11, y: 0}, {x: 7, y: 0}], inner: [[{x: 6, y: 3}, {x: 6, y: 1}, {x: 10, y: 1}, {x: 10, y: 3}]]}])
+      expect(result.points).to eq([{outer: [{x: 5, y: 0}, {x: 5, y: 4}, {x: 7, y: 4}, {x: 11, y: 4}, {x: 11, y: 0}, {x: 7, y: 0}], inner: [[{x: 6, y: 3}, {x: 6, y: 1}, {x: 10, y: 1}, {x: 10, y: 3}]]}])
     end
 
     it "2 workers one rectangle two holes" do
@@ -445,7 +445,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([
+      expect(result.points).to eq([
         {outer: [{x: 7, y: 0}, {x: 13, y: 0}, {x: 13, y: 9}, {x: 7, y: 9}, {x: 2, y: 9}, {x: 2, y: 0}],
          inner: [
            [{x: 3, y: 2}, {x: 3, y: 3}, {x: 12, y: 3}, {x: 12, y: 2}],
@@ -458,7 +458,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :a, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([{outer: [{x: 2, y: 0}, {x: 2, y: 9}, {x: 7, y: 9}, {x: 13, y: 9}, {x: 13, y: 0}, {x: 7, y: 0}], inner: [[{x: 3, y: 7}, {x: 3, y: 6}, {x: 12, y: 6}, {x: 12, y: 7}], [{x: 3, y: 3}, {x: 3, y: 2}, {x: 12, y: 2}, {x: 12, y: 3}]]}])
+      expect(result.points).to eq([{outer: [{x: 2, y: 0}, {x: 2, y: 9}, {x: 7, y: 9}, {x: 13, y: 9}, {x: 13, y: 0}, {x: 7, y: 0}], inner: [[{x: 3, y: 7}, {x: 3, y: 6}, {x: 12, y: 6}, {x: 12, y: 7}], [{x: 3, y: 3}, {x: 3, y: 2}, {x: 12, y: 2}, {x: 12, y: 3}]]}])
     end
 
     it "2 workers two rectangles" do
@@ -487,7 +487,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([{outer: [{x: 5, y: 1}, {x: 5, y: 4}, {x: 0, y: 4}, {x: 0, y: 1}], inner: [[{x: 4, y: 2}, {x: 1, y: 2}, {x: 1, y: 3}, {x: 4, y: 3}]]}, {outer: [{x: 14, y: 1}, {x: 14, y: 4}, {x: 9, y: 4}, {x: 9, y: 1}], inner: [[{x: 13, y: 2}, {x: 10, y: 2}, {x: 10, y: 3}, {x: 13, y: 3}]]}])
+      expect(result.points).to eq([{outer: [{x: 5, y: 1}, {x: 5, y: 4}, {x: 0, y: 4}, {x: 0, y: 1}], inner: [[{x: 4, y: 2}, {x: 1, y: 2}, {x: 1, y: 3}, {x: 4, y: 3}]]}, {outer: [{x: 14, y: 1}, {x: 14, y: 4}, {x: 9, y: 4}, {x: 9, y: 1}], inner: [[{x: 13, y: 2}, {x: 10, y: 2}, {x: 10, y: 3}, {x: 13, y: 3}]]}])
     end
 
     it "3 workers one inner on second rectangles" do
@@ -503,7 +503,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 3, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([
+      expect(result.points).to eq([
         {outer: [{x: 4, y: 1}, {x: 9, y: 1}, {x: 15, y: 1}, {x: 15, y: 5}, {x: 9, y: 5}, {x: 4, y: 5}, {x: 0, y: 5}, {x: 0, y: 1}],
          inner: [[{x: 9, y: 3}, {x: 5, y: 3}]]}
       ])
@@ -537,7 +537,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([
+      expect(result.points).to eq([
         {inner: [
            [{x: 4, y: 2}, {x: 1, y: 2}, {x: 1, y: 3}, {x: 4, y: 3}],
           [{x: 5, y: 2}, {x: 5, y: 3}, {x: 10, y: 3}, {x: 10, y: 2}],
@@ -562,7 +562,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([
+      expect(result.points).to eq([
         {outer: [{x: 7, y: 1}, {x: 15, y: 1}, {x: 15, y: 6}, {x: 7, y: 6}, {x: 0, y: 6}, {x: 0, y: 1}],
          inner: [[{x: 4, y: 3}, {x: 1, y: 3}, {x: 1, y: 4}, {x: 4, y: 4}],
            [{x: 5, y: 3}, {x: 5, y: 4}, {x: 10, y: 4}, {x: 10, y: 3}],
@@ -582,14 +582,14 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([{outer: [{x: 5, y: 0}, {x: 11, y: 0}, {x: 11, y: 1}, {x: 5, y: 1}, {x: 1, y: 2}, {x: 1, y: 3}, {x: 5, y: 4}, {x: 11, y: 4}, {x: 11, y: 5}, {x: 5, y: 5}, {x: 0, y: 5}, {x: 0, y: 0}], inner: []}])
+      expect(result.points).to eq([{outer: [{x: 5, y: 0}, {x: 11, y: 0}, {x: 11, y: 1}, {x: 5, y: 1}, {x: 1, y: 2}, {x: 1, y: 3}, {x: 5, y: 4}, {x: 11, y: 4}, {x: 11, y: 5}, {x: 5, y: 5}, {x: 0, y: 5}, {x: 0, y: 0}], inner: []}])
 
       result = @polygon_finder_class.new(
         bitmap: @bitmap_class.new(chunk, 12),
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :a, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([{outer: [{x: 0, y: 0}, {x: 0, y: 5}, {x: 5, y: 5}, {x: 11, y: 5}, {x: 11, y: 4}, {x: 5, y: 4}, {x: 1, y: 3}, {x: 1, y: 2}, {x: 5, y: 1}, {x: 11, y: 1}, {x: 11, y: 0}, {x: 5, y: 0}], inner: []}])
+      expect(result.points).to eq([{outer: [{x: 0, y: 0}, {x: 0, y: 5}, {x: 5, y: 5}, {x: 11, y: 5}, {x: 11, y: 4}, {x: 5, y: 4}, {x: 1, y: 3}, {x: 1, y: 2}, {x: 5, y: 1}, {x: 11, y: 1}, {x: 11, y: 0}, {x: 5, y: 0}], inner: []}])
     end
 
     it "3 workers one rectangle" do
@@ -616,7 +616,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 3, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([{
+      expect(result.points).to eq([{
         outer: [{x: 4, y: 1}, {x: 9, y: 1}, {x: 13, y: 1}, {x: 13, y: 6}, {x: 9, y: 6}, {x: 4, y: 6}, {x: 2, y: 6}, {x: 2, y: 1}], inner: [[{x: 4, y: 2}, {x: 3, y: 3}, {x: 3, y: 4}, {x: 4, y: 5}, {x: 12, y: 4}, {x: 12, y: 3}]]
       }])
     end
@@ -635,7 +635,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 3, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([
+      expect(result.points).to eq([
         {inner: [],
          outer: [{x: 4, y: 1}, {x: 9, y: 1}, {x: 13, y: 1}, {x: 13, y: 2}, {x: 9, y: 2},
            {x: 7, y: 3}, {x: 7, y: 4}, {x: 9, y: 5}, {x: 13, y: 5}, {x: 13, y: 6},
@@ -668,7 +668,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 3, versus: :a, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([
+      expect(result.points).to eq([
         {outer: [{x: 2, y: 1}, {x: 2, y: 6}, {x: 4, y: 6}, {x: 9, y: 6}, {x: 13, y: 6}, {x: 13, y: 5},
           {x: 9, y: 5}, {x: 7, y: 4}, {x: 7, y: 3}, {x: 9, y: 2}, {x: 13, y: 2}, {x: 13, y: 1},
           {x: 9, y: 1}, {x: 4, y: 1}], inner: []}
@@ -699,7 +699,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 3, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([
+      expect(result.points).to eq([
         {inner: [],
          outer: [{x: 4, y: 1}, {x: 9, y: 1}, {x: 13, y: 1}, {x: 13, y: 5},
            {x: 9, y: 5}, {x: 4, y: 5}, {x: 2, y: 5}, {x: 2, y: 1}]}
@@ -719,7 +719,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([
+      expect(result.points).to eq([
         {outer: [{x: 7, y: 0}, {x: 11, y: 0}, {x: 14, y: 1}, {x: 14, y: 5}, {x: 11, y: 6}, {x: 7, y: 6},
           {x: 5, y: 6}, {x: 1, y: 5}, {x: 1, y: 1}, {x: 5, y: 0}],
          inner: [[{x: 4, y: 2}, {x: 4, y: 4}, {x: 12, y: 4}, {x: 12, y: 2}]]}
@@ -740,7 +740,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([
+      expect(result.points).to eq([
         {outer: [{x: 4, y: 0}, {x: 4, y: 1}, {x: 7, y: 2}, {x: 9, y: 1}, {x: 9, y: 0},
           {x: 15, y: 0}, {x: 15, y: 5}, {x: 11, y: 6}, {x: 11, y: 7}, {x: 3, y: 7},
           {x: 3, y: 6}, {x: 1, y: 5}, {x: 1, y: 4}, {x: 3, y: 3}, {x: 3, y: 2},
@@ -767,13 +767,13 @@ RSpec.shared_examples "finder" do
         nil,
         {versus: :a, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([{outer: [{x: 5, y: 0}, {x: 1, y: 4}, {x: 5, y: 8}, {x: 10, y: 8}, {x: 14, y: 4}, {x: 10, y: 0}], inner: [[{x: 5, y: 1}, {x: 10, y: 1}, {x: 13, y: 4}, {x: 10, y: 7}, {x: 5, y: 7}, {x: 2, y: 4}, {x: 4, y: 2}]]}])
+      expect(result.points).to eq([{outer: [{x: 5, y: 0}, {x: 1, y: 4}, {x: 5, y: 8}, {x: 10, y: 8}, {x: 14, y: 4}, {x: 10, y: 0}], inner: [[{x: 5, y: 1}, {x: 10, y: 1}, {x: 13, y: 4}, {x: 10, y: 7}, {x: 5, y: 7}, {x: 2, y: 4}, {x: 4, y: 2}]]}])
       result = @polygon_finder_class.new(
         bitmap: @bitmap_class.new(chunk, 16),
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([
+      expect(result.points).to eq([
         {outer: [{x: 7, y: 0}, {x: 10, y: 0}, {x: 14, y: 4}, {x: 10, y: 8}, {x: 7, y: 8}, {x: 5, y: 8},
           {x: 1, y: 4}, {x: 5, y: 0}], inner: [
             [{x: 5, y: 1}, {x: 2, y: 4}, {x: 5, y: 7}, {x: 10, y: 7}, {x: 13, y: 4}, {x: 10, y: 1}]
@@ -792,7 +792,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :a, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([{outer: [{x: 6, y: 0}, {x: 4, y: 1}, {x: 4, y: 3}, {x: 6, y: 4}, {x: 7, y: 4}, {x: 12, y: 4}, {x: 12, y: 0}, {x: 7, y: 0}], inner: [[{x: 6, y: 3}, {x: 5, y: 2}, {x: 6, y: 1}, {x: 11, y: 1}, {x: 11, y: 3}]]}])
+      expect(result.points).to eq([{outer: [{x: 6, y: 0}, {x: 4, y: 1}, {x: 4, y: 3}, {x: 6, y: 4}, {x: 7, y: 4}, {x: 12, y: 4}, {x: 12, y: 0}, {x: 7, y: 0}], inner: [[{x: 6, y: 3}, {x: 5, y: 2}, {x: 6, y: 1}, {x: 11, y: 1}, {x: 11, y: 3}]]}])
     end
 
     it "does the work with at least two pixel border (b)" do
@@ -806,7 +806,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :a, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([{outer: [{x: 6, y: 0}, {x: 4, y: 1}, {x: 4, y: 3}, {x: 6, y: 4}, {x: 7, y: 4}, {x: 10, y: 4}, {x: 10, y: 0}, {x: 7, y: 0}], inner: [[{x: 6, y: 3}, {x: 4, y: 2}, {x: 6, y: 1}, {x: 9, y: 1}, {x: 9, y: 3}]]}])
+      expect(result.points).to eq([{outer: [{x: 6, y: 0}, {x: 4, y: 1}, {x: 4, y: 3}, {x: 6, y: 4}, {x: 7, y: 4}, {x: 10, y: 4}, {x: 10, y: 0}, {x: 7, y: 0}], inner: [[{x: 6, y: 3}, {x: 4, y: 2}, {x: 6, y: 1}, {x: 9, y: 1}, {x: 9, y: 3}]]}])
     end
 
     it "circle with shape inside" do
@@ -828,14 +828,14 @@ RSpec.shared_examples "finder" do
         nil,
         {versus: :a, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([{outer: [{x: 5, y: 0}, {x: 1, y: 4}, {x: 1, y: 7}, {x: 5, y: 11}, {x: 10, y: 11}, {x: 14, y: 7}, {x: 14, y: 4}, {x: 10, y: 0}], inner: [[{x: 5, y: 1}, {x: 10, y: 1}, {x: 13, y: 4}, {x: 13, y: 7}, {x: 10, y: 10}, {x: 5, y: 10}, {x: 2, y: 7}, {x: 2, y: 4}, {x: 4, y: 2}]]}, {outer: [{x: 6, y: 4}, {x: 4, y: 5}, {x: 4, y: 7}, {x: 6, y: 8}, {x: 10, y: 8}, {x: 10, y: 4}], inner: [[{x: 6, y: 5}, {x: 9, y: 5}, {x: 9, y: 7}, {x: 6, y: 7}, {x: 4, y: 6}]]}])
+      expect(result.points).to eq([{outer: [{x: 5, y: 0}, {x: 1, y: 4}, {x: 1, y: 7}, {x: 5, y: 11}, {x: 10, y: 11}, {x: 14, y: 7}, {x: 14, y: 4}, {x: 10, y: 0}], inner: [[{x: 5, y: 1}, {x: 10, y: 1}, {x: 13, y: 4}, {x: 13, y: 7}, {x: 10, y: 10}, {x: 5, y: 10}, {x: 2, y: 7}, {x: 2, y: 4}, {x: 4, y: 2}]]}, {outer: [{x: 6, y: 4}, {x: 4, y: 5}, {x: 4, y: 7}, {x: 6, y: 8}, {x: 10, y: 8}, {x: 10, y: 4}], inner: [[{x: 6, y: 5}, {x: 9, y: 5}, {x: 9, y: 7}, {x: 6, y: 7}, {x: 4, y: 6}]]}])
 
       result = @polygon_finder_class.new(
         bitmap: @bitmap_class.new(chunk, 16),
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :a, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([
+      expect(result.points).to eq([
         {outer: [{x: 5, y: 0}, {x: 1, y: 4}, {x: 1, y: 7}, {x: 5, y: 11}, {x: 7, y: 11},
           {x: 10, y: 11}, {x: 14, y: 7}, {x: 14, y: 4}, {x: 10, y: 0}, {x: 7, y: 0}],
          inner: [
@@ -859,25 +859,25 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 6, versus: :a, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([{outer: [{x: 1, y: 0}, {x: 1, y: 4}, {x: 5, y: 4}, {x: 7, y: 4}, {x: 7, y: 0}, {x: 5, y: 0}], inner: [[{x: 2, y: 3}, {x: 2, y: 1}, {x: 6, y: 1}, {x: 6, y: 3}]]}, {outer: [{x: 10, y: 0}, {x: 10, y: 4}, {x: 12, y: 4}, {x: 16, y: 4}, {x: 16, y: 0}, {x: 12, y: 0}], inner: [[{x: 11, y: 3}, {x: 11, y: 1}, {x: 15, y: 1}, {x: 15, y: 3}]]}, {outer: [{x: 20, y: 0}, {x: 20, y: 4}, {x: 25, y: 4}, {x: 26, y: 4}, {x: 26, y: 0}, {x: 25, y: 0}], inner: [[{x: 21, y: 1}, {x: 25, y: 1}, {x: 25, y: 3}, {x: 21, y: 3}, {x: 21, y: 2}]]}, {outer: [{x: 29, y: 0}, {x: 29, y: 4}, {x: 35, y: 4}, {x: 35, y: 0}, {x: 32, y: 0}], inner: [[{x: 30, y: 3}, {x: 30, y: 1}, {x: 34, y: 1}, {x: 34, y: 3}]]}])
+      expect(result.points).to eq([{outer: [{x: 1, y: 0}, {x: 1, y: 4}, {x: 5, y: 4}, {x: 7, y: 4}, {x: 7, y: 0}, {x: 5, y: 0}], inner: [[{x: 2, y: 3}, {x: 2, y: 1}, {x: 6, y: 1}, {x: 6, y: 3}]]}, {outer: [{x: 10, y: 0}, {x: 10, y: 4}, {x: 12, y: 4}, {x: 16, y: 4}, {x: 16, y: 0}, {x: 12, y: 0}], inner: [[{x: 11, y: 3}, {x: 11, y: 1}, {x: 15, y: 1}, {x: 15, y: 3}]]}, {outer: [{x: 20, y: 0}, {x: 20, y: 4}, {x: 25, y: 4}, {x: 26, y: 4}, {x: 26, y: 0}, {x: 25, y: 0}], inner: [[{x: 21, y: 1}, {x: 25, y: 1}, {x: 25, y: 3}, {x: 21, y: 3}, {x: 21, y: 2}]]}, {outer: [{x: 29, y: 0}, {x: 29, y: 4}, {x: 35, y: 4}, {x: 35, y: 0}, {x: 32, y: 0}], inner: [[{x: 30, y: 3}, {x: 30, y: 1}, {x: 34, y: 1}, {x: 34, y: 3}]]}])
       result = @polygon_finder_class.new(
         bitmap: @bitmap_class.new(chunk, 40),
         matcher: @matcher,
         options: {number_of_tiles: 5, versus: :a, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([{outer: [{x: 1, y: 0}, {x: 1, y: 4}, {x: 7, y: 4}, {x: 7, y: 0}], inner: [[{x: 2, y: 1}, {x: 6, y: 1}, {x: 6, y: 3}, {x: 2, y: 3}, {x: 2, y: 2}]]}, {outer: [{x: 10, y: 0}, {x: 10, y: 4}, {x: 15, y: 4}, {x: 16, y: 4}, {x: 16, y: 0}, {x: 15, y: 0}], inner: [[{x: 11, y: 1}, {x: 15, y: 1}, {x: 15, y: 3}, {x: 11, y: 3}, {x: 11, y: 2}]]}, {outer: [{x: 20, y: 0}, {x: 20, y: 4}, {x: 26, y: 4}, {x: 26, y: 0}, {x: 23, y: 0}], inner: [[{x: 21, y: 3}, {x: 21, y: 1}, {x: 25, y: 1}, {x: 25, y: 3}]]}, {outer: [{x: 29, y: 0}, {x: 29, y: 4}, {x: 31, y: 4}, {x: 35, y: 4}, {x: 35, y: 0}, {x: 31, y: 0}], inner: [[{x: 30, y: 3}, {x: 30, y: 1}, {x: 34, y: 1}, {x: 34, y: 3}]]}])
+      expect(result.points).to eq([{outer: [{x: 1, y: 0}, {x: 1, y: 4}, {x: 7, y: 4}, {x: 7, y: 0}], inner: [[{x: 2, y: 1}, {x: 6, y: 1}, {x: 6, y: 3}, {x: 2, y: 3}, {x: 2, y: 2}]]}, {outer: [{x: 10, y: 0}, {x: 10, y: 4}, {x: 15, y: 4}, {x: 16, y: 4}, {x: 16, y: 0}, {x: 15, y: 0}], inner: [[{x: 11, y: 1}, {x: 15, y: 1}, {x: 15, y: 3}, {x: 11, y: 3}, {x: 11, y: 2}]]}, {outer: [{x: 20, y: 0}, {x: 20, y: 4}, {x: 26, y: 4}, {x: 26, y: 0}, {x: 23, y: 0}], inner: [[{x: 21, y: 3}, {x: 21, y: 1}, {x: 25, y: 1}, {x: 25, y: 3}]]}, {outer: [{x: 29, y: 0}, {x: 29, y: 4}, {x: 31, y: 4}, {x: 35, y: 4}, {x: 35, y: 0}, {x: 31, y: 0}], inner: [[{x: 30, y: 3}, {x: 30, y: 1}, {x: 34, y: 1}, {x: 34, y: 3}]]}])
       result = @polygon_finder_class.new(
         bitmap: @bitmap_class.new(chunk, 40),
         matcher: @matcher,
         options: {number_of_tiles: 4, versus: :a, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([{outer: [{x: 1, y: 0}, {x: 1, y: 4}, {x: 7, y: 4}, {x: 7, y: 0}], inner: [[{x: 2, y: 1}, {x: 6, y: 1}, {x: 6, y: 3}, {x: 2, y: 3}, {x: 2, y: 2}]]}, {outer: [{x: 10, y: 0}, {x: 10, y: 4}, {x: 16, y: 4}, {x: 16, y: 0}], inner: [[{x: 11, y: 1}, {x: 15, y: 1}, {x: 15, y: 3}, {x: 11, y: 3}, {x: 11, y: 2}]]}, {outer: [{x: 20, y: 0}, {x: 20, y: 4}, {x: 26, y: 4}, {x: 26, y: 0}], inner: [[{x: 21, y: 1}, {x: 25, y: 1}, {x: 25, y: 3}, {x: 21, y: 3}, {x: 21, y: 2}]]}, {outer: [{x: 29, y: 0}, {x: 29, y: 4}, {x: 35, y: 4}, {x: 35, y: 0}], inner: [[{x: 30, y: 1}, {x: 34, y: 1}, {x: 34, y: 3}, {x: 30, y: 3}, {x: 30, y: 2}]]}])
+      expect(result.points).to eq([{outer: [{x: 1, y: 0}, {x: 1, y: 4}, {x: 7, y: 4}, {x: 7, y: 0}], inner: [[{x: 2, y: 1}, {x: 6, y: 1}, {x: 6, y: 3}, {x: 2, y: 3}, {x: 2, y: 2}]]}, {outer: [{x: 10, y: 0}, {x: 10, y: 4}, {x: 16, y: 4}, {x: 16, y: 0}], inner: [[{x: 11, y: 1}, {x: 15, y: 1}, {x: 15, y: 3}, {x: 11, y: 3}, {x: 11, y: 2}]]}, {outer: [{x: 20, y: 0}, {x: 20, y: 4}, {x: 26, y: 4}, {x: 26, y: 0}], inner: [[{x: 21, y: 1}, {x: 25, y: 1}, {x: 25, y: 3}, {x: 21, y: 3}, {x: 21, y: 2}]]}, {outer: [{x: 29, y: 0}, {x: 29, y: 4}, {x: 35, y: 4}, {x: 35, y: 0}], inner: [[{x: 30, y: 1}, {x: 34, y: 1}, {x: 34, y: 3}, {x: 30, y: 3}, {x: 30, y: 2}]]}])
       result = @polygon_finder_class.new(
         bitmap: @bitmap_class.new(chunk, 40),
         matcher: @matcher,
         options: {number_of_tiles: 4, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([{outer: [{x: 7, y: 0}, {x: 7, y: 4}, {x: 1, y: 4}, {x: 1, y: 0}], inner: [[{x: 6, y: 1}, {x: 2, y: 1}, {x: 2, y: 3}, {x: 6, y: 3}, {x: 6, y: 2}]]}, {outer: [{x: 16, y: 0}, {x: 16, y: 4}, {x: 10, y: 4}, {x: 10, y: 0}], inner: [[{x: 15, y: 1}, {x: 11, y: 1}, {x: 11, y: 3}, {x: 15, y: 3}, {x: 15, y: 2}]]}, {outer: [{x: 26, y: 0}, {x: 26, y: 4}, {x: 20, y: 4}, {x: 20, y: 0}], inner: [[{x: 25, y: 1}, {x: 21, y: 1}, {x: 21, y: 3}, {x: 25, y: 3}, {x: 25, y: 2}]]}, {outer: [{x: 35, y: 0}, {x: 35, y: 4}, {x: 29, y: 4}, {x: 29, y: 0}], inner: [[{x: 34, y: 1}, {x: 30, y: 1}, {x: 30, y: 3}, {x: 34, y: 3}, {x: 34, y: 2}]]}])
+      expect(result.points).to eq([{outer: [{x: 7, y: 0}, {x: 7, y: 4}, {x: 1, y: 4}, {x: 1, y: 0}], inner: [[{x: 6, y: 1}, {x: 2, y: 1}, {x: 2, y: 3}, {x: 6, y: 3}, {x: 6, y: 2}]]}, {outer: [{x: 16, y: 0}, {x: 16, y: 4}, {x: 10, y: 4}, {x: 10, y: 0}], inner: [[{x: 15, y: 1}, {x: 11, y: 1}, {x: 11, y: 3}, {x: 15, y: 3}, {x: 15, y: 2}]]}, {outer: [{x: 26, y: 0}, {x: 26, y: 4}, {x: 20, y: 4}, {x: 20, y: 0}], inner: [[{x: 25, y: 1}, {x: 21, y: 1}, {x: 21, y: 3}, {x: 25, y: 3}, {x: 25, y: 2}]]}, {outer: [{x: 35, y: 0}, {x: 35, y: 4}, {x: 29, y: 4}, {x: 29, y: 0}], inner: [[{x: 34, y: 1}, {x: 30, y: 1}, {x: 30, y: 3}, {x: 34, y: 3}, {x: 34, y: 2}]]}])
     end
 
     it "search for a missing block" do
@@ -891,7 +891,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 5, versus: :a, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([{outer: [{x: 1, y: 0}, {x: 1, y: 4}, {x: 4, y: 4}, {x: 4, y: 0}], inner: []}, {outer: [{x: 7, y: 0}, {x: 7, y: 4}, {x: 9, y: 4}, {x: 10, y: 4}, {x: 10, y: 0}, {x: 9, y: 0}], inner: []}, {outer: [{x: 13, y: 0}, {x: 13, y: 4}, {x: 16, y: 4}, {x: 16, y: 0}], inner: [[{x: 13, y: 1}, {x: 16, y: 1}, {x: 16, y: 3}, {x: 13, y: 3}, {x: 13, y: 2}]]}, {outer: [{x: 19, y: 0}, {x: 19, y: 4}, {x: 22, y: 4}, {x: 22, y: 0}], inner: []}, {outer: [{x: 24, y: 0}, {x: 24, y: 4}, {x: 27, y: 4}, {x: 27, y: 0}], inner: []}, {outer: [{x: 30, y: 0}, {x: 30, y: 4}, {x: 33, y: 4}, {x: 33, y: 0}], inner: []}, {outer: [{x: 37, y: 0}, {x: 37, y: 4}, {x: 39, y: 4}, {x: 40, y: 4}, {x: 40, y: 0}, {x: 39, y: 0}], inner: [[{x: 37, y: 3}, {x: 37, y: 1}, {x: 40, y: 1}, {x: 40, y: 3}]]}, {outer: [{x: 43, y: 0}, {x: 43, y: 4}, {x: 46, y: 4}, {x: 46, y: 0}], inner: []}])
+      expect(result.points).to eq([{outer: [{x: 1, y: 0}, {x: 1, y: 4}, {x: 4, y: 4}, {x: 4, y: 0}], inner: []}, {outer: [{x: 7, y: 0}, {x: 7, y: 4}, {x: 9, y: 4}, {x: 10, y: 4}, {x: 10, y: 0}, {x: 9, y: 0}], inner: []}, {outer: [{x: 13, y: 0}, {x: 13, y: 4}, {x: 16, y: 4}, {x: 16, y: 0}], inner: [[{x: 13, y: 1}, {x: 16, y: 1}, {x: 16, y: 3}, {x: 13, y: 3}, {x: 13, y: 2}]]}, {outer: [{x: 19, y: 0}, {x: 19, y: 4}, {x: 22, y: 4}, {x: 22, y: 0}], inner: []}, {outer: [{x: 24, y: 0}, {x: 24, y: 4}, {x: 27, y: 4}, {x: 27, y: 0}], inner: []}, {outer: [{x: 30, y: 0}, {x: 30, y: 4}, {x: 33, y: 4}, {x: 33, y: 0}], inner: []}, {outer: [{x: 37, y: 0}, {x: 37, y: 4}, {x: 39, y: 4}, {x: 40, y: 4}, {x: 40, y: 0}, {x: 39, y: 0}], inner: [[{x: 37, y: 3}, {x: 37, y: 1}, {x: 40, y: 1}, {x: 40, y: 3}]]}, {outer: [{x: 43, y: 0}, {x: 43, y: 4}, {x: 46, y: 4}, {x: 46, y: 0}], inner: []}])
     end
 
     it "circle with inside parts" do
@@ -912,16 +912,16 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :a, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([{outer: [{x: 5, y: 0}, {x: 1, y: 4}, {x: 1, y: 7}, {x: 5, y: 11}, {x: 7, y: 11}, {x: 10, y: 11}, {x: 14, y: 7}, {x: 14, y: 4}, {x: 10, y: 0}, {x: 7, y: 0}],
-                                        inner: [[{x: 4, y: 8}, {x: 3, y: 7}, {x: 3, y: 4}, {x: 4, y: 3}, {x: 11, y: 3}, {x: 12, y: 4}, {x: 12, y: 7}, {x: 11, y: 8}]]}])
+      expect(result.points).to eq([{outer: [{x: 5, y: 0}, {x: 1, y: 4}, {x: 1, y: 7}, {x: 5, y: 11}, {x: 7, y: 11}, {x: 10, y: 11}, {x: 14, y: 7}, {x: 14, y: 4}, {x: 10, y: 0}, {x: 7, y: 0}],
+                                    inner: [[{x: 4, y: 8}, {x: 3, y: 7}, {x: 3, y: 4}, {x: 4, y: 3}, {x: 11, y: 3}, {x: 12, y: 4}, {x: 12, y: 7}, {x: 11, y: 8}]]}])
 
       result = @polygon_finder_class.new(
         bitmap: @bitmap_class.new(chunk, 16),
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([{outer: [{x: 7, y: 0}, {x: 10, y: 0}, {x: 14, y: 4}, {x: 14, y: 7}, {x: 10, y: 11}, {x: 7, y: 11}, {x: 5, y: 11}, {x: 1, y: 7}, {x: 1, y: 4}, {x: 5, y: 0}],
-                                        inner: [[{x: 4, y: 3}, {x: 3, y: 4}, {x: 3, y: 7}, {x: 4, y: 8}, {x: 11, y: 8}, {x: 12, y: 7}, {x: 12, y: 4}, {x: 11, y: 3}]]}])
+      expect(result.points).to eq([{outer: [{x: 7, y: 0}, {x: 10, y: 0}, {x: 14, y: 4}, {x: 14, y: 7}, {x: 10, y: 11}, {x: 7, y: 11}, {x: 5, y: 11}, {x: 1, y: 7}, {x: 1, y: 4}, {x: 5, y: 0}],
+                                    inner: [[{x: 4, y: 3}, {x: 3, y: 4}, {x: 3, y: 7}, {x: 4, y: 8}, {x: 11, y: 8}, {x: 12, y: 7}, {x: 12, y: 4}, {x: 11, y: 3}]]}])
     end
 
     it "rectangle with holes" do
@@ -947,7 +947,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([{outer: [{x: 7, y: 0}, {x: 15, y: 0}, {x: 15, y: 16}, {x: 7, y: 16}, {x: 0, y: 16}, {x: 0, y: 0}], inner: [[{x: 4, y: 2}, {x: 3, y: 3}, {x: 3, y: 6}, {x: 4, y: 7}, {x: 7, y: 7}, {x: 7, y: 6}, {x: 8, y: 5}, {x: 8, y: 4}, {x: 7, y: 3}, {x: 7, y: 2}], [{x: 4, y: 10}, {x: 3, y: 11}, {x: 3, y: 14}, {x: 4, y: 15}, {x: 7, y: 15}, {x: 7, y: 14}, {x: 8, y: 13}, {x: 8, y: 12}, {x: 7, y: 11}, {x: 7, y: 10}]]}])
+      expect(result.points).to eq([{outer: [{x: 7, y: 0}, {x: 15, y: 0}, {x: 15, y: 16}, {x: 7, y: 16}, {x: 0, y: 16}, {x: 0, y: 0}], inner: [[{x: 4, y: 2}, {x: 3, y: 3}, {x: 3, y: 6}, {x: 4, y: 7}, {x: 7, y: 7}, {x: 7, y: 6}, {x: 8, y: 5}, {x: 8, y: 4}, {x: 7, y: 3}, {x: 7, y: 2}], [{x: 4, y: 10}, {x: 3, y: 11}, {x: 3, y: 14}, {x: 4, y: 15}, {x: 7, y: 15}, {x: 7, y: 14}, {x: 8, y: 13}, {x: 8, y: 12}, {x: 7, y: 11}, {x: 7, y: 10}]]}])
     end
 
     it "circle with inside" do
@@ -966,7 +966,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([
+      expect(result.points).to eq([
         {outer: [{x: 7, y: 0}, {x: 11, y: 0}, {x: 14, y: 3}, {x: 14, y: 6}, {x: 11, y: 9},
           {x: 7, y: 9}, {x: 4, y: 9}, {x: 1, y: 6}, {x: 1, y: 3}, {x: 4, y: 0}],
          inner: [[{x: 4, y: 2}, {x: 3, y: 3}, {x: 3, y: 6}, {x: 4, y: 7}, {x: 7, y: 7},
@@ -978,7 +978,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :a, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([
+      expect(result.points).to eq([
         {outer: [{x: 4, y: 0}, {x: 1, y: 3}, {x: 1, y: 6}, {x: 4, y: 9}, {x: 7, y: 9}, {x: 11, y: 9}, {x: 14, y: 6}, {x: 14, y: 3}, {x: 11, y: 0}, {x: 7, y: 0}],
          inner: [[{x: 4, y: 7}, {x: 3, y: 6}, {x: 3, y: 3}, {x: 4, y: 2}, {x: 7, y: 2},
            {x: 7, y: 3}, {x: 8, y: 4}, {x: 8, y: 5}, {x: 7, y: 6}, {x: 7, y: 7}]]}
@@ -1001,14 +1001,14 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([{outer: [{x: 7, y: 0}, {x: 15, y: 0}, {x: 15, y: 9}, {x: 7, y: 9}, {x: 1, y: 9}, {x: 1, y: 0}], inner: [[{x: 7, y: 2}, {x: 3, y: 2}, {x: 3, y: 7}, {x: 7, y: 7}, {x: 7, y: 3}]]}])
+      expect(result.points).to eq([{outer: [{x: 7, y: 0}, {x: 15, y: 0}, {x: 15, y: 9}, {x: 7, y: 9}, {x: 1, y: 9}, {x: 1, y: 0}], inner: [[{x: 7, y: 2}, {x: 3, y: 2}, {x: 3, y: 7}, {x: 7, y: 7}, {x: 7, y: 3}]]}])
 
       result = @polygon_finder_class.new(
         bitmap: @bitmap_class.new(chunk, 16),
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :a, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([{outer: [{x: 1, y: 0}, {x: 1, y: 9}, {x: 7, y: 9}, {x: 15, y: 9}, {x: 15, y: 0}, {x: 7, y: 0}], inner: [[{x: 3, y: 2}, {x: 7, y: 2}, {x: 7, y: 7}, {x: 3, y: 7}, {x: 3, y: 3}]]}])
+      expect(result.points).to eq([{outer: [{x: 1, y: 0}, {x: 1, y: 9}, {x: 7, y: 9}, {x: 15, y: 9}, {x: 15, y: 0}, {x: 7, y: 0}], inner: [[{x: 3, y: 2}, {x: 7, y: 2}, {x: 7, y: 7}, {x: 3, y: 7}, {x: 3, y: 3}]]}])
     end
 
     it "circle with inside hole" do
@@ -1027,7 +1027,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([
+      expect(result.points).to eq([
         {outer: [{x: 7, y: 0}, {x: 11, y: 0}, {x: 14, y: 3}, {x: 14, y: 6}, {x: 11, y: 9}, {x: 7, y: 9}, {x: 4, y: 9}, {x: 1, y: 6}, {x: 1, y: 3}, {x: 4, y: 0}],
          inner: [
            [{x: 5, y: 4}, {x: 5, y: 5}, {x: 7, y: 6}, {x: 8, y: 7}, {x: 11, y: 7}, {x: 11, y: 2}, {x: 8, y: 2}, {x: 7, y: 3}]
@@ -1054,7 +1054,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :a, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([{outer:
+      expect(result.points).to eq([{outer:
         [{x: 7, y: 0}, {x: 7, y: 3}, {x: 5, y: 4}, {x: 2, y: 5}, {x: 1, y: 6}, {x: 1, y: 9}, {x: 2, y: 10},
           {x: 7, y: 11}, {x: 12, y: 11}, {x: 14, y: 9}, {x: 14, y: 6}, {x: 13, y: 5}, {x: 13, y: 0}], inner: []}])
 
@@ -1063,7 +1063,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([{outer: [{x: 7, y: 0}, {x: 13, y: 0}, {x: 13, y: 5}, {x: 14, y: 6}, {x: 14, y: 9}, {x: 12, y: 11}, {x: 7, y: 11}, {x: 2, y: 10}, {x: 1, y: 9}, {x: 1, y: 6}, {x: 2, y: 5}, {x: 5, y: 4}, {x: 7, y: 3}, {x: 7, y: 1}], inner: []}])
+      expect(result.points).to eq([{outer: [{x: 7, y: 0}, {x: 13, y: 0}, {x: 13, y: 5}, {x: 14, y: 6}, {x: 14, y: 9}, {x: 12, y: 11}, {x: 7, y: 11}, {x: 2, y: 10}, {x: 1, y: 9}, {x: 1, y: 6}, {x: 2, y: 5}, {x: 5, y: 4}, {x: 7, y: 3}, {x: 7, y: 1}], inner: []}])
     end
 
     it "holed circle and many workers" do
@@ -1082,7 +1082,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 3, versus: :a, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([
+      expect(result.points).to eq([
         {outer: [{x: 4, y: 0}, {x: 1, y: 3}, {x: 1, y: 6}, {x: 4, y: 9}, {x: 6, y: 9},
           {x: 12, y: 9}, {x: 15, y: 6}, {x: 15, y: 3}, {x: 12, y: 0}, {x: 6, y: 0}],
          inner: [[{x: 5, y: 6}, {x: 4, y: 5}, {x: 4, y: 4}, {x: 5, y: 3}, {x: 10, y: 3},
@@ -1127,7 +1127,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 3, versus: :a, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([{outer: [{x: 3, y: 0}, {x: 0, y: 3}, {x: 0, y: 6}, {x: 3, y: 9}, {x: 3, y: 10}, {x: 6, y: 10}, {x: 13, y: 10}, {x: 18, y: 10}, {x: 18, y: 9}, {x: 21, y: 6}, {x: 21, y: 3}, {x: 18, y: 0}, {x: 13, y: 0}, {x: 6, y: 0}], inner: [[{x: 8, y: 8}, {x: 6, y: 9}, {x: 3, y: 8}, {x: 3, y: 5}, {x: 6, y: 4}, {x: 8, y: 5}, {x: 11, y: 5}, {x: 11, y: 3}, {x: 18, y: 3}, {x: 18, y: 7}]]}])
+      expect(result.points).to eq([{outer: [{x: 3, y: 0}, {x: 0, y: 3}, {x: 0, y: 6}, {x: 3, y: 9}, {x: 3, y: 10}, {x: 6, y: 10}, {x: 13, y: 10}, {x: 18, y: 10}, {x: 18, y: 9}, {x: 21, y: 6}, {x: 21, y: 3}, {x: 18, y: 0}, {x: 13, y: 0}, {x: 6, y: 0}], inner: [[{x: 8, y: 8}, {x: 6, y: 9}, {x: 3, y: 8}, {x: 3, y: 5}, {x: 6, y: 4}, {x: 8, y: 5}, {x: 11, y: 5}, {x: 11, y: 3}, {x: 18, y: 3}, {x: 18, y: 7}]]}])
     end
 
     it "problematic case" do
@@ -1141,14 +1141,14 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :a, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([{outer: [{x: 0, y: 0}, {x: 0, y: 4}, {x: 10, y: 4}, {x: 21, y: 4}, {x: 21, y: 0}, {x: 10, y: 0}], inner: [[{x: 9, y: 3}, {x: 9, y: 1}, {x: 21, y: 1}, {x: 21, y: 3}]]}])
+      expect(result.points).to eq([{outer: [{x: 0, y: 0}, {x: 0, y: 4}, {x: 10, y: 4}, {x: 21, y: 4}, {x: 21, y: 0}, {x: 10, y: 0}], inner: [[{x: 9, y: 3}, {x: 9, y: 1}, {x: 21, y: 1}, {x: 21, y: 3}]]}])
 
       result = @polygon_finder_class.new(
         bitmap: @bitmap_class.new(chunk, 22),
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([{outer: [{x: 10, y: 0}, {x: 21, y: 0}, {x: 21, y: 4}, {x: 10, y: 4}, {x: 0, y: 4}, {x: 0, y: 0}], inner: [[{x: 9, y: 1}, {x: 9, y: 3}, {x: 21, y: 3}, {x: 21, y: 1}]]}])
+      expect(result.points).to eq([{outer: [{x: 10, y: 0}, {x: 21, y: 0}, {x: 21, y: 4}, {x: 10, y: 4}, {x: 0, y: 4}, {x: 0, y: 0}], inner: [[{x: 9, y: 1}, {x: 9, y: 3}, {x: 21, y: 3}, {x: 21, y: 1}]]}])
     end
 
     it "letter e, problem class a" do
@@ -1169,7 +1169,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :a, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([
+      expect(result.points).to eq([
         {outer: [{x: 2, y: 0}, {x: 1, y: 1}, {x: 1, y: 2}, {x: 0, y: 3}, {x: 0, y: 7}, {x: 1, y: 8}, {x: 1, y: 9}, {x: 3, y: 11}, {x: 6, y: 11}, {x: 13, y: 11}, {x: 13, y: 10}, {x: 6, y: 10}, {x: 3, y: 9}, {x: 3, y: 7}, {x: 6, y: 6}, {x: 13, y: 6}, {x: 13, y: 0}, {x: 6, y: 0}],
          inner: [[{x: 3, y: 4}, {x: 3, y: 2}, {x: 11, y: 2}, {x: 11, y: 4}]]}
       ])
@@ -1193,7 +1193,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 3, versus: :a, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([{outer: [{x: 2, y: 0}, {x: 1, y: 1}, {x: 1, y: 2}, {x: 0, y: 3}, {x: 0, y: 7}, {x: 1, y: 8}, {x: 1, y: 9}, {x: 3, y: 11}, {x: 6, y: 11}, {x: 13, y: 11}, {x: 18, y: 11}, {x: 19, y: 10}, {x: 19, y: 9}, {x: 21, y: 7}, {x: 21, y: 3}, {x: 20, y: 2}, {x: 20, y: 1}, {x: 19, y: 0}, {x: 13, y: 0}, {x: 6, y: 0}], inner: [[{x: 3, y: 4}, {x: 3, y: 2}, {x: 11, y: 2}, {x: 11, y: 4}], [{x: 6, y: 10}, {x: 3, y: 9}, {x: 3, y: 7}, {x: 6, y: 6}, {x: 16, y: 7}, {x: 16, y: 9}]]}])
+      expect(result.points).to eq([{outer: [{x: 2, y: 0}, {x: 1, y: 1}, {x: 1, y: 2}, {x: 0, y: 3}, {x: 0, y: 7}, {x: 1, y: 8}, {x: 1, y: 9}, {x: 3, y: 11}, {x: 6, y: 11}, {x: 13, y: 11}, {x: 18, y: 11}, {x: 19, y: 10}, {x: 19, y: 9}, {x: 21, y: 7}, {x: 21, y: 3}, {x: 20, y: 2}, {x: 20, y: 1}, {x: 19, y: 0}, {x: 13, y: 0}, {x: 6, y: 0}], inner: [[{x: 3, y: 4}, {x: 3, y: 2}, {x: 11, y: 2}, {x: 11, y: 4}], [{x: 6, y: 10}, {x: 3, y: 9}, {x: 3, y: 7}, {x: 6, y: 6}, {x: 16, y: 7}, {x: 16, y: 9}]]}])
     end
 
     it "holed side overlapping tiles common limits" do
@@ -1210,7 +1210,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([{outer: [{x: 5, y: 0}, {x: 11, y: 0}, {x: 11, y: 7}, {x: 5, y: 7}, {x: 0, y: 7}, {x: 0, y: 6}, {x: 5, y: 5}, {x: 6, y: 4}, {x: 6, y: 3}, {x: 5, y: 2}, {x: 0, y: 1}, {x: 0, y: 0}], inner: []}])
+      expect(result.points).to eq([{outer: [{x: 5, y: 0}, {x: 11, y: 0}, {x: 11, y: 7}, {x: 5, y: 7}, {x: 0, y: 7}, {x: 0, y: 6}, {x: 5, y: 5}, {x: 6, y: 4}, {x: 6, y: 3}, {x: 5, y: 2}, {x: 0, y: 1}, {x: 0, y: 0}], inner: []}])
     end
 
     it "closed holed side overlapping tiles common limits" do
@@ -1227,7 +1227,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :a, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([
+      expect(result.points).to eq([
         {outer: [{x: 0, y: 0}, {x: 0, y: 7}, {x: 5, y: 7}, {x: 11, y: 7}, {x: 11, y: 0}, {x: 5, y: 0}],
          inner: [
            [{x: 4, y: 4}, {x: 4, y: 3}, {x: 5, y: 2}, {x: 11, y: 2}, {x: 11, y: 5}, {x: 5, y: 5}]
@@ -1239,7 +1239,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([
+      expect(result.points).to eq([
         {outer: [{x: 5, y: 0}, {x: 11, y: 0}, {x: 11, y: 7}, {x: 5, y: 7}, {x: 0, y: 7}, {x: 0, y: 0}],
          inner: [
            [{x: 4, y: 3}, {x: 4, y: 4}, {x: 5, y: 5}, {x: 11, y: 5}, {x: 11, y: 2}, {x: 5, y: 2}]
@@ -1262,7 +1262,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 4, versus: :a, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([{
+      expect(result.points).to eq([{
         outer: [{x: 0, y: 0}, {x: 0, y: 7}, {x: 4, y: 7}, {x: 19, y: 7}, {x: 19, y: 0}, {x: 4, y: 0}],
         inner: [
           [{x: 8, y: 4}, {x: 8, y: 3}, {x: 9, y: 2},
@@ -1275,7 +1275,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 4, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([{
+      expect(result.points).to eq([{
         outer: [{x: 4, y: 0}, {x: 19, y: 0}, {x: 19, y: 7}, {x: 4, y: 7}, {x: 0, y: 7}, {x: 0, y: 0}],
         inner: [
           [{x: 8, y: 3}, {x: 8, y: 4}, {x: 9, y: 5},
@@ -1308,7 +1308,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 3, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([{outer: [{x: 8, y: 0}, {x: 17, y: 0}, {x: 18, y: 0}, {x: 16, y: 2}, {x: 16, y: 14}, {x: 17, y: 15}, {x: 25, y: 14}, {x: 26, y: 13}, {x: 26, y: 16}, {x: 8, y: 16}, {x: 0, y: 16}, {x: 2, y: 14}, {x: 2, y: 2}, {x: 0, y: 0}], inner: [[{x: 4, y: 2}, {x: 4, y: 6}, {x: 8, y: 7}, {x: 10, y: 5}, {x: 10, y: 11}, {x: 8, y: 9}, {x: 4, y: 10}, {x: 4, y: 14}, {x: 9, y: 14}, {x: 10, y: 13}, {x: 10, y: 15}, {x: 13, y: 15}, {x: 14, y: 14}, {x: 14, y: 2}, {x: 13, y: 1}, {x: 10, y: 1}, {x: 10, y: 3}, {x: 9, y: 2}]]}])
+      expect(result.points).to eq([{outer: [{x: 8, y: 0}, {x: 17, y: 0}, {x: 18, y: 0}, {x: 16, y: 2}, {x: 16, y: 14}, {x: 17, y: 15}, {x: 25, y: 14}, {x: 26, y: 13}, {x: 26, y: 16}, {x: 8, y: 16}, {x: 0, y: 16}, {x: 2, y: 14}, {x: 2, y: 2}, {x: 0, y: 0}], inner: [[{x: 4, y: 2}, {x: 4, y: 6}, {x: 8, y: 7}, {x: 10, y: 5}, {x: 10, y: 11}, {x: 8, y: 9}, {x: 4, y: 10}, {x: 4, y: 14}, {x: 9, y: 14}, {x: 10, y: 13}, {x: 10, y: 15}, {x: 13, y: 15}, {x: 14, y: 14}, {x: 14, y: 2}, {x: 13, y: 1}, {x: 10, y: 1}, {x: 10, y: 3}, {x: 9, y: 2}]]}])
     end
 
     it "syllable el (sew technic) case two" do
@@ -1335,14 +1335,14 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([{outer: [{x: 8, y: 0}, {x: 17, y: 0}, {x: 17, y: 1}, {x: 16, y: 2}, {x: 16, y: 14}, {x: 17, y: 15}, {x: 17, y: 16}, {x: 8, y: 16}, {x: 0, y: 16}, {x: 2, y: 14}, {x: 2, y: 2}, {x: 0, y: 0}], inner: [[{x: 4, y: 2}, {x: 4, y: 6}, {x: 8, y: 7}, {x: 10, y: 5}, {x: 10, y: 11}, {x: 8, y: 9}, {x: 4, y: 10}, {x: 4, y: 14}, {x: 9, y: 14}, {x: 10, y: 13}, {x: 10, y: 15}, {x: 13, y: 15}, {x: 14, y: 14}, {x: 14, y: 2}, {x: 13, y: 1}, {x: 10, y: 1}, {x: 10, y: 3}, {x: 9, y: 2}]]}])
+      expect(result.points).to eq([{outer: [{x: 8, y: 0}, {x: 17, y: 0}, {x: 17, y: 1}, {x: 16, y: 2}, {x: 16, y: 14}, {x: 17, y: 15}, {x: 17, y: 16}, {x: 8, y: 16}, {x: 0, y: 16}, {x: 2, y: 14}, {x: 2, y: 2}, {x: 0, y: 0}], inner: [[{x: 4, y: 2}, {x: 4, y: 6}, {x: 8, y: 7}, {x: 10, y: 5}, {x: 10, y: 11}, {x: 8, y: 9}, {x: 4, y: 10}, {x: 4, y: 14}, {x: 9, y: 14}, {x: 10, y: 13}, {x: 10, y: 15}, {x: 13, y: 15}, {x: 14, y: 14}, {x: 14, y: 2}, {x: 13, y: 1}, {x: 10, y: 1}, {x: 10, y: 3}, {x: 9, y: 2}]]}])
 
       result = @polygon_finder_class.new(
         bitmap: @bitmap_class.new(chunk, 18),
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :a, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([{outer: [{x: 0, y: 0}, {x: 2, y: 2}, {x: 2, y: 14}, {x: 0, y: 16}, {x: 8, y: 16}, {x: 17, y: 16}, {x: 17, y: 15}, {x: 16, y: 14}, {x: 16, y: 2}, {x: 17, y: 1}, {x: 17, y: 0}, {x: 8, y: 0}], inner: [[{x: 4, y: 14}, {x: 4, y: 10}, {x: 8, y: 9}, {x: 10, y: 11}, {x: 10, y: 5}, {x: 8, y: 7}, {x: 4, y: 6}, {x: 4, y: 2}, {x: 9, y: 2}, {x: 10, y: 3}, {x: 10, y: 1}, {x: 13, y: 1}, {x: 14, y: 2}, {x: 14, y: 14}, {x: 13, y: 15}, {x: 10, y: 15}, {x: 10, y: 13}, {x: 9, y: 14}]]}])
+      expect(result.points).to eq([{outer: [{x: 0, y: 0}, {x: 2, y: 2}, {x: 2, y: 14}, {x: 0, y: 16}, {x: 8, y: 16}, {x: 17, y: 16}, {x: 17, y: 15}, {x: 16, y: 14}, {x: 16, y: 2}, {x: 17, y: 1}, {x: 17, y: 0}, {x: 8, y: 0}], inner: [[{x: 4, y: 14}, {x: 4, y: 10}, {x: 8, y: 9}, {x: 10, y: 11}, {x: 10, y: 5}, {x: 8, y: 7}, {x: 4, y: 6}, {x: 4, y: 2}, {x: 9, y: 2}, {x: 10, y: 3}, {x: 10, y: 1}, {x: 13, y: 1}, {x: 14, y: 2}, {x: 14, y: 14}, {x: 13, y: 15}, {x: 10, y: 15}, {x: 10, y: 13}, {x: 9, y: 14}]]}])
     end
 
     it "syllable el (sew technic) case three" do
@@ -1368,7 +1368,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([
+      expect(result.points).to eq([
         {outer: [{x: 8, y: 0}, {x: 17, y: 0}, {x: 17, y: 1}, {x: 16, y: 2}, {x: 16, y: 14}, {x: 17, y: 15}, {x: 17, y: 16}, {x: 8, y: 16}, {x: 0, y: 16}, {x: 2, y: 14}, {x: 2, y: 2}, {x: 0, y: 0}],
          inner: [
            [{x: 4, y: 2}, {x: 4, y: 4}, {x: 8, y: 5}, {x: 10, y: 4}, {x: 10, y: 12}, {x: 8, y: 11}, {x: 4, y: 12}, {x: 4, y: 14}, {x: 10, y: 14}, {x: 10, y: 15}, {x: 13, y: 15}, {x: 14, y: 14}, {x: 14, y: 2}, {x: 13, y: 1}, {x: 10, y: 1}, {x: 10, y: 2}],
@@ -1405,7 +1405,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq([{outer: [{x: 8, y: 0}, {x: 17, y: 0}, {x: 17, y: 1}, {x: 16, y: 2}, {x: 16, y: 19}, {x: 17, y: 20}, {x: 17, y: 21}, {x: 8, y: 21}, {x: 0, y: 21}, {x: 2, y: 19}, {x: 2, y: 2}, {x: 0, y: 0}], inner: [[{x: 4, y: 2}, {x: 4, y: 4}, {x: 8, y: 5}, {x: 10, y: 4}, {x: 10, y: 17}, {x: 8, y: 16}, {x: 4, y: 17}, {x: 4, y: 19}, {x: 10, y: 19}, {x: 10, y: 20}, {x: 13, y: 20}, {x: 14, y: 19}, {x: 14, y: 2}, {x: 13, y: 1}, {x: 10, y: 1}, {x: 10, y: 2}], [{x: 4, y: 7}, {x: 4, y: 9}, {x: 10, y: 9}, {x: 10, y: 7}], [{x: 4, y: 12}, {x: 4, y: 14}, {x: 10, y: 14}, {x: 10, y: 12}]]}])
+      expect(result.points).to eq([{outer: [{x: 8, y: 0}, {x: 17, y: 0}, {x: 17, y: 1}, {x: 16, y: 2}, {x: 16, y: 19}, {x: 17, y: 20}, {x: 17, y: 21}, {x: 8, y: 21}, {x: 0, y: 21}, {x: 2, y: 19}, {x: 2, y: 2}, {x: 0, y: 0}], inner: [[{x: 4, y: 2}, {x: 4, y: 4}, {x: 8, y: 5}, {x: 10, y: 4}, {x: 10, y: 17}, {x: 8, y: 16}, {x: 4, y: 17}, {x: 4, y: 19}, {x: 10, y: 19}, {x: 10, y: 20}, {x: 13, y: 20}, {x: 14, y: 19}, {x: 14, y: 2}, {x: 13, y: 1}, {x: 10, y: 1}, {x: 10, y: 2}], [{x: 4, y: 7}, {x: 4, y: 9}, {x: 10, y: 9}, {x: 10, y: 7}], [{x: 4, y: 12}, {x: 4, y: 14}, {x: 10, y: 14}, {x: 10, y: 12}]]}])
     end
 
     it "inscribed rectangles (sew technic)" do
@@ -1428,7 +1428,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info # (bm)
-      expect(result[:polygons]).to eq([{outer: [{x: 9, y: 0}, {x: 19, y: 0}, {x: 19, y: 12}, {x: 9, y: 12}, {x: 0, y: 12}, {x: 0, y: 0}], inner: [[{x: 0, y: 1}, {x: 0, y: 11}, {x: 19, y: 11}, {x: 19, y: 1}]]}, {outer: [{x: 9, y: 2}, {x: 16, y: 2}, {x: 16, y: 10}, {x: 9, y: 10}, {x: 3, y: 10}, {x: 3, y: 7}, {x: 7, y: 7}, {x: 9, y: 8}, {x: 10, y: 7}, {x: 10, y: 5}, {x: 9, y: 4}, {x: 7, y: 5}, {x: 3, y: 5}, {x: 3, y: 2}], inner: [[{x: 3, y: 3}, {x: 3, y: 4}, {x: 7, y: 4}, {x: 10, y: 4}, {x: 10, y: 8}, {x: 7, y: 8}, {x: 3, y: 8}, {x: 3, y: 9}, {x: 16, y: 9}, {x: 16, y: 3}]]}])
+      expect(result.points).to eq([{outer: [{x: 9, y: 0}, {x: 19, y: 0}, {x: 19, y: 12}, {x: 9, y: 12}, {x: 0, y: 12}, {x: 0, y: 0}], inner: [[{x: 0, y: 1}, {x: 0, y: 11}, {x: 19, y: 11}, {x: 19, y: 1}]]}, {outer: [{x: 9, y: 2}, {x: 16, y: 2}, {x: 16, y: 10}, {x: 9, y: 10}, {x: 3, y: 10}, {x: 3, y: 7}, {x: 7, y: 7}, {x: 9, y: 8}, {x: 10, y: 7}, {x: 10, y: 5}, {x: 9, y: 4}, {x: 7, y: 5}, {x: 3, y: 5}, {x: 3, y: 2}], inner: [[{x: 3, y: 3}, {x: 3, y: 4}, {x: 7, y: 4}, {x: 10, y: 4}, {x: 10, y: 8}, {x: 7, y: 8}, {x: 3, y: 8}, {x: 3, y: 9}, {x: 16, y: 9}, {x: 16, y: 3}]]}])
     end
 
     it "sew technic only" do
@@ -1448,7 +1448,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info # (bm)
-      expect(result[:polygons]).to eq([
+      expect(result.points).to eq([
         {outer: [{x: 6, y: 0}, {x: 13, y: 0}, {x: 13, y: 8}, {x: 6, y: 8}, {x: 0, y: 8}, {x: 0, y: 5}, {x: 4, y: 5}, {x: 6, y: 6}, {x: 7, y: 5}, {x: 7, y: 3}, {x: 6, y: 2}, {x: 4, y: 3}, {x: 0, y: 3}, {x: 0, y: 0}],
          inner: [
            [{x: 0, y: 1}, {x: 0, y: 2}, {x: 4, y: 2},
@@ -1476,7 +1476,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info # (bm)
-      expect(result[:polygons]).to eq([
+      expect(result.points).to eq([
         {outer: [{x: 9, y: 0}, {x: 19, y: 0}, {x: 19, y: 9}, {x: 9, y: 9}, {x: 0, y: 9}, {x: 0, y: 0}],
          inner: [[{x: 3, y: 2}, {x: 3, y: 3}, {x: 7, y: 3},
            {x: 9, y: 3}, {x: 9, y: 6},
@@ -1502,7 +1502,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 3, versus: :a, compress: {uniq: true, linear: true}}
       ).process_info # (bm)
-      expect(result[:polygons]).to eq([{outer: [{x: 0, y: 0}, {x: 0, y: 10}, {x: 9, y: 10}, {x: 29, y: 10}, {x: 29, y: 0}, {x: 9, y: 0}], inner: [[{x: 2, y: 8}, {x: 2, y: 7}, {x: 19, y: 7}, {x: 19, y: 8}], [{x: 18, y: 4}, {x: 18, y: 3}, {x: 9, y: 3}, {x: 7, y: 3}, {x: 7, y: 4}, {x: 2, y: 4}, {x: 2, y: 2}, {x: 9, y: 1}, {x: 27, y: 2}, {x: 27, y: 4}]]}])
+      expect(result.points).to eq([{outer: [{x: 0, y: 0}, {x: 0, y: 10}, {x: 9, y: 10}, {x: 29, y: 10}, {x: 29, y: 0}, {x: 9, y: 0}], inner: [[{x: 2, y: 8}, {x: 2, y: 7}, {x: 19, y: 7}, {x: 19, y: 8}], [{x: 18, y: 4}, {x: 18, y: 3}, {x: 9, y: 3}, {x: 7, y: 3}, {x: 7, y: 4}, {x: 2, y: 4}, {x: 2, y: 2}, {x: 9, y: 1}, {x: 27, y: 2}, {x: 27, y: 4}]]}])
     end
   end
 end

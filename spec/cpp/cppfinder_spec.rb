@@ -23,7 +23,7 @@ RSpec.describe Contrek::Cpp::CPPConcurrentFinder, type: :class do
       matcher = CPPValueNotMatcher.new(" ")
       polygonfinder = CPPFinder.new(1, bitmap, matcher, {versus: "o", number_of_tiles: 3, compress: {linear: true, visvalingam: {tolerance: 1}}})
       result = polygonfinder.process_info
-      expect(result[:polygons]).to eq([
+      expect(result.points).to eq([
         {outer: [{x: 4, y: 0}, {x: 3, y: 1}, {x: 3, y: 3}, {x: 4, y: 4}, {x: 2, y: 4}, {x: 2, y: 0}],
          inner: []},
         {outer: [{x: 12, y: 0}, {x: 12, y: 4}, {x: 9, y: 4}, {x: 11, y: 3}, {x: 11, y: 1}, {x: 9, y: 0}],
@@ -43,7 +43,7 @@ RSpec.describe Contrek::Cpp::CPPConcurrentFinder, type: :class do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: "o", compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result[:polygons]).to eq(
+      expect(result.points).to eq(
         [{outer: [{x: 7, y: 0}, {x: 12, y: 0}, {x: 12, y: 4}, {x: 2, y: 4}, {x: 2, y: 0}],
           inner: [[{x: 3, y: 1}, {x: 3, y: 3}, {x: 11, y: 3}, {x: 11, y: 1}]]}]
       )

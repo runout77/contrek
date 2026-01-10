@@ -10,7 +10,7 @@ RSpec.describe CPPPolygonFinder, type: :class do
         {versus: :a, compress: {uniq: true, linear: true}})
       result = polygonfinder.process_info
       png_image = Contrek::Bitmaps::PngBitmap.new("./spec/files/images/#{filename}")
-      Contrek::Bitmaps::Painting.direct_draw_polygons(result[:polygons], png_image)
+      Contrek::Bitmaps::Painting.direct_draw_polygons(result.points, png_image)
       same_image?(png_image.to_tmp_file.path, "./spec/files/stored_samples/#{filename}")
     end
 
@@ -24,7 +24,7 @@ RSpec.describe CPPPolygonFinder, type: :class do
         {versus: :a, compress: {uniq: true, linear: true}})
       result = polygonfinder.process_info
       png_image = Contrek::Bitmaps::PngBitmap.new("./spec/files/images/#{filename}")
-      Contrek::Bitmaps::Painting.direct_draw_polygons(result[:polygons], png_image)
+      Contrek::Bitmaps::Painting.direct_draw_polygons(result.points, png_image)
       same_image?(png_image.to_tmp_file.path, "./spec/files/stored_samples/#{filename}")
     end
 

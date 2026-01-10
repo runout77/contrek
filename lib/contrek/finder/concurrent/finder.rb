@@ -74,14 +74,17 @@ module Contrek
           end
         end.real
 
-        {polygons: raw_polygons,
-         benchmarks: {
-           total: ((@initialize_time + compress_time) * 1000).round(3),
-           init: (@initialize_time * 1000).round(3),
-           outer: (@whole_tile.benchmarks[:outer] * 1000).round(3),
-           inner: (@whole_tile.benchmarks[:inner] * 1000).round(3),
-           compress: ((compress_time * 1000).round(3) if @options.has_key?(:compress))
-         }.compact}
+        metadata = {
+          groups: raw_polygons.size,
+          benchmarks: {
+            total: ((@initialize_time + compress_time) * 1000).round(3),
+            init: (@initialize_time * 1000).round(3),
+            outer: (@whole_tile.benchmarks[:outer] * 1000).round(3),
+            inner: (@whole_tile.benchmarks[:inner] * 1000).round(3),
+            compress: ((compress_time * 1000).round(3) if @options.has_key?(:compress))
+          }.compact
+        }
+        Contrek::Finder::Result.new(raw_polygons, metadata)
       end
 
       private

@@ -11,8 +11,8 @@ RSpec.shared_examples "treemap" do
               "W             Z       " \
               "111111111111111       "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 22), @matcher, nil, {treemap: true}).process_info
-      expect(result[:groups]).to eq(3)
-      expect(result[:treemap]).to eq([[-1, -1],
+      expect(result.metadata[:groups]).to eq(3)
+      expect(result.metadata[:treemap]).to eq([[-1, -1],
         [0, 0],
         [1, 0]])
     end
@@ -27,8 +27,8 @@ RSpec.shared_examples "treemap" do
               "W             Z       " \
               "111111111111111       "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 22), @matcher, nil, {treemap: true}).process_info
-      expect(result[:groups]).to eq(5)
-      expect(result[:treemap]).to eq([[-1, -1],
+      expect(result.metadata[:groups]).to eq(5)
+      expect(result.metadata[:treemap]).to eq([[-1, -1],
         [0, 0],
         [1, 0],
         [1, 0],
@@ -45,8 +45,8 @@ RSpec.shared_examples "treemap" do
               "W       Z             " \
               "111111111             "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 22), @matcher, nil, {treemap: true}).process_info
-      expect(result[:groups]).to eq(4)
-      expect(result[:treemap]).to eq([[-1, -1],
+      expect(result.metadata[:groups]).to eq(4)
+      expect(result.metadata[:treemap]).to eq([[-1, -1],
         [-1, -1],
         [0, 0],
         [2, 0]])
@@ -62,8 +62,8 @@ RSpec.shared_examples "treemap" do
               "W       Z    3333333  " \
               "111111111             "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 22), @matcher, nil, {treemap: true}).process_info
-      expect(result[:groups]).to eq(6)
-      expect(result[:treemap]).to eq([[-1, -1],
+      expect(result.metadata[:groups]).to eq(6)
+      expect(result.metadata[:treemap]).to eq([[-1, -1],
         [-1, -1],
         [0, 0],
         [-1, -1],
@@ -81,8 +81,8 @@ RSpec.shared_examples "treemap" do
               "W       Z    3333333  " \
               "111111111             "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 22), @matcher, nil, {versus: :o, treemap: true}).process_info
-      expect(result[:groups]).to eq(6)
-      expect(result[:treemap]).to eq([[-1, -1],
+      expect(result.metadata[:groups]).to eq(6)
+      expect(result.metadata[:treemap]).to eq([[-1, -1],
         [-1, -1],
         [0, 0],
         [-1, -1],
@@ -96,8 +96,8 @@ RSpec.shared_examples "treemap" do
               "CCCCCC    GGG  EEEEEEE" \
               "DDDDDD         FFFFFFF"
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 22), @matcher, nil, {treemap: true}).process_info
-      expect(result[:groups]).to eq(2)
-      expect(result[:treemap]).to eq([[-1, -1],
+      expect(result.metadata[:groups]).to eq(2)
+      expect(result.metadata[:treemap]).to eq([[-1, -1],
         [-1, -1]])
     end
 
@@ -111,8 +111,8 @@ RSpec.shared_examples "treemap" do
               "AAAAAA         AAAAAAA" \
               "                      "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 22), @matcher, nil, {treemap: true}).process_info
-      expect(result[:groups]).to eq(2)
-      expect(result[:treemap]).to eq([[-1, -1],
+      expect(result.metadata[:groups]).to eq(2)
+      expect(result.metadata[:treemap]).to eq([[-1, -1],
         [-1, -1]])
     end
 
@@ -126,8 +126,8 @@ RSpec.shared_examples "treemap" do
               "AAAAAA         AAAAAAA" \
               "                      "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 22), @matcher, nil, {versus: :o, treemap: true}).process_info
-      expect(result[:groups]).to eq(2)
-      expect(result[:treemap]).to eq([[-1, -1],
+      expect(result.metadata[:groups]).to eq(2)
+      expect(result.metadata[:treemap]).to eq([[-1, -1],
         [-1, -1]])
     end
     it "scans 3 level plus 7" do
@@ -140,8 +140,8 @@ RSpec.shared_examples "treemap" do
               "AAAAAA         AAAAAAA" \
               "                      "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 22), @matcher, nil, {treemap: true}).process_info
-      expect(result[:groups]).to eq(3)
-      expect(result[:treemap]).to eq([[-1, -1],
+      expect(result.metadata[:groups]).to eq(3)
+      expect(result.metadata[:treemap]).to eq([[-1, -1],
         [-1, -1],
         [-1, -1]])
     end
@@ -155,8 +155,8 @@ RSpec.shared_examples "treemap" do
               "AAAAAA         AAAAAAA" \
               "                      "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 22), @matcher, nil, {treemap: true}).process_info
-      expect(result[:groups]).to eq(5)
-      expect(result[:treemap]).to eq([[-1, -1],
+      expect(result.metadata[:groups]).to eq(5)
+      expect(result.metadata[:treemap]).to eq([[-1, -1],
         [0, 0],
         [-1, -1],
         [-1, -1],
@@ -173,8 +173,8 @@ RSpec.shared_examples "treemap" do
               "               A     A" \
               "               AAAAAAA"
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 22), @matcher, nil, {treemap: true}).process_info
-      expect(result[:groups]).to eq(6)
-      expect(result[:treemap]).to eq([[-1, -1],
+      expect(result.metadata[:groups]).to eq(6)
+      expect(result.metadata[:treemap]).to eq([[-1, -1],
         [0, 0],
         [-1, -1],
         [-1, -1],
@@ -192,8 +192,8 @@ RSpec.shared_examples "treemap" do
               "H                    J" \
               "IIIIIIIIIIIIIIIIIIIIII"
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 22), @matcher, nil, {treemap: true}).process_info
-      expect(result[:groups]).to eq(3)
-      expect(result[:treemap]).to eq([[-1, -1],
+      expect(result.metadata[:groups]).to eq(3)
+      expect(result.metadata[:treemap]).to eq([[-1, -1],
         [0, 0],
         [1, 0]])
     end
@@ -212,8 +212,8 @@ RSpec.shared_examples "treemap" do
               "A                    A" \
               "AAAAAAAAAAAAAAAAAAAAAA"
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 22), @matcher, nil, {treemap: true}).process_info
-      expect(result[:groups]).to eq(8)
-      expect(result[:treemap]).to eq([[-1, -1],
+      expect(result.metadata[:groups]).to eq(8)
+      expect(result.metadata[:treemap]).to eq([[-1, -1],
         [0, 0],
         [1, 0],
         [1, 0],
@@ -237,8 +237,8 @@ RSpec.shared_examples "treemap" do
               "A                    A" \
               "AAAAAAAAAAAAAAAAAAAAAA"
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 22), @matcher, nil, {treemap: true}).process_info
-      expect(result[:groups]).to eq(4)
-      expect(result[:treemap]).to eq([[-1, -1],
+      expect(result.metadata[:groups]).to eq(4)
+      expect(result.metadata[:treemap]).to eq([[-1, -1],
         [0, 0],
         [1, 0],
         [1, 1]])
@@ -258,8 +258,8 @@ RSpec.shared_examples "treemap" do
               "A                    A" \
               "AAAAAAAAAAAAAAAAAAAAAA"
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 22), @matcher, nil, {versus: :o, treemap: true}).process_info
-      expect(result[:groups]).to eq(4)
-      expect(result[:treemap]).to eq([[-1, -1],
+      expect(result.metadata[:groups]).to eq(4)
+      expect(result.metadata[:treemap]).to eq([[-1, -1],
         [0, 0],
         [1, 1],
         [1, 0]])
@@ -279,8 +279,8 @@ RSpec.shared_examples "treemap" do
               "A                    A" \
               "AAAAAAAAAAAAAAAAAAAAAA"
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 22), @matcher, nil, {treemap: true}).process_info
-      expect(result[:groups]).to eq(3)
-      expect(result[:treemap]).to eq([[-1, -1],
+      expect(result.metadata[:groups]).to eq(3)
+      expect(result.metadata[:treemap]).to eq([[-1, -1],
         [0, 0],
         [1, 0]])
     end
@@ -299,8 +299,8 @@ RSpec.shared_examples "treemap" do
               "A                    A" \
               "AAAAAAAAAAAAAAAAAAAAAA"
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 22), @matcher, nil, {treemap: true}).process_info
-      expect(result[:groups]).to eq(8)
-      expect(result[:treemap]).to eq([[-1, -1],
+      expect(result.metadata[:groups]).to eq(8)
+      expect(result.metadata[:treemap]).to eq([[-1, -1],
         [0, 0],
         [1, 0],
         [1, 0],

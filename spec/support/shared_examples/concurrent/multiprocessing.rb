@@ -6,12 +6,13 @@ RSpec.shared_examples "multiprocessing" do
       workers = 8
       png_bitmap = @png_bitmap_class.new("./spec/files/images/#{filename}.png")
       rgb_matcher = @png_not_matcher.new(png_bitmap.rgb_value_at(0, 0))
-      @polygon_finder_class.new(
+      result = @polygon_finder_class.new(
         number_of_threads: workers,
         bitmap: png_bitmap,
         matcher: rgb_matcher,
         options: {number_of_tiles: tiles, versus: :o, compress: {uniq: true}}
       ).process_info
+      expect(result.metadata[:groups]).to eq 535
     end
 
     it "works with 2 thread and 2 tiles" do
@@ -28,8 +29,8 @@ RSpec.shared_examples "multiprocessing" do
         options: {number_of_tiles: tiles, versus: :o}
       )
       result = polygonfinder.process_info
-      puts result[:benchmarks].inspect
-      expect(result[:polygons]).to match_expected_polygons(filename + "_o", number_of_tiles: workers)
+      puts result.metadata[:benchmarks].inspect
+      expect(result.points).to match_expected_polygons(filename + "_o", number_of_tiles: workers)
     end
   end
 end

@@ -1,5 +1,5 @@
 # Contrek
-Contrek is a Ruby library (C++ powered) to trace png bitmap areas polygonal contours. Manages png images usign libspng (version 0.7.4) library. May work multithreading.
+Contrek is a Ruby gem with a C++ core for fast contour tracing and edge detection in PNG images. It extracts polygonal contours from bitmap shapes, enabling image processing, shape analysis, and raster-to-vector workflows such as PNG to SVG conversion. Manages png images usign libspng (version 0.7.4) library. May work multithreading.
 
 ## About Contrek library
 Contrek (**con**tour **trek**king) simply scans your png bitmap and returns shape contour as close polygonal lines, both for the external and internal sides. It can compute the nesting level of the polygons found with a tree structure. It supports various levels and modes of compression and approximation of the found coordinates. It is capable of multithreaded processing, splitting the image into vertical strips and recombining the coordinates in pairs.
@@ -34,9 +34,10 @@ result = Contrek.contour!(
   }
 )
 ```
-The result reports information about the execution times (microseconds), the polygons found, their coordinates and the nesting tree.
+The resulting metadata information contains the execution times (microseconds), the count of polygons found and the nesting tree map. You can access polygons coordinates too (see later).
+
 ```ruby
-{:benchmarks=>{"build_tangs_sequence"=>0.129, "compress"=>0.037, "plot"=>0.198, "scan"=>0.114, "total"=>0.478}, :groups=>2, :named_sequence=>"", :polygons=>[...], :treemap=>[]}
+{:benchmarks=>{"build_tangs_sequence"=>0.129, "compress"=>0.037, "plot"=>0.198, "scan"=>0.114, "total"=>0.478}, :groups=>2, :named_sequence=>"", :treemap=>[]}
 
 ```
 
@@ -63,7 +64,7 @@ polygonfinder = CPPPolygonFinder.new(png_bitmap,
   {versus: :a, compress: {visvalingam: {tolerance: 1.5}}})
 result = polygonfinder.process_info
 # draws the polygons found
-Contrek::Bitmaps::Painting.direct_draw_polygons(result[:polygons], png_image)
+Contrek::Bitmaps::Painting.direct_draw_polygons(result.points, png_image)
 png_image.save('result.png') # => inspect the image to feedback the result
 ```
 
@@ -98,7 +99,7 @@ Regarding multithreading:
 
 - The treemap option is currently ignored (multithreaded treemap support will be introduced in upcoming revisions).
 
-By not declaring native option CPP Multithreading optimized code is used. In the above example a [105 MP image](spec/files/images/sample_10240x10240.png) is examined by 2 thread working on 2 tiles (total compute time about 2 secs).
+By not declaring native option CPP Multithreading optimized code is used. In the above example a [105 MP image](spec/files/images/sample_10240x10240.png) is examined by 2 threads working on 2 tiles (total compute time about 2 secs).
 
 ```ruby
 result = Contrek.contour!(
@@ -110,7 +111,7 @@ result = Contrek.contour!(
     finder: {number_of_tiles: 2, compress: {uniq: true}}
   }
 )
-puts result[:benchmarks].inspect
+puts result.metadata[:benchmarks].inspect
 
 {"compress"=>14.596786999999999,
   "init"=>2078.745861,
@@ -118,6 +119,97 @@ puts result[:benchmarks].inspect
   "outer"=>118.94489599999999,
   "total"=>2093.342648}
 ```
+
+## Result
+
+The result structure contains polygon coordinates and a set of metadata. Polygon coordinates can be accessed via:
+
+```ruby
+result.polygons
+
+[{:outer=>[11, 2, 11, 5, 6, 5, 6, 2],
+  :inner=>[[10, 3, 7, 3, 7, 4, 10, 4]]}]
+```
+
+For native classes (C/C++), coordinates are represented as an interleaved NumPy array (`ndarray`) in the form:
+
+```
+[x0, y0, x1, y1, ...]
+```
+
+A ruby side helper method could converts this data structure into point-based representations:
+
+```ruby
+result.points
+
+[{:outer=>[{:x=>11, :y=>2}, {:x=>11, :y=>5}, {:x=>6, :y=>5}, {:x=>6, :y=>2}],
+  :inner=>[[{:x=>10, :y=>3}, {:x=>7, :y=>3}, {:x=>7, :y=>4}, {:x=>10, :y=>4}]]}]
+```
+
+- `outer` represents a single polygonal sequence  
+- `inner` is represented as an array of polygonal sequences (holes)
+
+For pure Ruby implementations (`{ native: false }`), coordinates are always expressed as points.  
+In this case, both `polygons` and `points` return the same data, represented as hashes with `x` and `y` keys.
+
+## Metadata
+
+Metadata associated with the result can be accessed via:
+
+```ruby
+result.metadata
+
+{:benchmarks=>{"build_tangs_sequence"=>0.00577,
+               "compress"=>0.01239,
+               "plot"=>0.01919,
+               "scan"=>0.01473,
+               "total"=>0.05208},
+ :groups=>1,
+ :named_sequence=>"AFEDCBA",
+ :treemap=>[]}
+```
+
+## Treemap
+
+The treemap is a data structure that represents the containment hierarchy of polygons. For each polygon, it defines the parent polygon in which it is contained and its relative position among siblings. This structure allows reconstruction of the inclusion tree and determination of nesting relationships between geometries. Consider the above image
+
+```ruby
+ "AAAAAAAAAAAAAAAAAAAAAA" \
+ "A                    A" \
+ "A BBBBBBBBBBBBBBBBBB A" \
+ "A BBBBBBBBBBBBBBBBBB A" \
+ "A BBB    BBBBB   BBB A" \
+ "A BBB CC BBBBB D BBB A" \
+ "A BBB    BBBBB   BBB A" \
+ "A BBBBBBBBBBBBBBBBBB A" \
+ "A BBBBBBBBBBBBBBBBBB A" \
+ "A                    A" \
+ "AAAAAAAAAAAAAAAAAAAAAA"
+```
+
+```ruby
+result.metadata[:treemap]
+
+[[-1, -1],  # A
+ [0, 0],    # B
+ [1, 0],    # C
+ [1, 1]]    # D
+```
+
+There are four polygons (`A`, `B`, `C`, and `D`).  
+The order matches the one provided in `result.polygons`.
+
+Each entry has the structure:
+
+```
+[parent_index, position]
+```
+
+- Polygon **A** (index `0`) has no parent and is represented as `[-1, -1]`
+- Polygon **B** is contained in **A** and is its first child → `[0, 0]`
+- Polygon **C** is contained in **B** and is its first child → `[1, 0]`
+- Polygon **D** is also contained in **B** and is its second child → `[1, 1]`
+
 ## Multithreaded approach
 
 The multithreaded contour-tracing implementation operates as follows:
@@ -177,6 +269,10 @@ About 75x faster. Times are in microseconds; system: AMD Ryzen 7 3700X 8-Core Pr
 This project is licensed under the terms of the MIT license.
 
 See [LICENSE.md](LICENSE.md).
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for a complete list of changes.
 
 ## History
 The algorithm was originally developed by me in 2018 when I was commissioned to create a Rails web application whose main objective was to census buildings from GoogleMAPS; the end user had to be able to select their home building by clicking its roof on the map which had to be identified as a clickable polygon. The solution was to configure GoogleMAPS to render buildings of a well-defined color (red), and at each refresh of the same to transform the div into an image (html2canvas) then process it server side returning the polygons to be superimposed again on the map. This required very fast polygons determination. Searching for a library for tracing the contours I was not able to find anything better except OpenCV which however seemed to me a very heavy dependency. So I decided to write my algorithm directly in the context of the ROR application. Once perfected, it was already usable but a bit slow in the higher image resolutions. So I decided to write the counterpart in C++, which came out much faster and which I then used as an extension on Ruby by means of Rice.

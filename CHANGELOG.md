@@ -18,4 +18,8 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Added C++ multithreading supports
 - Optimized old just present C++ code
-- Removed Png++ dependency in place of libspn 
+- Removed Png++ dependency in place of libspn
+
+## [1.0.7] - 2026-01-10
+### Added
+- Optimized C++/Ruby data transfer: Implemented NumPy-compatible binary serialization for coordinate outputs. This reduces serialization overhead and significantly increases data throughput between the C++ core and the Ruby interface.

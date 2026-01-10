@@ -43,12 +43,14 @@ module Contrek
 
       # infos
       def process_info
-        {named_sequence: @node_cluster.sequences.map { |list| list.map(&:name).join }.join("-"),
-         groups: @node_cluster.sequences.size,
-         groups_names: @node_cluster.root_nodes.map(&:name).join,
-         polygons: @node_cluster.polygons,
-         benchmarks: format_benchmarks,
-         treemap: (@node_cluster.treemap if @options.has_key?(:treemap))}
+        metadata = {
+          named_sequence: @node_cluster.sequences.map { |list| list.map(&:name).join }.join("-"),
+          groups: @node_cluster.sequences.size,
+          groups_names: @node_cluster.root_nodes.map(&:name).join,
+          benchmarks: format_benchmarks,
+          treemap: (@node_cluster.treemap if @options.has_key?(:treemap))
+        }
+        Result.new(@node_cluster.polygons, metadata)
       end
 
       def get_shapelines

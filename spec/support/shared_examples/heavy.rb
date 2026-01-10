@@ -8,7 +8,7 @@ RSpec.shared_examples "heavy" do
       result = polygonfinder.process_info
       # store_sample(polygonfinder,filename)
       saved_poly = YAML.load_file("./spec/files/coordinates/#{filename}.yml")
-      expect(result[:polygons]).to eq(saved_poly)
+      expect(result.points).to eq(saved_poly)
     end
     it "scans poly 1200x800", sample_1200x800: true do
       filename = "sample_1200x800.png"
@@ -18,7 +18,7 @@ RSpec.shared_examples "heavy" do
       result = polygonfinder.process_info
       # store_sample(polygonfinder,filename)
       saved_poly = YAML.load_file("./spec/files/coordinates/#{filename}.yml")
-      expect(result[:polygons]).to eq(saved_poly)
+      expect(result.points).to eq(saved_poly)
     end
     it "scans poly 1200x1192", sample_1200x1192: true do
       filename = "sample_1200x1192.png"
@@ -28,7 +28,7 @@ RSpec.shared_examples "heavy" do
       result = polygonfinder.process_info
       # store_sample(polygonfinder,filename,@result)
       saved_poly = YAML.load_file("./spec/files/coordinates/#{filename}.yml")
-      expect(result[:polygons]).to eq(saved_poly)
+      expect(result.points).to eq(saved_poly)
     end
     it "scans poly 3000x3000", sample_3000x3000: true do
       skip
@@ -38,7 +38,7 @@ RSpec.shared_examples "heavy" do
       polygonfinder = @polygon_finder_class.new(png_bitmap, rgb_matcher, nil, {versus: :a})
       result = polygonfinder.process_info
       puts result[:benchmarks].inspect
-      expect(result[:polygons]).to eq(JSON.parse(File.read("./spec/files/coordinates/#{filename}.json"), symbolize_names: true))
+      expect(result.points).to eq(JSON.parse(File.read("./spec/files/coordinates/#{filename}.json"), symbolize_names: true))
     end
   end
 
@@ -47,6 +47,6 @@ RSpec.shared_examples "heavy" do
     polygonfinder.draw_shapelines(test_bitmap)
     polygonfinder.draw_polygons(test_bitmap)
     test_bitmap.save("./spec/files/images/processed_#{filename}")
-    # File.write("./spec/coordinates/#{filename}.yml", @result[:polygons].to_yaml)
+    # File.write("./spec/coordinates/#{filename}.yml", @result.points.to_yaml)
   end
 end

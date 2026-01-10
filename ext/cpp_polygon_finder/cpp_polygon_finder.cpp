@@ -8,11 +8,11 @@
 
 #include <iostream>
 #include <list>
-#include <rice/rice.hpp>
-#include <rice/stl.hpp>
 #include <vector>
 #include <map>
 #include <string>
+#include <rice/rice.hpp>
+#include <rice/stl.hpp>
 
 #include "PolygonFinder/src/polygon/finder/PolygonFinder.h"
 #include "PolygonFinder/src/polygon/finder/PolygonFinder.cpp"
@@ -86,142 +86,133 @@ extern "C" {
   #include "PolygonFinder/src/polygon/bitmaps/spng.h"
 }
 
+class RubyResult {
+ public:
+  Rice::Array polygons;
+  Rice::Hash metadata;
+};
+
 using namespace Rice;
 
-namespace Rice::detail
-{ template<>
-  class To_Ruby<std::vector<Point*>>
-  { public:
-      VALUE convert(const std::vector<Point*>& x)
-      { Rice::Array arr;
-        for (Point* p : x)
-          arr.push(p);
-        return arr;
-      }
-  };
+namespace Rice::detail {
 
-  template<>
-  class To_Ruby<std::list<std::vector<Point*>>>
-  { public:
-      VALUE convert(const std::list<std::vector<Point*>>& x)
-      { Rice::Array arr;
-        for (const std::vector<Point*>& vec : x)
-        { arr.push(vec);
-        }
-        return arr;
-      }
-  };
-
-  template<>
-  class To_Ruby<Point*>
-  { public:
-      VALUE convert(Point* const & x)
-      {  Rice::Hash h = Rice::Hash();
-         h[Symbol("x")] = x->x;
-         h[Symbol("y")] = x->y;
-         return(h);
-      }
-  };
-
-  template<>
-  class To_Ruby<std::map<std::string, double>*>
-  { public:
-      VALUE convert(std::map<std::string, double>* const & x)
-      { Rice::Hash return_me = Rice::Hash();
-        std::map<std::string, double>::iterator it;
-        for ( it = x->begin(); it != x->end(); it++ )
-        {  return_me[String(it->first)] = it->second;
-        }
-        return return_me;
-      }
-  };
-
-  template<>
-  class From_Ruby<std::vector<std::string>*>
-  { public:
-    Convertible is_convertible(VALUE value)
-    { switch (rb_type(value))
-      { case RUBY_T_HASH:
-          return Convertible::Cast;
+template<>
+class From_Ruby<std::vector<std::string>*>
+{ public:
+  Convertible is_convertible(VALUE value)
+  { switch (rb_type(value))
+    { case RUBY_T_HASH:
+        return Convertible::Cast;
+        break;
+      default:
+        return Convertible::None;
+    }
+  }
+  std::vector<std::string>* convert(VALUE value)
+  { std::vector<std::string> *arguments = new std::vector<std::string>();
+    if (rb_type(value) == RUBY_T_NIL) return(arguments);
+    Rice::Hash hash = (Rice::Hash) value;
+    for (Rice::Hash::iterator it = hash.begin(); it != hash.end(); ++it) {
+      Rice::String keyString = it->key.to_s();
+      Rice::Object value = it->value;
+      switch (value.rb_type()) {
+        case T_STRING:
+          arguments->push_back("--" + keyString.str()+"="+((Rice::String) value).str());
           break;
-        default:
-          return Convertible::None;
-      }
+        case T_SYMBOL:
+          arguments->push_back("--" + keyString.str()+"="+((Rice::Symbol) value).str());
+          break;
+        case T_FLOAT:
+          arguments->push_back("--" + keyString.str()+"="+std::to_string(NUM2DBL(value.value())));
+          break;
+        case T_FIXNUM:
+          arguments->push_back("--" + keyString.str()+"="+std::to_string(NUM2INT(value.value())));
+          break;
+        case T_TRUE:
+          arguments->push_back("--" + keyString.str()+"=true");
+          break;
+        case T_FALSE:
+          arguments->push_back("--" + keyString.str()+"=false");
+          break;
+        case T_HASH:
+          std::vector<std::string>* iv = From_Ruby<std::vector<std::string>*>::convert(value);
+          for (std::vector<std::string>::iterator it_iv = iv->begin() ; it_iv != iv->end(); ++it_iv)
+          { (*it_iv).replace(0, 2, "_");
+            arguments->push_back("--" + keyString.str() + *it_iv);
+          }
+          break;
+       }
     }
-    std::vector<std::string>* convert(VALUE value)
-    { std::vector<std::string> *arguments = new std::vector<std::string>();
-      if (rb_type(value) == RUBY_T_NIL) return(arguments);
-      Rice::Hash hash = (Rice::Hash) value;
-      for (Rice::Hash::iterator it = hash.begin(); it != hash.end(); ++it) {
-        Rice::String keyString = it->key.to_s();
-        Rice::Object value = it->value;
-        switch (value.rb_type()) {
-          case T_STRING:
-            arguments->push_back("--" + keyString.str()+"="+((Rice::String) value).str());
-            break;
-          case T_SYMBOL:
-            arguments->push_back("--" + keyString.str()+"="+((Rice::Symbol) value).str());
-            break;
-          case T_FLOAT:
-            arguments->push_back("--" + keyString.str()+"="+std::to_string(NUM2DBL(value.value())));
-            break;
-          case T_FIXNUM:
-            arguments->push_back("--" + keyString.str()+"="+std::to_string(NUM2INT(value.value())));
-            break;
-          case T_TRUE:
-            arguments->push_back("--" + keyString.str()+"=true");
-            break;
-          case T_FALSE:
-            arguments->push_back("--" + keyString.str()+"=false");
-            break;
-          case T_HASH:
-            std::vector<std::string>* iv = From_Ruby<std::vector<std::string>*>::convert(value);
-            for (std::vector<std::string>::iterator it_iv = iv->begin() ; it_iv != iv->end(); ++it_iv)
-            { (*it_iv).replace(0, 2, "_");
-              arguments->push_back("--" + keyString.str() + *it_iv);
-            }
-            break;
-         }
-      }
-      return arguments;
-    }
-  };
+    return arguments;
+  }
+};
 
-  template<>
-  struct Type<ProcessResult>
-  { static bool verify()
-    { return true;
+template<>
+class To_Ruby<ProcessResult*>
+{public:
+  VALUE convert(ProcessResult* const & pr)
+  { if (!pr) {
+      return Qnil;
     }
-  };
+    RubyResult* rr = new RubyResult();
+    Rice::Data_Object<RubyResult> rb_result(rr);
 
-  template<>
-  class To_Ruby<ProcessResult*>
-  { public:
-    VALUE convert(ProcessResult* const & pr)
-    { Rice::Hash return_me = Rice::Hash();
-      return_me[Symbol("benchmarks")] = &pr->benchmarks;
-      return_me[Symbol("groups")] = pr->groups;
-      return_me[Symbol("named_sequence")] = pr->named_sequence;
-      Rice::Array out;
-      for (Polygon& x : pr->polygons)
-      { Rice::Hash h = Rice::Hash();
-        h[Symbol("outer")] = x.outer;
-        h[Symbol("inner")] = x.inner;
-        out.push(h);
-      }
-      return_me[Symbol("polygons")] = out;
-      Rice::Array tmapout;
-      for (const auto& tm : pr->treemap) {
-        Rice::Array tmentry;
-        tmentry.push(tm.first);   // outer
-        tmentry.push(tm.second);  // inner
-        tmapout.push(tmentry);
-      }
-      return_me[Symbol("treemap")] = tmapout;
-      delete pr;
-      return(return_me);
+    Rice::Hash return_me = Rice::Hash();
+    Rice::Hash benchmarks_rb;
+    for (auto const& [name, value] : pr->benchmarks) {
+      benchmarks_rb[Rice::String(name)] = value;
     }
-  };
+    return_me[Symbol("benchmarks")] = benchmarks_rb;
+    return_me[Symbol("groups")] = pr->groups;
+    return_me[Symbol("named_sequence")] = pr->named_sequence;
+
+    Rice::Array out;
+    for (Polygon& x : pr->polygons)
+    { Rice::Hash poly_hash = Rice::Hash();
+      // OUTER: std::vector<Point*>
+      Rice::Array outer_flat;
+      for (Point* p : x.outer) {
+        outer_flat.push(p->x);
+        outer_flat.push(p->y);
+      }
+      poly_hash[Symbol("outer")] = outer_flat;
+      // INNER: std::list<std::vector<Point*>>
+      Rice::Array inner_collection;
+      for (const std::vector<Point*>& sequence : x.inner) {
+        Rice::Array sequence_flat;
+        for (Point* p : sequence) {
+          sequence_flat.push(p->x);
+          sequence_flat.push(p->y);
+        }
+        inner_collection.push(sequence_flat);
+      }
+      poly_hash[Symbol("inner")] = inner_collection;
+      out.push(poly_hash);
+    }
+    rr->polygons = out;
+
+    // Treemap
+    Rice::Array tmapout;
+    for (const auto& tm : pr->treemap) {
+      Rice::Array tmentry;
+      tmentry.push(tm.first);
+      tmentry.push(tm.second);
+      tmapout.push(tmentry);
+    }
+    return_me[Symbol("treemap")] = tmapout;
+    rr->metadata = return_me;
+
+    // Protects objects 'out' e 'return_me' linking them to the ruby instance preventing GC
+    // garbage collector to free them before the instance itself.
+    Rice::Object ruby_obj = rb_result;
+    ruby_obj.iv_set("@polygons_storage", out);
+    ruby_obj.iv_set("@metadata_storage", return_me);
+
+    delete pr;
+    return rb_result.value();
+  }
+};
+
 }  // namespace Rice::detail
 
 extern "C"
@@ -281,12 +272,18 @@ void Init_cpp_polygon_finder() {
 
   Data_Type<PolygonFinder> rb_cPolygonFinder =
     define_class<PolygonFinder>("CPPPolygonFinder")
-    .define_constructor(Constructor<PolygonFinder, Bitmap*, Matcher*, Bitmap*, std::vector<std::string>*>(), Arg("bitmap"), Arg("matcher"), Arg("test_bitmap") = nullptr, Arg("options") = nullptr)
+    .define_constructor(Constructor<PolygonFinder, Bitmap*, Matcher*, Bitmap*, std::vector<std::string>*>(), Arg("bitmap"), Arg("matcher"), Arg("test_bitmap") = nullptr, Arg("options") = nullptr, Rice::Arg("yield_gvl") = true)
     .define_method("get_shapelines", &PolygonFinder::get_shapelines)
-    .define_method("process_info", &PolygonFinder::process_info);
+    .define_method("process_info", &PolygonFinder::process_info, Rice::Arg("yield_gvl") = true);
 
   Data_Type<Finder> rb_cFinder =
     define_class<Finder>("CPPFinder")
-    .define_constructor(Constructor<Finder, int, Bitmap*, Matcher*, std::vector<std::string>*>(), Arg("number_of_threads"), Arg("bitmap"), Arg("matcher"), Arg("options") = nullptr)
-    .define_method("process_info", &Finder::process_info);
+    .define_constructor(Constructor<Finder, int, Bitmap*, Matcher*, std::vector<std::string>*>(), Arg("number_of_threads"), Arg("bitmap"), Arg("matcher"), Arg("options") = nullptr, Rice::Arg("yield_gvl") = true)
+    .define_method("process_info", &Finder::process_info, Rice::Arg("yield_gvl") = true);
+
+  Data_Type<RubyResult> rb_cResult =
+    define_class_under<RubyResult>(rb_cFinder, "Result")
+    .define_constructor(Constructor<RubyResult>())
+    .define_method("polygons", [](RubyResult& rr) { return rr.polygons; })
+    .define_method("metadata", [](RubyResult& rr) { return rr.metadata; });
 }

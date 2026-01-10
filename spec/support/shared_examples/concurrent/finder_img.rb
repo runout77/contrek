@@ -12,7 +12,7 @@ RSpec.shared_examples "finder_img" do
           options: {number_of_tiles: workers, versus: :a, compress: {uniq: true, linear: true}}
         ).process_info
 
-        expect(result[:polygons]).to match_expected_polygons(filename, number_of_tiles: workers)
+        expect(result.points).to match_expected_polygons(filename, number_of_tiles: workers)
       end
     end
 
@@ -26,8 +26,8 @@ RSpec.shared_examples "finder_img" do
         matcher: rgb_matcher,
         options: {number_of_tiles: workers, versus: :a, compress: {uniq: true, linear: true}}
       ).process_info
-      puts result[:benchmarks].inspect
-      expect(result[:polygons]).to match_expected_polygons(filename, number_of_tiles: workers)
+      puts result.metadata[:benchmarks].inspect
+      expect(result.points).to match_expected_polygons(filename, number_of_tiles: workers)
     end
 
     it "divides image into large number of tiles (1200x800)" do
@@ -42,8 +42,8 @@ RSpec.shared_examples "finder_img" do
           number_of_tiles: workers, versus: :a, compress: {uniq: true, linear: true}
         }
       ).process_info
-      puts result[:benchmarks].inspect
-      expect(result[:polygons]).to match_expected_polygons(filename, number_of_tiles: workers)
+      puts result.metadata[:benchmarks].inspect
+      expect(result.points).to match_expected_polygons(filename, number_of_tiles: workers)
     end
 
     it "divides image into large number of tiles (1160x772)" do
@@ -57,9 +57,9 @@ RSpec.shared_examples "finder_img" do
         matcher: rgb_matcher,
         options: {number_of_tiles: workers, versus: :a, compress: {uniq: true, linear: true}}
       ).process_info
-      puts result[:benchmarks].inspect
+      puts result.metadata[:benchmarks].inspect
 
-      expect(result[:polygons]).to match_expected_polygons(filename, number_of_tiles: workers)
+      expect(result.points).to match_expected_polygons(filename, number_of_tiles: workers)
     end
 
     it "resolves shape problem" do
@@ -75,7 +75,7 @@ RSpec.shared_examples "finder_img" do
         options: {number_of_tiles: workers, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
 
-      expect(result[:polygons]).to match_expected_polygons(filename, number_of_tiles: workers)
+      expect(result.points).to match_expected_polygons(filename, number_of_tiles: workers)
     end
 
     it "resolves shape problem (the tree leaf case)" do
@@ -91,7 +91,7 @@ RSpec.shared_examples "finder_img" do
         options: {number_of_tiles: workers, versus: :a, compress: {uniq: true, linear: true}}
       ).process_info
 
-      expect(result[:polygons]).to match_expected_polygons(filename, number_of_tiles: workers)
+      expect(result.points).to match_expected_polygons(filename, number_of_tiles: workers)
     end
 
     it "resolves shape problem (the bonsai tree case)" do
@@ -108,7 +108,7 @@ RSpec.shared_examples "finder_img" do
         options: {number_of_tiles: workers, versus: :a, compress: {uniq: true, linear: true}}
       ).process_info
 
-      expect(result[:polygons]).to match_expected_polygons(filename, number_of_tiles: workers)
+      expect(result.points).to match_expected_polygons(filename, number_of_tiles: workers)
     end
 
     it "resolves shape problem (the bonsai full height tree case)" do
@@ -123,7 +123,7 @@ RSpec.shared_examples "finder_img" do
         options: {number_of_tiles: workers, versus: :a, compress: {uniq: true, linear: true}}
       ).process_info
 
-      expect(result[:polygons]).to match_expected_polygons(filename, number_of_tiles: workers)
+      expect(result.points).to match_expected_polygons(filename, number_of_tiles: workers)
     end
 
     it "works on small image many tiles" do
@@ -138,7 +138,7 @@ RSpec.shared_examples "finder_img" do
         options: {number_of_tiles: workers, versus: :a, compress: {uniq: true, linear: true}}
       ).process_info
 
-      expect(result[:polygons]).to match_expected_polygons(filename, number_of_tiles: workers)
+      expect(result.points).to match_expected_polygons(filename, number_of_tiles: workers)
     end
 
     it "resolves shape problem (the nested leaf case)" do
@@ -153,7 +153,7 @@ RSpec.shared_examples "finder_img" do
         options: {number_of_tiles: workers, versus: :a, compress: {uniq: true, linear: true}}
       ).process_info
 
-      expect(result[:polygons]).to match_expected_polygons(filename, number_of_tiles: workers)
+      expect(result.points).to match_expected_polygons(filename, number_of_tiles: workers)
     end
   end
 end

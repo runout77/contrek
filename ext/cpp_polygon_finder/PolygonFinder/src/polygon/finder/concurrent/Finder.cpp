@@ -124,6 +124,7 @@ Finder::~Finder() {
 ProcessResult* Finder::process_info() {
   ProcessResult *pr = new ProcessResult();
   pr->polygons = std::move(this->whole_tile->to_raw_polygons());
+  pr->groups = pr->polygons.size();
   FakeCluster fake_cluster(pr->polygons, this->options);
   cpu_timer.start();
   fake_cluster.compress_coords(pr->polygons, this->options);

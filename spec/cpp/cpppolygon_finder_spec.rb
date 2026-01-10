@@ -21,9 +21,8 @@ RSpec.describe CPPPolygonFinder, type: :class do
       matcher = CPPValueNotMatcher.new("0")
       polygonfinder = CPPPolygonFinder.new(bitmap, matcher, nil, {versus: "o", named_sequences: true, compress: {linear: true, visvalingam: {tolerance: 1}}})
       pi = polygonfinder.process_info
-
-      expect(pi[:groups]).to eq 1
-      expect(pi[:named_sequence]).to eq("AFEDCBA")
+      expect(pi.metadata[:groups]).to eq 1
+      expect(pi.metadata[:named_sequence]).to eq("AFEDCBA")
     end
   end
 

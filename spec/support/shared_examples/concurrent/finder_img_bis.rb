@@ -13,8 +13,8 @@ RSpec.shared_examples "finder_img_bis" do
         options: {number_of_tiles: workers, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
 
-      puts result[:benchmarks].inspect
-      expect(result[:polygons]).to match_expected_polygons(filename + "_o", number_of_tiles: workers)
+      puts result.metadata[:benchmarks].inspect
+      expect(result.points).to match_expected_polygons(filename + "_o", number_of_tiles: workers)
     end
 
     it "divides image into large number of tiles (1160x772) clockwise" do
@@ -28,9 +28,9 @@ RSpec.shared_examples "finder_img_bis" do
         matcher: rgb_matcher,
         options: {number_of_tiles: workers, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      puts result[:benchmarks].inspect
+      puts result.metadata[:benchmarks].inspect
 
-      expect(result[:polygons]).to match_expected_polygons(filename + "_o", number_of_tiles: workers)
+      expect(result.points).to match_expected_polygons(filename + "_o", number_of_tiles: workers)
     end
 
     it "divides image into large number of tiles (3000x3000) clockwise" do
@@ -45,9 +45,9 @@ RSpec.shared_examples "finder_img_bis" do
         matcher: rgb_matcher,
         options: {number_of_tiles: workers, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      puts result[:benchmarks].inspect
+      puts result.metadata[:benchmarks].inspect
 
-      expect(result[:polygons]).to match_expected_polygons(filename + "_o", number_of_tiles: workers)
+      expect(result.points).to match_expected_polygons(filename + "_o", number_of_tiles: workers)
     end
 
     it "divides image into large number of tiles (1024x1024) clockwise" do
@@ -61,9 +61,9 @@ RSpec.shared_examples "finder_img_bis" do
         matcher: rgb_matcher,
         options: {number_of_tiles: workers, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      puts result[:benchmarks].inspect
+      puts result.metadata[:benchmarks].inspect
 
-      expect(result[:polygons]).to match_expected_polygons(filename + "_o", number_of_tiles: workers)
+      expect(result.points).to match_expected_polygons(filename + "_o", number_of_tiles: workers)
     end
 
     it "divides spiral into large number of tiles (1024x1024) clockwise" do
@@ -77,9 +77,9 @@ RSpec.shared_examples "finder_img_bis" do
         matcher: rgb_matcher,
         options: {number_of_tiles: workers, versus: :o}
       ).process_info
-      puts result[:benchmarks].inspect
+      puts result.metadata[:benchmarks].inspect
 
-      expect(result[:polygons]).to match_expected_polygons(filename + "_o", number_of_tiles: workers)
+      expect(result.points).to match_expected_polygons(filename + "_o", number_of_tiles: workers)
     end
   end
 end

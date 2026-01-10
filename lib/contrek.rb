@@ -15,6 +15,7 @@ require "contrek/finder/node"
 require "contrek/finder/node_cluster"
 require "contrek/finder/concurrent/fake_cluster"
 require "contrek/finder/polygon_finder"
+require "contrek/finder/result"
 require "contrek/finder/concurrent/clipped_polygon_finder"
 require "contrek/finder/concurrent/hub"
 require "contrek/finder/concurrent/end_point"
@@ -41,6 +42,7 @@ require "contrek/reducers/uniq_reducer"
 require "contrek/reducers/visvalingam_reducer"
 require "cpp_polygon_finder"
 require "contrek/cpp/cpp_concurrent_finder"
+require "contrek/results/cpp_result"
 
 module Contrek
   class << self
