@@ -10,6 +10,16 @@ module Contrek
         @size = 0
       end
 
+      def singleton!
+        if @head&.next
+          @head.next.prev = nil
+          @head.next = nil
+        end
+        @tail = nil
+        @size = 1
+        @iterator = 0
+      end
+
       def rem(node)
         Raise "Not my node" if node.owner != self
 
@@ -84,12 +94,13 @@ module Contrek
         @iterator = 0
       end
 
+      # from yield: false => stop, true => continue
       def each(&block)
         last = nil
         unless @head.nil?
           pointer = @head
           loop do
-            yield(pointer)
+            break unless yield(pointer)
             last = pointer
             break unless (pointer = pointer.next)
           end
@@ -140,25 +151,6 @@ module Contrek
 
       def pop!
         rem(@tail)
-      end
-
-      def intersection_with(queueable)
-        int = []
-        each do |node|
-          int += queueable.map do |e|
-            break [e.payload] if e.payload == node.payload
-          end.compact
-        end
-        int
-      end
-
-      def intersection_with_array?(array)
-        each { |node| return true if array.index(node.payload) }
-        false
-      end
-
-      def intersect_with?(queueable)
-        intersection_with(queueable).any?
       end
 
       def remove_adjacent_pairs(array = nil)

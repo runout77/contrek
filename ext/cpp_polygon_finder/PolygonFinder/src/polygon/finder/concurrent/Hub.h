@@ -14,16 +14,19 @@
 class EndPoint;
 class Hub {
  public:
-  explicit Hub(int height, int width);
-  EndPoint* spawn_end_point();
+  explicit Hub(int height, int start_x, int end_x);
+  int spawn_end_point();
   const int width() const { return width_; }
-  inline EndPoint* get(int key) const {
+  const int start_x() const { return start_x_; }
+  inline EndPoint* get(int key) {
     if (!is_set(key)) return nullptr;
-    return payloads_[key];
+    int index = payloads_[key];
+    return &endpoint_pool_[index];
   }
-  inline void put(int key, EndPoint* payload) {
-    payloads_[key] = payload;
+  inline EndPoint* put(int key, int index) {
+    payloads_[key] = index;
     bitset_[key >> 6] |= (1ULL << (key & 63));
+    return &endpoint_pool_[index];
   }
   inline bool is_set(int key) const {
     return (bitset_[key >> 6] & (1ULL << (key & 63)));
@@ -32,7 +35,8 @@ class Hub {
  private:
   int width_;
   int height_;
-  std::vector<EndPoint*> payloads_;
+  int start_x_;
+  std::vector<int> payloads_;
   std::deque<EndPoint> endpoint_pool_;
   Hub(const Hub&) = delete;
   Hub& operator=(const Hub&) = delete;

@@ -267,7 +267,7 @@ void Init_cpp_polygon_finder() {
 
   Data_Type<RGBNotMatcher> rb_cRGBNotMatcher =
     define_class<RGBNotMatcher, Matcher>("CPPRGBNotMatcher")
-    .define_constructor(Constructor<RGBNotMatcher, int>())
+    .define_constructor(Constructor<RGBNotMatcher, unsigned int>())
     .define_method("match", &RGBNotMatcher::match);
 
   Data_Type<PolygonFinder> rb_cPolygonFinder =

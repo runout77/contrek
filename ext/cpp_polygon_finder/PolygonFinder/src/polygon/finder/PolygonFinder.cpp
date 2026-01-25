@@ -89,7 +89,7 @@ void PolygonFinder::scan() {
       if (rgb_m) run_loop(rgb_m, fetcher);
       else       run_loop(this->matcher, fetcher);
     } else {
-      auto fetcher = [](const unsigned char* p) { return p[0] | (p[1] << 8) | (p[2] << 16); };
+      auto fetcher = [](const unsigned char* p) { return *reinterpret_cast<const uint32_t*>(p); };
       if (rgb_m) run_loop(rgb_m, fetcher);
       else       run_loop(this->matcher, fetcher);
     }

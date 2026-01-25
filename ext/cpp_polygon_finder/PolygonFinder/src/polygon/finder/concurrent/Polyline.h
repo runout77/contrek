@@ -10,7 +10,9 @@
 #include <list>
 #include <cstdint>
 #include <optional>
+#include <utility>
 #include <vector>
+#include <unordered_map>
 #include "Partitionable.h"
 #include "../RectBounds.h"
 
@@ -37,11 +39,12 @@ class Polyline : public Partitionable {
   std::vector<Point*> raw() const { return raw_; }
   const std::list<Shape*>& next_tile_eligible_shapes() const { return next_tile_eligible_shapes_; }
   const std::vector<Part*>& parts() const { return parts_; }
-  std::vector<Point*> intersection(const Polyline* other) const;
+  std::vector<std::pair<int, int>> intersection(const Polyline* other) const;
   const int max_y() const { return max_y_; }
   void clear();
   bool is_empty();
   bool vert_intersect(Polyline& other);
+  void reset_tracked_endpoints();
 
  private:
   std::vector<Point*> raw_;
@@ -49,4 +52,5 @@ class Polyline : public Partitionable {
   void find_boundary();
   uint32_t flags_ = 0;
   std::list<Shape*> next_tile_eligible_shapes_;
+  mutable std::unordered_map<const EndPoint*, int> tracked_endpoints;
 };

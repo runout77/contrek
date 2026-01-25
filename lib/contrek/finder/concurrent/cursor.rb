@@ -54,22 +54,9 @@ module Contrek
             missing_shapes << shape
           end
         end
-        @polylines_sequence.each do |polyline|
-          missing_shapes.each do |missing_shape|
-            outer_polyline = missing_shape.outer_polyline
-            next unless polyline.vert_intersect?(outer_polyline)
-            if (intersection = polyline.intersection(outer_polyline)).any?
-              inject_sequences_left, inject_sequences_right = polyline.sew!(intersection, outer_polyline)
-              combine!(inject_sequences_right, inject_sequences_left).each do |sewn_sequence|
-                sewn_sequence.uniq!
-                @orphan_inners << sewn_sequence if sewn_sequence.size > 1 && sewn_sequence.map { |c| c[:x] }.uniq.size > 1 # segmenti non sono ammessi, solo aree
-              end
-              outer_polyline.clear!
-              outer_polyline.turn_on(Polyline::TRACKED_OUTER)
-              outer_polyline.turn_on(Polyline::TRACKED_INNER)
-              @orphan_inners += missing_shape.inner_polylines
-            end
-          end
+        to_delay = connect_missings(missing_shapes)
+        while to_delay.any?
+          to_delay = connect_missings(to_delay)
         end
 
         retme = collect_inner_sequences(outer_seq)
@@ -81,6 +68,36 @@ module Contrek
       end
 
       private
+
+      def connect_missings(missing_shapes)
+        delay_shapes = []
+
+        @polylines_sequence.each do |polyline|
+          missing_shapes.each do |missing_shape|
+            missing_outer_polyline = missing_shape.outer_polyline
+            next if missing_outer_polyline.on?(Polyline::TRACKED_OUTER) ||
+              !polyline.vert_intersect?(missing_outer_polyline)
+
+            if (intersection = polyline.intersection(missing_outer_polyline)).any?
+              inject_sequences_left, inject_sequences_right = polyline.sew!(intersection, missing_outer_polyline)
+              if inject_sequences_left.nil?
+                delay_shapes << missing_shape
+                next
+              end
+              combine!(inject_sequences_right, inject_sequences_left).each do |sewn_sequence|
+                sewn_sequence.uniq!
+                @orphan_inners << sewn_sequence if sewn_sequence.size > 1 && sewn_sequence.map { |c| c[:x] }.uniq.size > 1 # segmenti non sono ammessi, solo aree
+              end
+              missing_outer_polyline.clear!
+              missing_outer_polyline.turn_on(Polyline::TRACKED_OUTER)
+              missing_outer_polyline.turn_on(Polyline::TRACKED_INNER)
+              @orphan_inners += missing_shape.inner_polylines
+            end
+          end
+        end
+
+        delay_shapes
+      end
 
       # rubocop:disable Lint/NonLocalExitFromIterator
       def traverse_outer(act_part, all_parts, polylines, shapes, outer_joined_polyline)

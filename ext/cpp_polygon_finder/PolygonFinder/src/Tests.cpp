@@ -107,7 +107,7 @@ void Tests::test_c()
   Point* p2 = new Point({2, 2});
   Point* p3 = new Point({3, 3});
 
-  Hub* hub = new Hub(4, 4);  // coordinate 0 -> 3 sia x che y, matrice di 4 * 4
+  Hub* hub = new Hub(4, 0, 3);
 
   Position* pos1 = new Position(hub, p1);
   Position* pos2 = new Position(hub, p2);
@@ -176,15 +176,16 @@ void Tests::test_e()
   cpu_timer.start();
   FastPngBitmap png_bitmap("images/sample_10240x10240.png");
   // FastPngBitmap png_bitmap("images/sample_1024x1024.png");
-  std::cout << "immagine =" << cpu_timer.stop() << std::endl;
+  std::cout << "image reading time =" << cpu_timer.stop() << std::endl;
 
-  int color = png_bitmap.value_at(0, 0);
-  std::cout << "color =" << color << std::endl;
+  int color = png_bitmap.rgb_value_at(0, 0);
+  std::cout << "color = " << color << std::endl;
   RGBNotMatcher not_matcher(color);
 
   std::vector<std::string> arguments = {"--versus=a", "--compress_uniq", "--number_of_tiles=2"};
   Finder pl(2, &png_bitmap, &not_matcher, &arguments);
   ProcessResult *o = pl.process_info();
   o->print_info();
+  std::cout << "polygons =" << o->groups << std::endl;
   delete o;
 }

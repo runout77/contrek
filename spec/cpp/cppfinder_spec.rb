@@ -5,9 +5,7 @@ RSpec.describe Contrek::Cpp::CPPConcurrentFinder, type: :class do
     @bitmap_class = CPPBitMap
     @png_bitmap_class = CPPPngBitMap
     @png_not_matcher = CPPRGBNotMatcher
-    @png_not_matcher_color = 0x00FFFFFF
-    @color_class = Contrek::Bitmaps::RgbColor
-
+    @color_class = Contrek::Bitmaps::RgbCppColor
     @ruby_bitmap_class = Contrek::Bitmaps::ChunkyBitmap
     @ruby_matcher = Contrek::Matchers::ValueNotMatcher.new(" ")
   end

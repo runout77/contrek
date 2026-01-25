@@ -98,7 +98,18 @@ module Contrek
             return
           end
           if (twin_tile = arriving_tiles.find { |b| (b.start_x == (tile.end_x - 1)) || ((b.end_x - 1) == tile.start_x) })
-            cluster = Cluster.new(finder: self, height: bitmap.h, width: bitmap.w)
+
+            if twin_tile.start_x == (tile.end_x - 1)
+              start_x = tile.start_x
+              end_x = twin_tile.end_x
+            else
+              start_x = twin_tile.start_x
+              end_x = tile.end_x
+            end
+
+            # puts "start = #{start_x} end = #{end_x}"
+
+            cluster = Cluster.new(finder: self, height: bitmap.h, start_x:, end_x:)
             if twin_tile.start_x == (tile.end_x - 1)
               cluster.add(tile)
               cluster.add(twin_tile)

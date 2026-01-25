@@ -5,6 +5,7 @@ require "contrek/bitmaps/chunky_bitmap"
 require "contrek/bitmaps/png_bitmap"
 require "contrek/bitmaps/custom_bitmap"
 require "contrek/bitmaps/rgb_color"
+require "contrek/bitmaps/rgb_cpp_color"
 require "contrek/finder/bounds"
 require "contrek/bitmaps/sample_generator"
 require "contrek/finder/list"
@@ -54,10 +55,10 @@ module Contrek
     private
 
     def compute_cpp(png_file_path, options)
-      color = Bitmaps::RgbColor.new(**options[:color])
+      color = Bitmaps::RgbCppColor.new(**options[:color])
       png_bitmap = CPPPngBitMap.new(png_file_path)
       rgb_matcher_klass = (options[:class] == "value_not_matcher") ? CPPRGBNotMatcher : CPPRGBMatcher
-      rgb_matcher = rgb_matcher_klass.new(color.to_rgb_raw)
+      rgb_matcher = rgb_matcher_klass.new(color.raw)
       if options.key?(:number_of_threads) || options[:finder]&.key?(:number_of_tiles)
         Contrek::Cpp::CPPConcurrentFinder.new(
           number_of_threads: options.dig(:number_of_threads) || 0,
@@ -74,7 +75,7 @@ module Contrek
     end
 
     def compute_ruby_pure(png_file_path, options)
-      color = Bitmaps::RgbColor.new(**options[:color])
+      color = Bitmaps::RgbCppColor.new(**options[:color])
       png_bitmap = Bitmaps::PngBitmap.new(png_file_path)
       rgb_matcher = const_get("Contrek::Matchers::" + camelize("value_not_matcher")).new(color.raw)
       if options.key?(:number_of_threads) || options[:finder]&.key?(:number_of_tiles)

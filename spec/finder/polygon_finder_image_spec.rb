@@ -3,7 +3,7 @@ RSpec.describe Contrek::Finder::PolygonFinder, type: :class do
     it "trace contourn on sample image" do
       filename = "sample_1200x800.png"
       png_bitmap = Contrek::Bitmaps::PngBitmap.new("./spec/files/images/#{filename}")
-      color = Contrek::Bitmaps::RgbColor.new(r: 251, g: 251, b: 251, a: 255)
+      color = Contrek::Bitmaps::RgbCppColor.new(r: 251, g: 251, b: 251, a: 255)
       rgb_matcher = Contrek::Matchers::ValueNotMatcher.new(color.raw)
       polygonfinder = Contrek::Finder::PolygonFinder.new(png_bitmap,
         rgb_matcher,
@@ -18,7 +18,7 @@ RSpec.describe Contrek::Finder::PolygonFinder, type: :class do
     it "trace contourn on sample image 2" do
       filename = "sample_300x300.png"
       png_bitmap = Contrek::Bitmaps::PngBitmap.new("./spec/files/images/#{filename}")
-      color = Contrek::Bitmaps::RgbColor.new(r: 1, g: 1, b: 1, a: 255)
+      color = Contrek::Bitmaps::RgbCppColor.new(r: 1, g: 1, b: 1, a: 255)
       rgb_matcher = Contrek::Matchers::Matcher.new(color.raw)
       polygonfinder = Contrek::Finder::PolygonFinder.new(png_bitmap,
         rgb_matcher,

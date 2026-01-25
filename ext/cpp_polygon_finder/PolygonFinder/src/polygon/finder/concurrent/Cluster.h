@@ -20,7 +20,7 @@ class Cluster {
   std::vector<Tile*> tiles_;
   Hub *hub_ = nullptr;
  public:
-  Cluster(Finder *finder, int height, int width);
+  Cluster(Finder *finder, int height, int start_x, int end_x);
   virtual ~Cluster();
   void add(Tile* tile);
   Tile* merge_tiles();

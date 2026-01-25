@@ -2,15 +2,15 @@ CXX = g++
 CXXFLAGS = -Wall -Wextra -std=c++17 -Isrc -MMD -MP -pthread -g \
            -fno-omit-frame-pointer -fsanitize=address,undefined \
            -O0
-LDFLAGS = -lpng -pthread -lz -fsanitize=address,undefined
+LDFLAGS = -pthread -lz -fsanitize=address,undefined
 
 # valgrinf or perf setup
-#CXXFLAGS = -Wall -Wextra -std=c++17 -Isrc -MMD -MP -pthread -g -fno-omit-frame-pointer -march=native -DNDEBUG -O3
-#LDFLAGS = -lpng -pthread -lz
+# CXXFLAGS = -Wall -Wextra -std=c++17 -Isrc -MMD -MP -pthread -g -fno-omit-frame-pointer -march=native -DNDEBUG -O3
+# LDFLAGS = -lpng -pthread -lz
 
 # best performances
 CXXFLAGS = -Wall -Wextra -std=c++17 -Isrc -MMD -MP -pthread -g -march=native -DNDEBUG -Ofast -flto
-LDFLAGS = -lpng -pthread -lz -flto=auto
+LDFLAGS = -pthread -lz -flto=auto
 
 SRC = $(shell find src -name '*.cpp')
 C_SRC = $(shell find src -name 'spng.c')

@@ -27,7 +27,15 @@ module Contrek
       end
 
       def inspect
-        "#{self.class}[b#{@tile.name} S#{@name} #{"B" if boundary?}] (#{raw.count} => #{raw.inspect})"
+        "#{self.class}#{named} (#{raw.count} => #{raw.inspect})"
+      end
+
+      def named
+        "[b#{@tile.name} S#{@name} #{"B" if boundary?}]"
+      end
+
+      def numpy_raw
+        raw.flat_map { |p| [p[:x], p[:y]] }
       end
 
       def info
@@ -46,8 +54,35 @@ module Contrek
         (@flags & flag) != 0
       end
 
+      def reset_tracked_endpoints!
+        @tracked_endpoints = nil
+      end
+
+      # returns for every position of intersection an array composed by the indexes of parts (self,other) involved
+      # es [[1,3],[2,6],...]. The first time the sequence for self is computed is stored.
       def intersection(other)
-        @raw & other.raw
+        if @tracked_endpoints.nil?
+          @tracked_endpoints = {} # memoize found sequence
+          parts.each_with_index do |part, part_index|
+            next if !part.is?(Part::SEAM) && part.trasmuted
+            part.each do |pos|
+              @tracked_endpoints[pos.end_point.object_id] = part_index
+            end
+          end
+        end
+        matching_parts = []
+        other.parts.each_with_index do |part, part_index|
+          next if !part.is?(Part::SEAM) && part.trasmuted
+          part.each do |pos|
+            if (self_index = @tracked_endpoints[pos.end_point.object_id])
+              matching_parts << [self_index, part_index]
+              false
+            else
+              true
+            end
+          end
+        end
+        matching_parts
       end
 
       def empty?
@@ -80,6 +115,13 @@ module Contrek
 
       def vert_intersect?(other)
         !(@max_y < other.min_y || other.max_y < @min_y)
+      end
+
+      def get_bounds
+        {min_x: @min_x,
+         max_x: @max_x,
+         min_y: @min_y,
+         max_y: @max_y}
       end
 
       private

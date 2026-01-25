@@ -1,8 +1,3 @@
-class FakeRgbColor < Contrek::Bitmaps::RgbColor
-  def to_rgb_raw
-    @raw
-  end
-end
 RSpec.describe Contrek::Concurrent::Finder, type: :class do
   before do
     @ruby_bitmap_class = Contrek::Bitmaps::ChunkyBitmap
@@ -12,7 +7,7 @@ RSpec.describe Contrek::Concurrent::Finder, type: :class do
     @bitmap_class = @ruby_bitmap_class
     @png_bitmap_class = Contrek::Bitmaps::PngBitmap
     @png_not_matcher = Contrek::Matchers::ValueNotMatcher
-    @color_class = FakeRgbColor
+    @color_class = Contrek::Bitmaps::RgbColor
   end
 
   describe "shared_test" do

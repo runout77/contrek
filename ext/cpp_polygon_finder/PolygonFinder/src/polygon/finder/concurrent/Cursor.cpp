@@ -159,13 +159,36 @@ std::vector<Sequence*> Cursor::join_inners(Sequence* outer_seq) {
     }
   }
 
+  std::vector<Shape*> to_delay;
+  to_delay = connect_missings(missing_shapes);
+  while (!to_delay.empty()) {
+    to_delay = connect_missings(to_delay);
+  }
+
+  retme = collect_inner_sequences(outer_seq);
+  for (Polyline* polyline : polylines_sequence) {
+    polyline->turn_on(Polyline::TRACKED_INNER);
+  }
+  return(retme);
+}
+
+std::vector<Shape*> Cursor::connect_missings(std::vector<Shape*> missing_shapes) {
+  std::vector<Shape*> delay_shapes;
+
   for (Polyline *polyline : polylines_sequence)
   { for (Shape *missing_shape : missing_shapes)
     { Polyline* outer_polyline = missing_shape->outer_polyline;
-      if (!polyline->vert_intersect(*outer_polyline)) continue;
-      std::vector<Point*> intersection = polyline->intersection(outer_polyline);
+      if ( outer_polyline->is_on(Polyline::TRACKED_OUTER)  ||
+           !polyline->vert_intersect(*outer_polyline)) continue;
+      std::vector<std::pair<int, int>> intersection = polyline->intersection(outer_polyline);
       if (intersection.size() > 0)
-      { auto [inject_sequences_left, inject_sequences_right] = polyline->sew(intersection, outer_polyline);
+      { auto result = polyline->sew(intersection, outer_polyline);
+        if (!result) {
+          delay_shapes.push_back(missing_shape);
+          continue;
+        }
+        auto& inject_sequences_left = result->first;
+        auto& inject_sequences_right = result->second;
         auto combined = combine(inject_sequences_right, inject_sequences_left);
         for (auto& sewn_sequence : combined) {
           std::vector<Point*> unique;
@@ -205,11 +228,8 @@ std::vector<Sequence*> Cursor::join_inners(Sequence* outer_seq) {
       }
     }
   }
-  retme = collect_inner_sequences(outer_seq);
-  for (Polyline* polyline : polylines_sequence) {
-    polyline->turn_on(Polyline::TRACKED_INNER);
-  }
-  return(retme);
+
+  return(delay_shapes);
 }
 
 std::vector<Sequence*> Cursor::collect_inner_sequences(Sequence* outer_seq) {

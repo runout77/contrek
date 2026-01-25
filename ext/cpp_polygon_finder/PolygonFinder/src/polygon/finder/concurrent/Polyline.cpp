@@ -48,6 +48,10 @@ bool Polyline::boundary() {
   return( tile->tg_border(Point{min_x, 0}) || tile->tg_border(Point{max_x, 0}));
 }
 
+void Polyline::reset_tracked_endpoints() {
+  tracked_endpoints.clear();
+}
+
 void Polyline::find_boundary() {
   if (raw_.empty()) return;
   min_x =  std::numeric_limits<int>::max();
@@ -65,39 +69,40 @@ void Polyline::find_boundary() {
   }
 }
 
-struct PointHash {
-  size_t operator()(const Point* p) const {
-    if (!p) return 0;
-    std::hash<double> hasher;
-    size_t h1 = hasher(p->x);
-    size_t h2 = hasher(p->y);
-    return h1 ^ (h2 << 1);
-  }
-};
-
-struct PointEqual {
-  bool operator()(const Point* p1, const Point* p2) const {
-    if (!p1 || !p2) return p1 == p2;
-    return *p1 == *p2;
-  }
-};
-
-std::vector<Point*> Polyline::intersection(const Polyline* other) const {
-  std::vector<Point*> result;
-  if (!other) return result;
-  std::unordered_set<Point*, PointHash, PointEqual> other_set;
-  other_set.reserve(other->raw().size());
-  for (Point* p : other->raw()) {
-    if (p) other_set.insert(p);
-  }
-  for (Point* p : raw_) {
-    if (!p) continue;
-    if (other_set.count(p)) {
-      result.push_back(p);
+std::vector<std::pair<int, int>> Polyline::intersection(const Polyline* other) const {
+  if (this->tracked_endpoints.empty()) {
+    for (int i = 0; i < parts_.size(); ++i) {
+      auto& part = parts_[i];
+      if (!part->is(Part::SEAM) && part->trasmuted) continue;
+      part->each([&](QNode<Point>* pos) -> bool {
+        Position *position = dynamic_cast<Position*>(pos);
+        this->tracked_endpoints[position->end_point()] = i;
+        return true;
+      });
     }
   }
-  return result;
+
+  std::vector<std::pair<int, int>> matching_parts;
+  for (int j = 0; j < other->parts_.size(); ++j) {
+    auto& other_part = other->parts_[j];
+    if (!other_part->is(Part::SEAM) && other_part->trasmuted) {
+      continue;
+    }
+    other_part->each([&](QNode<Point>* pos) -> bool {
+      Position *position = dynamic_cast<Position*>(pos);
+      auto it = this->tracked_endpoints.find(position->end_point());
+      if (it != this->tracked_endpoints.end()) {
+        int self_index = it->second;
+        matching_parts.push_back({self_index, j});
+        return false;
+      }
+      return true;
+    });
+  }
+
+  return matching_parts;
 }
+
 
 void Polyline::clear() {
   this->raw_.clear();

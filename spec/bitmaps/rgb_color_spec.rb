@@ -1,8 +1,13 @@
-RSpec.describe Contrek::Bitmaps::RgbColor, type: :class do
+RSpec.describe Contrek::Bitmaps::RgbCppColor, type: :class do
   describe "rgb color" do
-    it "initializes rgb color struct" do
-      rgba = Contrek::Bitmaps::RgbColor.new(r: 241, g: 156, b: 156)
-      expect(rgba.raw).to eq 4053572863
+    it "initializes rgb color struct (ABGR)" do
+      rgba = Contrek::Bitmaps::RgbCppColor.new(r: 1, g: 2, b: 3, a: 4)
+      expect(rgba.raw).to eq 67305985
+    end
+
+    it "initializes rgb color struct (RGBA)" do
+      rgba = Contrek::Bitmaps::RgbColor.new(r: 1, g: 2, b: 3, a: 4)
+      expect(rgba.raw).to eq 16909060
     end
   end
 end

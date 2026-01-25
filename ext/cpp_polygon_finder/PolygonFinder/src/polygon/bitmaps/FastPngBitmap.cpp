@@ -70,12 +70,10 @@ char FastPngBitmap::value_at(int x, int y) {
   return(0);
 }
 
+// source image format RGBA => returning uint ABGR
 unsigned int FastPngBitmap::rgb_value_at(int x, int y) {
-  int32_t index = ((y * width) + x) * 4;
-  unsigned int color;
-  unsigned char *red = &image[index];
-  std::memcpy(&color, red, 3);
-  return(color);
+  uint32_t index = (uint32_t(y) * width + x) * 4;
+  return *reinterpret_cast<const uint32_t*>(&image[index]);
 }
 
 const unsigned char* FastPngBitmap::get_row_ptr(int y) const {

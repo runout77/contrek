@@ -23,3 +23,9 @@ All notable changes to this project will be documented in this file.
 ## [1.0.7] - 2026-01-10
 ### Added
 - Optimized C++/Ruby data transfer: Implemented NumPy-compatible binary serialization for coordinate outputs. This reduces serialization overhead and significantly increases data throughput between the C++ core and the Ruby interface.
+
+## [1.0.8] - 2026-01-25
+### Changed
+- Fixed ARGB/RGBA format discrepancies between Ruby and C++.
+- Updated the multithreading-side algorithm for rejoining mono-connected orphan polygons to other orphan polygons. The algorithm can now identify them and defer their processing within the pipeline.
+- Improved, on the multithreading side, the polygon intersection detection mechanism; the geometric approach has been dropped in favor of a purely topological one.

@@ -1,9 +1,9 @@
 module Contrek
   module Bitmaps
-    class RgbColor
+    class RgbCppColor
       attr_reader :raw
       def initialize(r:, g:, b:, a: 255)
-        @raw = (r << 24) + (g << 16) + (b << 8) + a
+        @raw = (a << 24) | (b << 16) | (g << 8) | r
       end
     end
   end

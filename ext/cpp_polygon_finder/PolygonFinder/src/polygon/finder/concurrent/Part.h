@@ -27,6 +27,7 @@ class Part : public Queueable<Point> {
   bool is(Types type);
   bool inverts = false;
   bool trasmuted = false;
+  bool delayed = false;
   Part* next = nullptr;
   Part* prev = nullptr;
   Part* circular_next = nullptr;
@@ -40,6 +41,7 @@ class Part : public Queueable<Point> {
   const bool touched() const { return touched_; }
   void touch();
   bool intersect_part(Part* other_part);
+  void set_polyline(Polyline* polyline) { this->polyline_ = polyline; }
 
  private:
   bool touched_ = false;

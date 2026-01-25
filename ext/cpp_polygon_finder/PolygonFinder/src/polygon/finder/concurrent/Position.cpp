@@ -11,11 +11,10 @@
 
 Position::Position(Hub* hub, Point* point)
 : QNode<Point>(point)
-{ int key = point->y * hub->width() + point->x;
+{ int key = point->y * hub->width() + (point->x - hub->start_x());
   EndPoint* existing_ep = hub->get(key);
   if (existing_ep == nullptr)
-  { end_point_ = hub->spawn_end_point();
-    hub->put(key, end_point_);
+  { end_point_ = hub->put(key, hub->spawn_end_point());
   } else {
     end_point_ = existing_ep;
   }

@@ -79,7 +79,19 @@ class Queueable {
     head = nullptr;
     tail = nullptr;
     _iterator = nullptr;
+    _started = false;
     size = 0;
+  }
+
+  void singleton()
+  { if (head && head->next) {
+      head->next->prev = nullptr;
+      head->next = nullptr;
+    }
+    tail = nullptr;
+    size = 1;
+    _iterator = nullptr;
+    _started = false;
   }
 
   void replace(Queueable<T>& q) {
@@ -130,8 +142,8 @@ class Queueable {
   }
 
   void next_of(QNode<T>* node) {
-    if (!node)  throw std::runtime_error("nil node");
-    if (node->owner != this) throw std::runtime_error("wrong node");
+    // if (!node)  throw std::runtime_error("nil node");
+    // if (node->owner != this) throw std::runtime_error("wrong node");
     _iterator = node->next;
     _started = true;
   }
@@ -181,23 +193,6 @@ class Queueable {
       return out;
   }
 
-  bool intersection_with_array(const std::vector<T*>& array) {
-    if (array.empty() || size == 0) return false;
-
-    QNode<T>* current = head;
-    while (current) {
-      if (current->payload) {
-        for (T* item : array) {
-          if (item && *item == *(current->payload)) {
-            return true;
-          }
-        }
-      }
-      current = current->next;
-    }
-    return false;
-  }
-
   QNode<T>* pop() {
     if (!tail) return nullptr;
     return rem(tail);
@@ -220,7 +215,7 @@ class Queueable {
 
     for (T* current : source) {
       if (!result.empty() && *result.back() == *current) {
-          result.pop_back();  // "Annulla" la coppia invece di ricominciare
+          result.pop_back();
       } else {
           result.push_back(current);
       }

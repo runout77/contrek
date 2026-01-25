@@ -16,10 +16,10 @@
 #include "Cursor.h"
 #include "../../CpuTimer.h"
 
-Cluster::Cluster(Finder *finder, int height, int width)
+Cluster::Cluster(Finder *finder, int height, int start_x, int end_x)
   : finder(finder)
 { tiles_.reserve(2);  // only two (left|right)
-  this->hub_ = new Hub(height, width);
+  this->hub_ = new Hub(height, start_x, end_x);
 }
 
 Cluster::~Cluster() {

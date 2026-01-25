@@ -5,7 +5,7 @@ RSpec.describe CPPPolygonFinder, type: :class do
     @bitmap_class = CPPBitMap
     @png_bitmap_class = CPPPngBitMap
     @png_not_matcher = CPPRGBNotMatcher
-    @png_not_matcher_color = 0x00FFFFFF
+    @png_not_matcher_color = Contrek::Bitmaps::RgbCppColor.new(r: 255, g: 255, b: 255, a: 255).raw
   end
 
   describe "node test" do

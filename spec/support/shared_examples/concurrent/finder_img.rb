@@ -58,7 +58,6 @@ RSpec.shared_examples "finder_img" do
         options: {number_of_tiles: workers, versus: :a, compress: {uniq: true, linear: true}}
       ).process_info
       puts result.metadata[:benchmarks].inspect
-
       expect(result.points).to match_expected_polygons(filename, number_of_tiles: workers)
     end
 
@@ -68,7 +67,7 @@ RSpec.shared_examples "finder_img" do
 
       png_bitmap = @png_bitmap_class.new("./spec/files/images/#{filename}.png")
       color = @color_class.new(r: 251, g: 251, b: 251, a: 255)
-      rgb_matcher = @png_not_matcher.new(color.to_rgb_raw)
+      rgb_matcher = @png_not_matcher.new(color.raw)
       result = @polygon_finder_class.new(
         bitmap: png_bitmap,
         matcher: rgb_matcher,
@@ -84,7 +83,7 @@ RSpec.shared_examples "finder_img" do
 
       png_bitmap = @png_bitmap_class.new("./spec/files/images/#{filename}.png")
       color = @color_class.new(r: 251, g: 251, b: 251, a: 255)
-      rgb_matcher = @png_not_matcher.new(color.to_rgb_raw)
+      rgb_matcher = @png_not_matcher.new(color.raw)
       result = @polygon_finder_class.new(
         bitmap: png_bitmap,
         matcher: rgb_matcher,
@@ -100,7 +99,7 @@ RSpec.shared_examples "finder_img" do
 
       png_bitmap = @png_bitmap_class.new("./spec/files/images/#{filename}.png")
       color = @color_class.new(r: 251, g: 251, b: 251, a: 255)
-      rgb_matcher = @png_not_matcher.new(color.to_rgb_raw)
+      rgb_matcher = @png_not_matcher.new(color.raw)
       TerminalTracker.new
       result = @polygon_finder_class.new(
         bitmap: png_bitmap,
@@ -116,7 +115,7 @@ RSpec.shared_examples "finder_img" do
       workers = 3
       png_bitmap = @png_bitmap_class.new("./spec/files/images/#{filename}.png")
       color = @color_class.new(r: 251, g: 251, b: 251, a: 255)
-      rgb_matcher = @png_not_matcher.new(color.to_rgb_raw)
+      rgb_matcher = @png_not_matcher.new(color.raw)
       result = @polygon_finder_class.new(
         bitmap: png_bitmap,
         matcher: rgb_matcher,

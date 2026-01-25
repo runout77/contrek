@@ -9,7 +9,10 @@
 #pragma once
 #include <vector>
 #include <utility>
+#include <optional>
 #include "Part.h"
+
+using SewReturnData = std::pair<std::vector<std::vector<Point*>>, std::vector<std::vector<Point*>>>;
 
 class Partitionable {
  public:
@@ -17,14 +20,13 @@ class Partitionable {
   virtual ~Partitionable() = default;
   void partition();
   Part* find_first_part_by_position(Position* position);
-  std::pair<
-    std::vector<std::vector<Point*>>,
-    std::vector<std::vector<Point*>>> sew(std::vector<Point*> intersection, Polyline* other);
+  std::optional<SewReturnData> sew(std::vector<std::pair<int, int>> intersection, Polyline* other);
 
  protected:
   std::vector<Part*> parts_;
 
  private:
   void add_part(Part* new_part);
+  void insert_after(Part* part, Part* new_part);
   void trasmute_parts();
 };

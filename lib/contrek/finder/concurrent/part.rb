@@ -8,7 +8,7 @@ module Contrek
       ADDED = 2
 
       attr_reader :polyline, :index, :touched
-      attr_accessor :next, :circular_next, :prev, :type, :passes, :inverts, :trasmuted
+      attr_accessor :next, :circular_next, :prev, :type, :passes, :inverts, :trasmuted, :delayed
       def initialize(type, polyline)
         @type = type
         @polyline = polyline
@@ -19,10 +19,15 @@ module Contrek
         @touched = false
         @inverts = false
         @trasmuted = false
+        @delayed = false
       end
 
       def is?(type)
         @type == type
+      end
+
+      def set_polyline(polyline)
+        @polyline = polyline
       end
 
       def add_position(position)

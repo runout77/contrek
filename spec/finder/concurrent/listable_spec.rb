@@ -114,28 +114,6 @@ RSpec.describe Contrek::Concurrent::Listable, type: :class do
       expect(list.to_a).to eq ["a", "c"]
     end
 
-    it "intersection" do
-      a = TestNode.new("a")
-      b = TestNode.new("b")
-      c = TestNode.new("c")
-      c1 = TestNode.new("c")
-      d = TestNode.new("d")
-      list = TestList.new
-      list.add(a)
-      list.add(b)
-      list.add(c)
-      list2 = TestList.new
-
-      expect(list.intersection_with(list2)).to eq([])
-      expect(list.intersect_with?(list2)).to be false
-
-      list2.add(c1)
-      list2.add(d)
-
-      expect(list.intersection_with(list2)).to eq(["c"])
-      expect(list.intersect_with?(list2)).to be true
-    end
-
     it "iterate on a list" do
       a = TestNode.new("a")
       b = TestNode.new("b")

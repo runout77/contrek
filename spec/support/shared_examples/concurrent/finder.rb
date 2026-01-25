@@ -1308,7 +1308,12 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 3, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result.points).to eq([{outer: [{x: 8, y: 0}, {x: 17, y: 0}, {x: 18, y: 0}, {x: 16, y: 2}, {x: 16, y: 14}, {x: 17, y: 15}, {x: 25, y: 14}, {x: 26, y: 13}, {x: 26, y: 16}, {x: 8, y: 16}, {x: 0, y: 16}, {x: 2, y: 14}, {x: 2, y: 2}, {x: 0, y: 0}], inner: [[{x: 4, y: 2}, {x: 4, y: 6}, {x: 8, y: 7}, {x: 10, y: 5}, {x: 10, y: 11}, {x: 8, y: 9}, {x: 4, y: 10}, {x: 4, y: 14}, {x: 9, y: 14}, {x: 10, y: 13}, {x: 10, y: 15}, {x: 13, y: 15}, {x: 14, y: 14}, {x: 14, y: 2}, {x: 13, y: 1}, {x: 10, y: 1}, {x: 10, y: 3}, {x: 9, y: 2}]]}])
+      expect(result.points).to eq([
+        {outer: [{x: 8, y: 0}, {x: 17, y: 0}, {x: 18, y: 0}, {x: 16, y: 2}, {x: 16, y: 14}, {x: 17, y: 15},
+          {x: 25, y: 14}, {x: 26, y: 13}, {x: 26, y: 16}, {x: 8, y: 16}, {x: 0, y: 16}, {x: 2, y: 14},
+          {x: 2, y: 2}, {x: 0, y: 0}],
+         inner: [[{x: 4, y: 2}, {x: 4, y: 6}, {x: 8, y: 7}, {x: 10, y: 5}, {x: 10, y: 11}, {x: 8, y: 9}, {x: 4, y: 10}, {x: 4, y: 14}, {x: 9, y: 14}, {x: 10, y: 13}, {x: 10, y: 15}, {x: 13, y: 15}, {x: 14, y: 14}, {x: 14, y: 2}, {x: 13, y: 1}, {x: 10, y: 1}, {x: 10, y: 3}, {x: 9, y: 2}]]}
+])
     end
 
     it "syllable el (sew technic) case two" do
@@ -1427,7 +1432,7 @@ RSpec.shared_examples "finder" do
         bitmap: @bitmap_class.new(chunk, 20),
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
-      ).process_info # (bm)
+      ).process_info
       expect(result.points).to eq([{outer: [{x: 9, y: 0}, {x: 19, y: 0}, {x: 19, y: 12}, {x: 9, y: 12}, {x: 0, y: 12}, {x: 0, y: 0}], inner: [[{x: 0, y: 1}, {x: 0, y: 11}, {x: 19, y: 11}, {x: 19, y: 1}]]}, {outer: [{x: 9, y: 2}, {x: 16, y: 2}, {x: 16, y: 10}, {x: 9, y: 10}, {x: 3, y: 10}, {x: 3, y: 7}, {x: 7, y: 7}, {x: 9, y: 8}, {x: 10, y: 7}, {x: 10, y: 5}, {x: 9, y: 4}, {x: 7, y: 5}, {x: 3, y: 5}, {x: 3, y: 2}], inner: [[{x: 3, y: 3}, {x: 3, y: 4}, {x: 7, y: 4}, {x: 10, y: 4}, {x: 10, y: 8}, {x: 7, y: 8}, {x: 3, y: 8}, {x: 3, y: 9}, {x: 16, y: 9}, {x: 16, y: 3}]]}])
     end
 
@@ -1442,12 +1447,11 @@ RSpec.shared_examples "finder" do
               "X   XXXX     X" \
               "X            X" \
               "XXXXXXXXXXXXXX"
-
       result = @polygon_finder_class.new(
         bitmap: @bitmap_class.new(chunk, 14),
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
-      ).process_info # (bm)
+      ).process_info
       expect(result.points).to eq([
         {outer: [{x: 6, y: 0}, {x: 13, y: 0}, {x: 13, y: 8}, {x: 6, y: 8}, {x: 0, y: 8}, {x: 0, y: 5}, {x: 4, y: 5}, {x: 6, y: 6}, {x: 7, y: 5}, {x: 7, y: 3}, {x: 6, y: 2}, {x: 4, y: 3}, {x: 0, y: 3}, {x: 0, y: 0}],
          inner: [
@@ -1475,7 +1479,7 @@ RSpec.shared_examples "finder" do
         bitmap: @bitmap_class.new(chunk, 20),
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
-      ).process_info # (bm)
+      ).process_info
       expect(result.points).to eq([
         {outer: [{x: 9, y: 0}, {x: 19, y: 0}, {x: 19, y: 9}, {x: 9, y: 9}, {x: 0, y: 9}, {x: 0, y: 0}],
          inner: [[{x: 3, y: 2}, {x: 3, y: 3}, {x: 7, y: 3},
@@ -1501,8 +1505,188 @@ RSpec.shared_examples "finder" do
         bitmap: @bitmap_class.new(chunk, 30),
         matcher: @matcher,
         options: {number_of_tiles: 3, versus: :a, compress: {uniq: true, linear: true}}
-      ).process_info # (bm)
+      ).process_info
       expect(result.points).to eq([{outer: [{x: 0, y: 0}, {x: 0, y: 10}, {x: 9, y: 10}, {x: 29, y: 10}, {x: 29, y: 0}, {x: 9, y: 0}], inner: [[{x: 2, y: 8}, {x: 2, y: 7}, {x: 19, y: 7}, {x: 19, y: 8}], [{x: 18, y: 4}, {x: 18, y: 3}, {x: 9, y: 3}, {x: 7, y: 3}, {x: 7, y: 4}, {x: 2, y: 4}, {x: 2, y: 2}, {x: 9, y: 1}, {x: 27, y: 2}, {x: 27, y: 4}]]}])
+    end
+
+    it "half moon problem 1" do
+      #        ---------*----------
+      chunk = "00000000000000000000" \
+              "00000000000000000000" \
+              "00              0000" \
+              "00    00000000000000" \
+              "00    00000000000000" \
+              "00    00000000000000" \
+              "00              0000" \
+              "00000000000000000000" \
+              "00000000000000000000"
+      result = Contrek::Finder::PolygonFinder.new(
+        @ruby_bitmap_class.new(chunk, 20),
+        @ruby_matcher,
+        nil,
+        {versus: :o, compress: {uniq: true, linear: true}}
+      ).process_info
+      expect(result.points).to eq([
+        {outer: [{x: 19, y: 0}, {x: 19, y: 8}, {x: 0, y: 8}, {x: 0, y: 0}],
+         inner: [[{x: 16, y: 2}, {x: 1, y: 2}, {x: 1, y: 6}, {x: 16, y: 6}, {x: 6, y: 5}, {x: 6, y: 3}]]}
+])
+
+      result = @polygon_finder_class.new(
+        bitmap: @bitmap_class.new(chunk, 20),
+        matcher: @matcher,
+        options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
+      ).process_info
+      expect(result.points).to eq([
+        {outer: [{x: 9, y: 0}, {x: 19, y: 0}, {x: 19, y: 8}, {x: 9, y: 8}, {x: 0, y: 8}, {x: 0, y: 0}],
+         inner: [[{x: 1, y: 2}, {x: 1, y: 6}, {x: 16, y: 6}, {x: 9, y: 5}, {x: 6, y: 5}, {x: 6, y: 3}, {x: 9, y: 3}, {x: 16, y: 2}]]}
+])
+    end
+
+    it "half moon problem 2" do
+      #        ---------*----------
+      chunk = "00000000000000000000" \
+              "00000000000000000000" \
+              "00              0000" \
+              "00  0000000000000000" \
+              "00  0000000000000000" \
+              "00  000         0000" \
+              "00  000 000000000000" \
+              "00  000 000000000000" \
+              "00  000         0000" \
+              "00  0000000000000000" \
+              "00  0000000000000000" \
+              "00              0000" \
+              "00000000000000000000" \
+              "00000000000000000000"
+      result = Contrek::Finder::PolygonFinder.new(
+        @ruby_bitmap_class.new(chunk, 20),
+        @ruby_matcher,
+        nil,
+        {versus: :o, compress: {uniq: true, linear: true}}
+      ).process_info
+      expect(result.points).to eq([
+        {outer: [{x: 19, y: 0}, {x: 19, y: 13}, {x: 0, y: 13}, {x: 0, y: 0}],
+         inner: [
+          [{x: 16, y: 2}, {x: 1, y: 2}, {x: 1, y: 11}, {x: 16, y: 11}, {x: 4, y: 10}, {x: 4, y: 3}],
+          [{x: 16, y: 5}, {x: 6, y: 5}, {x: 6, y: 8}, {x: 16, y: 8}, {x: 8, y: 7}, {x: 8, y: 6}]
+]}
+])
+
+      result = @polygon_finder_class.new(
+        bitmap: @bitmap_class.new(chunk, 20),
+        matcher: @matcher,
+        options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
+      ).process_info
+      expect(result.points).to eq([
+        {outer: [{x: 9, y: 0}, {x: 19, y: 0}, {x: 19, y: 13}, {x: 9, y: 13}, {x: 0, y: 13}, {x: 0, y: 0}],
+         inner: [
+          [{x: 1, y: 2}, {x: 1, y: 11}, {x: 16, y: 11}, {x: 9, y: 10}, {x: 4, y: 10},
+            {x: 4, y: 3}, {x: 9, y: 3}, {x: 16, y: 2}],
+          [{x: 16, y: 8}, {x: 9, y: 7}, {x: 8, y: 7}, {x: 8, y: 6}, {x: 9, y: 6},
+            {x: 16, y: 5}, {x: 6, y: 5}, {x: 6, y: 8}]
+]}
+])
+    end
+
+    it "half moon problem 3" do
+      #        ---------*----------
+      chunk = "000000000000000000000000" \
+              "000000000000000000000000" \
+              "00              00000000" \
+              "00  00000000000000000000" \
+              "00  00000000000000000000" \
+              "00  00          00000000" \
+              "00  00  0000000000000000" \
+              "00  00  0000000000000000" \
+              "00  00  00      00000000" \
+              "00  00  00      00000000" \
+              "00  00  00  000000000000" \
+              "00  00  00  000000000000" \
+              "00  00  00      00000000" \
+              "00  00  00      00000000" \
+              "00  00  0000000000000000" \
+              "00  00  0000000000000000" \
+              "00  00          00000000" \
+              "00  00000000000000000000" \
+              "00  00000000000000000000" \
+              "00              00000000" \
+              "000000000000000000000000" \
+              "000000000000000000000000"
+      result = @polygon_finder_class.new(
+        bitmap: @bitmap_class.new(chunk, 24),
+        matcher: @matcher,
+        options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
+      ).process_info
+      expect(result.points).to eq([{
+        outer: [{x: 11, y: 0}, {x: 23, y: 0}, {x: 23, y: 21}, {x: 11, y: 21}, {x: 0, y: 21}, {x: 0, y: 0}],
+        inner: [
+          [{x: 1, y: 2}, {x: 1, y: 19}, {x: 16, y: 19}, {x: 11, y: 18},
+            {x: 4, y: 18}, {x: 4, y: 3}, {x: 11, y: 3}, {x: 16, y: 2}],
+          [{x: 16, y: 13}, {x: 16, y: 12}, {x: 12, y: 11}, {x: 12, y: 10},
+            {x: 16, y: 9}, {x: 16, y: 8}, {x: 9, y: 8}, {x: 9, y: 13}],
+            [{x: 16, y: 16}, {x: 11, y: 15}, {x: 8, y: 15}, {x: 8, y: 6},
+              {x: 11, y: 6}, {x: 16, y: 5}, {x: 5, y: 5}, {x: 5, y: 16}]
+]
+      }])
+    end
+
+    it "missing shape still missing" do
+      #        ---------*----------
+      chunk = "00000000000000000000" \
+              "00000000000000000000" \
+              "00              0000" \
+              "00  0000000000000000" \
+              "00  0000000000000000" \
+              "00  000         0000" \
+              "00  000     00  0000" \
+              "00  0000000000  0000" \
+              "00  0000000000  0000" \
+              "00              0000" \
+              "00000000000000000000" \
+              "00000000000000000000"
+      result = @polygon_finder_class.new(
+        bitmap: @bitmap_class.new(chunk, 20),
+        matcher: @matcher,
+        options: {number_of_tiles: 2, versus: :a, compress: {uniq: true, linear: true}}
+      ).process_info
+      expect(result.points).to eq([
+        {outer: [{x: 0, y: 0}, {x: 0, y: 11}, {x: 9, y: 11}, {x: 19, y: 11}, {x: 19, y: 0}, {x: 9, y: 0}],
+         inner: [
+          [{x: 1, y: 9}, {x: 1, y: 2}, {x: 16, y: 2}, {x: 9, y: 3}, {x: 4, y: 3}, {x: 4, y: 8},
+           {x: 9, y: 8}, {x: 13, y: 8}, {x: 13, y: 6}, {x: 12, y: 6}, {x: 9, y: 7}, {x: 6, y: 6},
+           {x: 6, y: 5}, {x: 9, y: 4}, {x: 16, y: 5}, {x: 16, y: 9}]
+]}
+])
+    end
+
+    it "half moon problem 1 (flipped)" do
+      #        ---------*----------
+      chunk = "00000000000000000000" \
+              "00000000000000000000" \
+              "0000              00" \
+              "0000000000000000  00" \
+              "0000000000000000  00" \
+              "0000         000  00" \
+              "000000000000 000  00" \
+              "000000000000 000  00" \
+              "0000         000  00" \
+              "0000000000000000  00" \
+              "0000000000000000  00" \
+              "0000              00" \
+              "00000000000000000000" \
+              "00000000000000000000"
+      result = @polygon_finder_class.new(
+        bitmap: @bitmap_class.new(chunk, 20),
+        matcher: @matcher,
+        options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
+      ).process_info
+      expect(result.points).to eq([
+        {outer: [{x: 9, y: 0}, {x: 19, y: 0}, {x: 19, y: 13}, {x: 9, y: 13}, {x: 0, y: 13}, {x: 0, y: 0}],
+         inner: [
+          [{x: 3, y: 2}, {x: 9, y: 3}, {x: 15, y: 3}, {x: 15, y: 10}, {x: 9, y: 10}, {x: 3, y: 11}, {x: 18, y: 11}, {x: 18, y: 2}],
+          [{x: 3, y: 5}, {x: 9, y: 6}, {x: 11, y: 6}, {x: 11, y: 7}, {x: 9, y: 7}, {x: 3, y: 8}, {x: 13, y: 8}, {x: 13, y: 5}]
+]}
+])
     end
   end
 end
