@@ -37,7 +37,7 @@ class Hub {
   int height_;
   int start_x_;
   std::vector<int> payloads_;
-  std::deque<EndPoint> endpoint_pool_;
+  std::vector<EndPoint> endpoint_pool_;
   Hub(const Hub&) = delete;
   Hub& operator=(const Hub&) = delete;
   std::vector<uint64_t> bitset_;

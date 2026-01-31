@@ -29,3 +29,8 @@ All notable changes to this project will be documented in this file.
 - Fixed ARGB/RGBA format discrepancies between Ruby and C++.
 - Updated the multithreading-side algorithm for rejoining mono-connected orphan polygons to other orphan polygons. The algorithm can now identify them and defer their processing within the pipeline.
 - Improved, on the multithreading side, the polygon intersection detection mechanism; the geometric approach has been dropped in favor of a purely topological one.
+
+## [1.0.9] - 2026-01-31
+### Added
+- **CMake Integration**: The library is now fully modularized via CMake, enabling seamless integration as a dependency in external C++ projects.
+- Multithreading Algorithm Optimization.

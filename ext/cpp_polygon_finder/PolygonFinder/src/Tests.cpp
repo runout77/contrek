@@ -28,12 +28,6 @@
 #include "polygon/finder/concurrent/Position.h"
 #include "polygon/finder/Polygon.h"
 
-Tests::Tests() {
-}
-
-Tests::~Tests() {
-}
-
 void Tests::test_a()
 { std::string chunk =
       "0000000000000000"\
@@ -79,22 +73,10 @@ void Tests::test_b()
       "  XX       XX   "\
       "  XX       XX   "\
       "  XXXXXXXXXXX   ";
-//        "0123456789012345"
-  /*chunk = "  XXXXXXXXXXX   "\
-          "  XX   XX  XX   "\
-          "  XX   XX  XX   "\
-          "  XX   XX  XX   "\
-          "  XXXXXXXXXXX   ";*/
 
   std::vector<std::string> arguments = {"--versus=o", "--number_of_tiles=2", "--compress_uniq", "--compress_linear", "--treemap"};
   ValueNotMatcher matcher(' ');
   Bitmap b(chunk, 16);
-
-  /*ClippedPolygonFinder pl(&b, &matcher, 0, 16, &arguments);
-  ProcessResult *pr = pl.process_info();
-  pr->print_polygons();
-  delete pr;*/
-
   Finder concurrentFinder(2, &b, &matcher, &arguments);
   ProcessResult *pro = concurrentFinder.process_info();
   pro->print_polygons();
@@ -155,7 +137,7 @@ void Tests::test_c()
 void Tests::test_d()
 { CpuTimer cpu_timer;
   cpu_timer.start();
-  FastPngBitmap png_bitmap("images/sample_10240x10240.png");
+  FastPngBitmap png_bitmap("../images/sample_10240x10240.png");
   // FastPngBitmap png_bitmap("images/labyrinth.png");
   std::cout << "image_w=" << png_bitmap.w() << " image_h=" << png_bitmap.h() << std::endl;
   std::cout << "immagine =" << cpu_timer.stop() << std::endl;
@@ -174,7 +156,7 @@ void Tests::test_d()
 void Tests::test_e()
 { CpuTimer cpu_timer;
   cpu_timer.start();
-  FastPngBitmap png_bitmap("images/sample_10240x10240.png");
+  FastPngBitmap png_bitmap("../images/sample_10240x10240.png");
   // FastPngBitmap png_bitmap("images/sample_1024x1024.png");
   std::cout << "image reading time =" << cpu_timer.stop() << std::endl;
 
@@ -188,4 +170,16 @@ void Tests::test_e()
   o->print_info();
   std::cout << "polygons =" << o->groups << std::endl;
   delete o;
+}
+
+void Tests::test_f()
+{ FastPngBitmap png_bitmap("../images/labyrinth.png");
+  std::cout << "image_w=" << png_bitmap.w() << " image_h=" << png_bitmap.h() << std::endl;
+  std::cout << "load_error=" << png_bitmap.error() << std::endl;
+
+  std::string data_url = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+P+/HgAFhAJ/wlseKgAAAABJRU5ErkJggg==";
+  data_url.erase(0, 22);
+  RemoteFastPngBitmap bitmap(&data_url);
+  std::cout << "image_w=" << bitmap.w() << " image_h=" << bitmap.h() << std::endl;
+  std::cout << "load_error=" << bitmap.error() << std::endl;
 }

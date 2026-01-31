@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    contrek (1.0.8)
+    contrek (1.0.9)
       chunky_png (~> 1.4)
       concurrent-ruby (~> 1.3.5)
       rice (= 4.5.0)

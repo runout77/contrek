@@ -21,5 +21,5 @@ class Position : public QNode<Point>{
   void before_rem(Queueable<Point>* q) override;
   void after_add(Queueable<Point>* q) override;
  private:
-  EndPoint* end_point_;
+  EndPoint* end_point_ = nullptr;
 };

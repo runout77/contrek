@@ -289,7 +289,7 @@ void Cursor::traverse_inner(Part* act_part, std::vector<Part*>& all_parts, Bound
         } else {
           for (Shape *shape : act_part->polyline()->next_tile_eligible_shapes()) {
             for (Part* dest_part : shape->outer_polyline->parts()) {
-              if (dest_part->trasmuted) continue;
+              if (dest_part->trasmuted || dest_part->is(Part::EXCLUSIVE)) continue;
               if (dest_part->intersect_part(act_part)) {
                 std::vector<Point*> link_seq = duplicates_intersection(*dest_part, *act_part);
                 if (!link_seq.empty()) {

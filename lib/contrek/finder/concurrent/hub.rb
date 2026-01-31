@@ -1,10 +1,9 @@
 module Contrek
   module Concurrent
     class Hub
-      attr_reader :payloads, :width
-      def initialize(start_x:, end_x:)
-        @width = end_x - start_x
-        # @payloads = Array.new(width * height)
+      attr_reader :payloads
+      def initialize(height:, start_x:, end_x:)
+        # @payloads = Array.new(height)
         @payloads = {}
       end
     end

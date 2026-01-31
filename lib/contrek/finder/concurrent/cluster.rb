@@ -6,7 +6,7 @@ module Contrek
       def initialize(finder:, height:, start_x:, end_x:)
         @finder = finder
         @tiles = []
-        @hub = Hub.new(start_x:, end_x:)
+        @hub = Hub.new(height:, start_x:, end_x:)
       end
 
       def add(tile)

@@ -10,11 +10,10 @@
 
 class Tests {
  public:
-  Tests();
-  virtual ~Tests();
   virtual void test_a();
   virtual void test_b();
   virtual void test_c();
   virtual void test_d();
   virtual void test_e();
+  virtual void test_f();
 };

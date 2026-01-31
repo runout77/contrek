@@ -31,7 +31,8 @@ module Contrek
       end
 
       def add_position(position)
-        add(Position.new(position: position, hub: polyline.tile.cluster.hub))
+        hub = is?(EXCLUSIVE) ? nil : polyline.tile.cluster.hub
+        add(Position.new(position: position, hub: hub))
       end
 
       def next_position(force_position = nil)

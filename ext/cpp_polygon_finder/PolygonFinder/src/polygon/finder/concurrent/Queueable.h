@@ -43,8 +43,7 @@ class Queueable {
 
   QNode<T>* rem(QNode<T>* node) {
     if (!node) return nullptr;
-    if (node->owner != this)
-        throw std::runtime_error("Not my node");
+    // if (node->owner != this) throw std::runtime_error("Not my node");
     node->before_rem(this);
     if (node->prev) node->prev->next = node->next;
     if (node->next) node->next->prev = node->prev;

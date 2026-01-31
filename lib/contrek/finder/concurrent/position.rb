@@ -6,8 +6,7 @@ module Contrek
       attr_reader :end_point
 
       def initialize(hub:, position:)
-        key = position[:y] * hub.width + position[:x]
-        @end_point = hub.payloads[key] ||= EndPoint.new
+        @end_point = hub.payloads[position[:y]] ||= EndPoint.new if hub
         @position = position
       end
 
@@ -16,11 +15,11 @@ module Contrek
       end
 
       def after_add(new_queue)
-        @end_point.queues << new_queue
+        @end_point.queues << new_queue if @end_point
       end
 
       def before_rem(old_queue)
-        @end_point.queues.delete(old_queue)
+        @end_point&.queues&.delete(old_queue)
       end
     end
   end

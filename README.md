@@ -1,5 +1,5 @@
 # Contrek
-Contrek is a Ruby gem with a C++ core for fast contour tracing and edge detection in PNG images. Unlike standard geometric tracers, it employs a **topological approach** to extract polygonal contours, representing shapes as a connected graph of shared endpoints. This ensures perfect adjacency and structural integrity for shape analysis and raster-to-vector workflows, such as PNG to SVG conversion, managed via libspng (0.7.4) with multithreading support.
+Contrek is a Ruby gem powered by a <u>standalone C++17 core library</u> for fast contour tracing and edge detection in PNG images. It employs a **topological approach** to extract polygonal contours, representing shapes as a connected graph of shared endpoints. This ensures perfect adjacency and structural integrity for shape analysis and raster-to-vector workflows, such as PNG to SVG conversion, managed via libspng (0.7.4) with multithreading support.
 
 ## About Contrek library
 Contrek (**con**tour **trek**king) simply scans your png bitmap and returns shape contour as close polygonal lines, both for the external and internal sides. It can compute the nesting level of the polygons found with a tree structure. It supports various levels and modes of compression and approximation of the found coordinates. It is capable of multithreaded processing, splitting the image into vertical strips and recombining the coordinates in pairs.
@@ -99,7 +99,7 @@ Regarding multithreading:
 
 - The treemap option is currently ignored (multithreaded treemap support will be introduced in upcoming revisions).
 
-By not declaring native option CPP Multithreading optimized code is used. In the above example a [105 MP image](spec/files/images/sample_10240x10240.png) is examined by 2 threads working on 2 tiles (total compute time about 2 secs).
+By not declaring native option CPP Multithreading optimized code is used. In the above example a [105 MP image](spec/files/images/sample_10240x10240.png) is examined by 2 threads working on 2 tiles (total compute time about 1.66 secs with image load).
 
 ```ruby
 result = Contrek.contour!(
@@ -113,11 +113,13 @@ result = Contrek.contour!(
 )
 puts result.metadata[:benchmarks].inspect
 
-{"compress"=>14.596786999999999,
-  "init"=>2078.745861,
-  "inner"=>1183.143734,
-  "outer"=>118.94489599999999,
-  "total"=>2093.342648}
+{ "compress"=>13.423765,
+  "init"=>612.654121,
+  "inner"=>14.8930669,
+  "outer"=>33.0693249,
+  "total"=>626.0778879
+}
+
 ```
 
 ## Result
@@ -262,7 +264,77 @@ This the one for the native C++
 }
 ```
 
-About 75x faster. Times are in microseconds; system: AMD Ryzen 7 3700X 8-Core Processor (BogoMIPS: 7199,99) on Ubuntu distro. 
+About 75x faster. Times are in microseconds; system: AMD Ryzen 7 3700X 8-Core Processor (BogoMIPS: 7199,99) on Ubuntu distro.
+
+## 🛠 C++ Standalone Library Usage
+
+The core of **Contrek** is a high-performance `C++17` library. It is designed to be **standalone**, meaning it has zero dependencies on Ruby and can be integrated into any `C++` project.
+
+
+### Prerequisites
+* **CMake** (3.10+)
+* **ZLIB** (Required for PNG processing)
+* **C++17 Compiler**
+
+### 1. Build & Run Examples
+If you want to test the performances or see the library in action:
+
+```bash
+# Navigate to the core folder
+cd ext/cpp_polygon_finder/PolygonFinder
+
+# Setup build directory
+mkdir build && cd build
+
+# Configure with examples enabled
+cmake -DBUILD_EXAMPLES=ON ..
+
+# Build and run
+make
+./contrek_test
+```
+
+### 2. How to integrate it into your project
+
+To use Contrek's engine in your own C++ application without Ruby:
+
+1. **Copy the core folder**: Take the `ext/cpp_polygon_finder/PolygonFinder` directory and place it inside your project (e.g., in a `libs/` or `third_party/` folder).
+2. **Update your CMakeLists.txt**: Add these lines to link the library:
+
+```cmake
+# Tell CMake to include Contrek
+add_subdirectory(libs/PolygonFinder)
+
+# Link it to your executable
+add_executable(my_app main.cpp)
+target_link_libraries(my_app PRIVATE ContrekLib)
+```
+
+### 3. C++ API Quick Start
+
+Contrek provides a high-level C++ API. Here is how you can use it in your standalone projects:
+
+```cpp
+#include "ContrekApi.h"
+#include <iostream>
+
+int main() {
+    // 1. Configure the engine
+    Contrek::Config cfg;
+    cfg.threads = 4;
+    cfg.tiles = 2;
+
+    // 2. Run the tracing process
+    // Supports PNG files via internal spng integration
+    auto result = Contrek::trace("path/to/image.png", cfg);
+
+    // 3. Access results
+    result->print_info(); // prints generic infos
+    std::cout << "Found polygons: " << result->groups << std::endl;
+
+    return 0;
+}
+```
 
 ## License
 

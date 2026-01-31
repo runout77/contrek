@@ -44,7 +44,8 @@ Position* Part::next_position(Position* force_position) {
 
 void Part::add_position(Point* point) {
   Cluster* c = this->polyline_->tile->cluster;
-  c->positions_pool.emplace_back(c->hub(), point);
+  Hub* hub = is(EXCLUSIVE) ? nullptr : c->hub();
+  c->positions_pool.emplace_back(hub, point);
   this->add(&c->positions_pool.back());
 }
 

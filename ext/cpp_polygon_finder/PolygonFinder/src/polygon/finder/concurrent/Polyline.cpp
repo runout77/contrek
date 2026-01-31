@@ -76,7 +76,9 @@ std::vector<std::pair<int, int>> Polyline::intersection(const Polyline* other) c
       if (!part->is(Part::SEAM) && part->trasmuted) continue;
       part->each([&](QNode<Point>* pos) -> bool {
         Position *position = dynamic_cast<Position*>(pos);
-        this->tracked_endpoints[position->end_point()] = i;
+        if (position->end_point() != nullptr)
+        { this->tracked_endpoints[position->end_point()] = i;
+        }
         return true;
       });
     }

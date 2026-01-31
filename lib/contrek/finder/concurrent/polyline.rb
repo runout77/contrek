@@ -66,6 +66,7 @@ module Contrek
           parts.each_with_index do |part, part_index|
             next if !part.is?(Part::SEAM) && part.trasmuted
             part.each do |pos|
+              next if pos.end_point.nil?
               @tracked_endpoints[pos.end_point.object_id] = part_index
             end
           end
