@@ -29,7 +29,7 @@ RSpec.describe Contrek::Concurrent::Listable, type: :class do
       [e, a, b, b1, a1, f, g].each { |entry| list.add(entry) }
       expect(list.to_a).to eq ["e", "a", "b", "b", "a", "f", "g"]
       expect(a.next).to be b
-      expect(list.remove_adjacent_pairs).to eq ["e", "f", "g"]
+      expect(Contrek::Concurrent::Part.remove_adjacent_pairs(list.to_a)).to eq ["e", "f", "g"]
       list.remove_adjacent_pairs!
       expect(list.to_a).to eq ["e", "f", "g"]
     end

@@ -16,10 +16,16 @@ Position::Position(Hub* hub, Point* point)
     EndPoint* existing_ep = hub->get(key);
     if (existing_ep == nullptr)
     { end_point_ = hub->put(key, hub->spawn_end_point());
+      end_point_->set_point(point);
     } else {
       end_point_ = existing_ep;
     }
   }
+}
+
+Position::Position(EndPoint* end_point)
+  : QNode<Point>(end_point->get_point())
+{  this->end_point_ = end_point;
 }
 
 void Position::before_rem(Queueable<Point>* q)  {

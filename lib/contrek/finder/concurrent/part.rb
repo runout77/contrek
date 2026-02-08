@@ -73,6 +73,22 @@ module Contrek
         end
         false
       end
+
+      def to_endpoints
+        map(&:end_point)
+      end
+
+      def self.remove_adjacent_pairs(array = nil)
+        n = array.size
+        (0...(n - 1)).each do |i|
+          if array[i] == array[i + 1]
+            # Remove the pair and call recursively
+            new_array = array[0...i] + array[(i + 2)..]
+            return remove_adjacent_pairs(new_array)
+          end
+        end
+        array
+      end
     end
   end
 end

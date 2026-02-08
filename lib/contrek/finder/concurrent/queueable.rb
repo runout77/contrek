@@ -153,19 +153,6 @@ module Contrek
         rem(@tail)
       end
 
-      def remove_adjacent_pairs(array = nil)
-        array = to_a if array.nil?
-        n = array.size
-        (0...(n - 1)).each do |i|
-          if array[i] == array[i + 1]
-            # Remove the pair and call recursively
-            new_array = array[0...i] + array[(i + 2)..]
-            return remove_adjacent_pairs(new_array)
-          end
-        end
-        array
-      end
-
       def remove_adjacent_pairs!
         unless @tail.nil?
           pointer = @tail
@@ -182,15 +169,6 @@ module Contrek
           end
         end
       end
-
-      #       def index(node)
-      #         index = 0
-      #         each do |loop_node|
-      #           return index if node == loop_node
-      #           index += 1
-      #         end
-      #         -1
-      #       end
     end
   end
 end

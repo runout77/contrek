@@ -26,8 +26,8 @@ void run_test() {
 
 int main() {
   Contrek::Config cfg;
-  cfg.threads = 2;
-  cfg.tiles = 2;
+  cfg.threads = 4;
+  cfg.tiles = 4;
   cfg.compress_unique = true;
 
   CpuTimer cpu_timer;

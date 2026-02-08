@@ -7,7 +7,7 @@ module Contrek
       TRACKED_INNER = 1 << 1
 
       attr_reader :raw, :name, :min_y, :max_y, :next_tile_eligible_shapes
-      attr_accessor :shape, :tile
+      attr_accessor :shape, :tile, :mixed_tile_origin
 
       def initialize(tile:, polygon:, shape: nil, bounds: nil)
         @tile = tile
@@ -15,6 +15,7 @@ module Contrek
         @raw = polygon
         @shape = shape
         @flags = 0
+        @mixed_tile_origin = false # becomes true when is sewn with polyline coming from other side tile
 
         if bounds.nil?
           find_boundary

@@ -34,3 +34,9 @@ All notable changes to this project will be documented in this file.
 ### Added
 - **CMake Integration**: The library is now fully modularized via CMake, enabling seamless integration as a dependency in external C++ projects.
 - Multithreading Algorithm Optimization.
+
+## [1.1.0] - 2026-02-08
+### Changes
+- Resolved connectivity issues between internal zones and the outer boundary.
+- Refined the internal parts stitching algorithm (sew method) for better performance.
+- Miscellaneous optimizations and improvements.

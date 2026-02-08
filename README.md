@@ -99,25 +99,25 @@ Regarding multithreading:
 
 - The treemap option is currently ignored (multithreaded treemap support will be introduced in upcoming revisions).
 
-By not declaring native option CPP Multithreading optimized code is used. In the above example a [105 MP image](spec/files/images/sample_10240x10240.png) is examined by 2 threads working on 2 tiles (total compute time about 1.66 secs with image load).
+By not declaring native option CPP Multithreading optimized code is used. In the above example a [105 MP image](spec/files/images/sample_10240x10240.png) is examined by 4 threads working on 4 tiles (total compute time about 1.53 secs with image load).
 
 ```ruby
 result = Contrek.contour!(
   png_file_path: "./spec/files/images/sample_10240x10240.png",
   options: {
-    number_of_threads: 2,
+    number_of_threads: 4,
     class: "value_not_matcher",
     color: {r: 255, g: 255, b: 255, a: 255},
-    finder: {number_of_tiles: 2, compress: {uniq: true}}
+    finder: {number_of_tiles: 4, compress: {uniq: true}}
   }
 )
 puts result.metadata[:benchmarks].inspect
 
-{ "compress"=>13.423765,
-  "init"=>612.654121,
-  "inner"=>14.8930669,
-  "outer"=>33.0693249,
-  "total"=>626.0778879
+{ compress: 13.0815,
+  init: 453.245,
+  inner: 27.0072,
+  outer: 66.9162,
+  total: 466.326
 }
 
 ```

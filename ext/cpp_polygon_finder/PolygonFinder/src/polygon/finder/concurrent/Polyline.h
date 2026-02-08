@@ -45,6 +45,7 @@ class Polyline : public Partitionable {
   bool is_empty();
   bool vert_intersect(Polyline& other);
   void reset_tracked_endpoints();
+  bool mixed_tile_origin = false;
 
  private:
   std::vector<Point*> raw_;

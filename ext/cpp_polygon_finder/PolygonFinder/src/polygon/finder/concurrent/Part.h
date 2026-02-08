@@ -10,12 +10,15 @@
 #include <cstdint>
 #include <string>
 #include <deque>
+#include <vector>
 #include "Queueable.h"
 #include "Position.h"
+#include "EndPoint.h"
 #include "../Node.h"
 
 class Polyline;
 class Position;
+class EndPoint;
 class Part : public Queueable<Point> {
  public:
   enum Types : uint32_t {
@@ -42,6 +45,8 @@ class Part : public Queueable<Point> {
   void touch();
   bool intersect_part(Part* other_part);
   void set_polyline(Polyline* polyline) { this->polyline_ = polyline; }
+  std::vector<EndPoint*> to_endpoints();
+  static std::vector<EndPoint*> remove_adjacent_pairs(const std::vector<EndPoint*>& input);
 
  private:
   bool touched_ = false;

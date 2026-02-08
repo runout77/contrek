@@ -8,6 +8,7 @@
 
 #include "Part.h"
 #include <iostream>
+#include <vector>
 #include "Polyline.h"
 #include "Tile.h"
 #include "Cluster.h"
@@ -68,4 +69,27 @@ bool Part::intersect_part(Part* other_part)
     return(true);
   });
   return(intersect);
+}
+
+std::vector<EndPoint*> Part::to_endpoints() {
+  std::vector<EndPoint*> out;
+  QNode<Point>* current = head;
+  while (current) {
+    out.push_back((dynamic_cast<Position*>(current))->end_point());
+    current = current->next;
+  }
+  return out;
+}
+
+std::vector<EndPoint*> Part::remove_adjacent_pairs(const std::vector<EndPoint*>& input = {}) {
+  std::vector<EndPoint*> result;
+  result.reserve(input.size());
+  for (EndPoint* current : input) {
+    if (!result.empty() && result.back() == current) {
+      result.pop_back();
+    } else {
+      result.push_back(current);
+    }
+  }
+  return result;
 }

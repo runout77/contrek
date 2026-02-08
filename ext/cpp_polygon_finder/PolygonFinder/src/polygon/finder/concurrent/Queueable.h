@@ -206,19 +206,4 @@ class Queueable {
     }
     return false;
   }
-
-  std::vector<T*> remove_adjacent_pairs(const std::vector<T*>& input = {}) const {
-    const std::vector<T*>& source = input.empty() ? to_vector() : input;
-    std::vector<T*> result;
-    result.reserve(source.size());
-
-    for (T* current : source) {
-      if (!result.empty() && *result.back() == *current) {
-          result.pop_back();
-      } else {
-          result.push_back(current);
-      }
-    }
-    return result;
-  }
 };

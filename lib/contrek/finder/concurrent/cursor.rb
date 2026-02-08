@@ -3,11 +3,10 @@ module Contrek
     class Cursor
       attr_reader :orphan_inners
       def initialize(cluster:, shape:)
-        @polylines_sequence = []
+        @shapes_sequence = Set.new([shape])
         @cluster = cluster
         @outer_polyline = shape.outer_polyline
         @orphan_inners = []
-        @shapes = [shape]
       end
 
       def inspect
@@ -15,26 +14,22 @@ module Contrek
       end
 
       # Given the initial polyline, draw its outer boundary, possibly extending into
-      # adjacent polylines, and then connect them. At the end, @polylines_sequence
+      # adjacent polylines, and then connect them. At the end, @shapes_sequence
       # contains the merged polylines. Returns a new resulting polyline.
       def join_outers!
         seq_log = []
-        @polylines_sequence << @outer_polyline
 
         outer_joined_polyline = Sequence.new
-
         traverse_outer(@outer_polyline.parts.first,
           seq_log,
-          @polylines_sequence,
-          @shapes,
+          @shapes_sequence,
           outer_joined_polyline)
         outer_joined_polyline.pop! if outer_joined_polyline.head.payload == outer_joined_polyline.tail.payload &&
           @cluster.tiles.first.left? && @cluster.tiles.last.right?
 
-        @polylines_sequence.uniq!
-
-        @polylines_sequence.each { |c| c.turn_on(Polyline::TRACKED_OUTER) }
-        (@shapes - [@outer_polyline.shape]).each do |shape|
+        @shapes_sequence.each do |shape|
+          shape.outer_polyline.turn_on(Polyline::TRACKED_OUTER)
+          next if shape == @outer_polyline.shape
           @orphan_inners += shape.inner_polylines
           shape.clear_inner!
         end
@@ -50,32 +45,41 @@ module Contrek
             next if shape.outer_polyline.on?(Polyline::TRACKED_OUTER) ||
               shape.outer_polyline.on?(Polyline::TRACKED_INNER) ||
               !shape.outer_polyline.boundary? ||
-              @polylines_sequence.include?(shape.outer_polyline)
+              @shapes_sequence.include?(shape)
             missing_shapes << shape
           end
         end
-        to_delay = connect_missings(missing_shapes)
-        while to_delay.any?
-          to_delay = connect_missings(to_delay)
+
+        if missing_shapes.any?
+          to_delay_shapes = connect_missings(@shapes_sequence, missing_shapes)
+          if to_delay_shapes.any?
+            connect_missings(to_delay_shapes, missing_shapes)
+            while to_delay_shapes.any?
+              to_delay_shapes = connect_missings(@shapes_sequence, to_delay_shapes)
+            end
+          end
         end
 
         retme = collect_inner_sequences(outer_seq)
 
-        @polylines_sequence.each do |polyline|
-          polyline.turn_on(Polyline::TRACKED_INNER)
+        @shapes_sequence.each do |shape|
+          shape.outer_polyline.turn_on(Polyline::TRACKED_INNER)
         end
         retme
       end
 
       private
 
-      def connect_missings(missing_shapes)
+      def connect_missings(shapes_sequence, missing_shapes)
         delay_shapes = []
 
-        @polylines_sequence.each do |polyline|
+        shapes_sequence.each do |shape|
+          polyline = shape.outer_polyline
           missing_shapes.each do |missing_shape|
             missing_outer_polyline = missing_shape.outer_polyline
-            next if missing_outer_polyline.on?(Polyline::TRACKED_OUTER) ||
+            next if (polyline.mixed_tile_origin == false && missing_outer_polyline.tile == polyline.tile) || # accepts only other side ones
+              missing_outer_polyline.on?(Polyline::TRACKED_OUTER) ||
+              polyline == missing_outer_polyline ||
               !polyline.vert_intersect?(missing_outer_polyline)
 
             if (intersection = polyline.intersection(missing_outer_polyline)).any?
@@ -89,6 +93,7 @@ module Contrek
                 @orphan_inners << sewn_sequence if sewn_sequence.size > 1 && sewn_sequence.map { |c| c[:x] }.uniq.size > 1 # segmenti non sono ammessi, solo aree
               end
               missing_outer_polyline.clear!
+              polyline.mixed_tile_origin = true
               missing_outer_polyline.turn_on(Polyline::TRACKED_OUTER)
               missing_outer_polyline.turn_on(Polyline::TRACKED_INNER)
               @orphan_inners += missing_shape.inner_polylines
@@ -100,9 +105,9 @@ module Contrek
       end
 
       # rubocop:disable Lint/NonLocalExitFromIterator
-      def traverse_outer(act_part, all_parts, polylines, shapes, outer_joined_polyline)
+      def traverse_outer(act_part, all_parts, shapes_sequence, outer_joined_polyline)
         all_parts << act_part if all_parts.last != act_part
-        shapes << act_part.polyline.shape if !shapes.include?(act_part.polyline.shape)
+
         if act_part.is?(Part::EXCLUSIVE)
           return if act_part.size == 0
           while (position = act_part.next_position)
@@ -125,9 +130,9 @@ module Contrek
                     map = all_parts[-2..].map(&:type).uniq
                     break if map.size == 1 && map.first == Part::SEAM
                   end
-                  polylines << part.polyline.shape.outer_polyline
+                  shapes_sequence.add(part.polyline.shape)
                   part.next_position(new_position)
-                  traverse_outer(part, all_parts, polylines, shapes, outer_joined_polyline)
+                  traverse_outer(part, all_parts, shapes_sequence, outer_joined_polyline)
                   return
                 end
               end
@@ -138,12 +143,13 @@ module Contrek
         end
         next_part = act_part.circular_next
         next_part.rewind!
-        traverse_outer(act_part.circular_next, all_parts, polylines, shapes, outer_joined_polyline)
+        traverse_outer(act_part.circular_next, all_parts, shapes_sequence, outer_joined_polyline)
       end
 
       def collect_inner_sequences(outer_seq)
         return_sequences = []
-        @polylines_sequence.each do |polyline|
+        @shapes_sequence.each do |shape|
+          polyline = shape.outer_polyline
           polyline.parts.each do |part|
             if part.innerable?
               all_parts = []
@@ -154,9 +160,9 @@ module Contrek
               retme_sequence = Sequence.new
               all_parts.each do |part|
                 part.touch!
-                retme_sequence.move_from(part) do |pos|
-                  next false if part.is?(Part::ADDED) && !(range_of_bounds === pos.payload[:y])
-                  !(polyline.tile.tg_border?(pos.payload) && pos.end_point.queues.include?(outer_seq))
+                retme_sequence.move_from(part) do |position|
+                  next false if part.is?(Part::ADDED) && !(range_of_bounds === position.payload[:y])
+                  !(polyline.tile.tg_border?(position.payload) && position.end_point.queues.include?(outer_seq))
                 end
               end
               return_sequences << retme_sequence if retme_sequence.is_not_vertical
@@ -189,10 +195,12 @@ module Contrek
                     if link_seq.any?
                       ins_part = Part.new(Part::ADDED, act_part.polyline)
                       link_seq.each do |pos|
-                        ins_part.add(Position.new(position: pos, hub: @cluster.hub))
+                        ins_part.add(Position.new(position: nil, hub: nil, known_endpoint: pos))
                       end
                       all_parts << ins_part
                     end
+                    shape.outer_polyline.turn_on(Polyline::TRACKED_INNER)
+                    shape.outer_polyline.turn_on(Polyline::TRACKED_OUTER)
                     traverse_inner(dest_part.circular_next, all_parts, bounds)
                     return
                   end
@@ -213,9 +221,8 @@ module Contrek
       # a connection between parts inserted afterwards.
       # TODO evaluate the adoption of remove_adjacent_pairs!
       def duplicates_intersection(part_a, part_b)
-        a1 = part_a.inverts ? part_a.remove_adjacent_pairs : part_a.to_a
-        b1 = part_b.inverts ? part_b.remove_adjacent_pairs : part_b.to_a
-
+        a1 = part_a.inverts ? Part.remove_adjacent_pairs(part_a.to_endpoints) : part_a.to_endpoints
+        b1 = part_b.inverts ? Part.remove_adjacent_pairs(part_b.to_endpoints) : part_b.to_endpoints
         (a1 - b1) + (b1 - a1)
       end
 
