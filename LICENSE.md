@@ -1,9 +1,17 @@
-The MIT License
+# Licensing Information
 
-Copyright 2018 -- 2025 by Emanuele Cesaroni.
+Contrek is distributed under a dual-license model:
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+### 1. Ruby Gem & Infrastructure
+The Ruby code, wrappers, and gem packaging are licensed under the **MIT License**.
+You are free to use, modify, and distribute this part of the project in any application, including commercial ones, with minimal restrictions.
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+### 2. C++ Core Engine (ext/cpp_polygon_finder/PolygonFinder)
+The standalone C++17 engine, which contains the high-performance tile-based loading and contour tracking logic, is licensed under the **GNU Affero General Public License v3 (AGPLv3)**.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+**What this means for you:**
+- **Reciprocity:** If you modify the C++ core engine to improve performance or features, you must share those modifications under the same AGPLv3 license.
+- **Network Services (SaaS):** If you run a public service that leverages the C++ core engine, you must make the source code of your version of the core available to the users of that service.
+- **Commercial Use:** If your organization cannot comply with the AGPLv3 for the C++ core, please contact the author for a private commercial license.
+
+For the full license texts, see [LICENSE-MIT](LICENSE-MIT.md) and [LICENSE_AGPL](ext/cpp_polygon_finder/PolygonFinder/LICENSE_AGPL.txt).

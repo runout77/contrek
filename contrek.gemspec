@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.authors = ["Emanuele Cesaroni"]
   s.email = "cesaroni.emanuele77@gmail.com"
   s.homepage = "https://github.com/runout77/contrek"
-  s.license = "MIT"
+  s.licenses = ["MIT", "AGPL-3.0-only"]
   s.files = Dir.chdir(File.expand_path("..", __FILE__)) do
     `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(pkg|spec)/}) }
   end

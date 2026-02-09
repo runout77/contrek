@@ -44,3 +44,7 @@ All notable changes to this project will be documented in this file.
 ## [1.1.1] - 2026-02-09
 ### Changes
 - Removed forgotten png++ dependency in Rice bridge file.
+
+## [1.1.2] - 2026-02-09
+### Changed
+- Transitioned to an Open Core licensing model: Ruby Gem (MIT) and C++ Core Engine (AGPLv3).
