@@ -40,3 +40,7 @@ All notable changes to this project will be documented in this file.
 - Resolved connectivity issues between internal zones and the outer boundary.
 - Refined the internal parts stitching algorithm (sew method) for better performance.
 - Miscellaneous optimizations and improvements.
+
+## [1.1.1] - 2026-02-09
+### Changes
+- Removed forgotten png++ dependency in Rice bridge file.

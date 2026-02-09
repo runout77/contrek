@@ -47,7 +47,6 @@
 #include "PolygonFinder/src/polygon/reducers/LinearReducer.h"
 #include "PolygonFinder/src/polygon/reducers/VisvalingamReducer.cpp"
 #include "PolygonFinder/src/polygon/reducers/VisvalingamReducer.h"
-#include "png++/png.hpp"
 #include "PolygonFinder/src/polygon/finder/concurrent/Finder.h"
 #include "PolygonFinder/src/polygon/finder/concurrent/Finder.cpp"
 #include "PolygonFinder/src/polygon/finder/concurrent/Poolable.h"
