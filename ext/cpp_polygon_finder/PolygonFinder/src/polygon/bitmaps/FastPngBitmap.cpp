@@ -7,6 +7,7 @@
  * See the LICENSE file in this directory for the full license text.
  */
 
+#include <sys/mman.h>
 #include <iostream>
 #include <vector>
 #include <fstream>
@@ -38,6 +39,7 @@ FastPngBitmap::FastPngBitmap(std::string filename) : Bitmap("", 0) {
         size_t out_size;
         spng_decoded_image_size(ctx, SPNG_FMT_RGBA8, &out_size);
         this->image.resize(out_size);
+        madvise(this->image.data(), out_size, MADV_HUGEPAGE);
         int error = spng_decode_image(ctx, image.data(), out_size, SPNG_FMT_RGBA8, SPNG_DECODE_TRNS);
         spng_ctx_free(ctx);
         this->png_error = error;

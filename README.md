@@ -1,11 +1,24 @@
 # Contrek
 Contrek is a Ruby gem powered by a <u>standalone C++17 core library</u> for fast contour tracing and edge detection in PNG images. It employs a **topological approach** to extract polygonal contours, representing shapes as a connected graph of shared endpoints. This ensures perfect adjacency and structural integrity for shape analysis and raster-to-vector workflows, such as PNG to SVG conversion, managed via libspng (0.7.4) with multithreading support.
 
+
 ## About Contrek library
+
 Contrek (**con**tour **trek**king) simply scans your png bitmap and returns shape contour as close polygonal lines, both for the external and internal sides. It can compute the nesting level of the polygons found with a tree structure. It supports various levels and modes of compression and approximation of the found coordinates. It is capable of multithreaded processing, splitting the image into vertical strips and recombining the coordinates in pairs.
 
 In the following image all the non-white pixels have been examined and the result is the red polygon for the outer contour and the green one for the inner one
 ![alt text](contrek.png "Contour tracing")
+
+
+## Prerequisites
+
+For optimal performance and efficient memory management with large images (20k+), it is highly recommended to install **tcmalloc**.
+
+**Ubuntu / Debian:**
+```bash
+sudo apt-get install libgoogle-perftools-dev
+```
+
 
 ## Install
 
@@ -120,6 +133,33 @@ puts result.metadata[:benchmarks].inspect
   total: 466.326
 }
 
+```
+
+### Connectivity Modes
+
+Contrek supports different pixel connectivity rules to define how polygons are traced and merged. This is controlled by the `:connectivity` option.
+
+| Value | Name | Type | Description |
+| :--- | :--- | :--- | :--- |
+| `4` | **Orthogonal** | Default | Only pixels sharing an edge (N, S, E, W) are connected. |
+| `8` | **Omnidirectional** | Extended | Includes diagonal neighbors (sharing a corner). |
+
+
+To enable **Omnidirectional** (8-way) connectivity, pass `connectivity: 8` in the options hash:
+
+```ruby
+result = Contrek.contour!(
+  png_file_path: "./spec/files/images/sample_10240x10240.png",
+  options: {
+    number_of_threads: 4,
+    class: "value_not_matcher",
+    color: {r: 255, g: 255, b: 255, a: 255},
+    finder: {
+      number_of_tiles: 4,
+      connectivity: 8, # 8 for Omnidirectional, 4 for Orthogonal
+      compress: {uniq: true}}
+  }
+)
 ```
 
 ## Result
@@ -338,7 +378,7 @@ int main() {
 
 ## License
 
-This project is licensed under the terms of the MIT license.
+This project is licensed under the terms of a dual-license.
 
 See [LICENSE.md](LICENSE.md).
 

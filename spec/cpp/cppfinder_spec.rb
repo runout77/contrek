@@ -57,6 +57,10 @@ RSpec.describe Contrek::Cpp::CPPConcurrentFinder, type: :class do
   end
 
   describe "shared_test" do
+    include_examples "connectivity"
+  end
+
+  describe "shared_test" do
     include_examples "finder_img"
   end
 

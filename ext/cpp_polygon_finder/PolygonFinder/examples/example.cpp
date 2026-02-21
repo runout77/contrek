@@ -1,10 +1,11 @@
-//============================================================================
-// Name        : example.cpp
-// Author      : Emanuele Cesaroni
-// Version     :
-// Copyright   : 2025 Emanuele Cesaroni
-// Description :
-//============================================================================
+/*
+ * example.cpp
+ *
+ * Copyright (c) 2025-2026 Emanuele Cesaroni
+ *
+ * Licensed under the GNU Affero General Public License v3 (AGPLv3).
+ * See the LICENSE file in this directory for the full license text.
+ */
 
 #include <iostream>
 #include "ContrekApi.h"
@@ -29,6 +30,7 @@ int main() {
   cfg.threads = 4;
   cfg.tiles = 4;
   cfg.compress_unique = true;
+  cfg.connectivity_mode = Contrek::Connectivity::OMNIDIRECTIONAL;
 
   CpuTimer cpu_timer;
   cpu_timer.start();

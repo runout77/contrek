@@ -31,6 +31,8 @@ void Partitionable::add_part(Part* new_part)
   }
   new_part->prev = last;
   new_part->circular_next = this->parts_.front();
+
+  if (new_part->is(Part::SEAM)) new_part->orient();
 }
 
 void Partitionable::insert_after(Part* part, Part* new_part) {
@@ -77,10 +79,10 @@ void Partitionable::partition()
   this->trasmute_parts();
 }
 
-Part* Partitionable::find_first_part_by_position(Position* position) {
+Part* Partitionable::find_first_part_by_position(Position* position, int versus) {
   for (Part* part : this->parts_)
   { if ( part->is(Part::SEAM) &&
-      part->passes == 0 &&
+      part->versus() == -(versus) &&
       position->end_point()->queues_include(part)) return(part);
   }
   return(nullptr);
@@ -194,7 +196,6 @@ std::optional<SewReturnData> Partitionable::sew(std::vector<std::pair<int, int>>
   return std::make_pair(left, right);
 }
 
-
 void Partitionable::trasmute_parts()
 { std::vector<Part*> insides;
   for (Part* p : parts_) {
@@ -205,16 +206,16 @@ void Partitionable::trasmute_parts()
   for (Part* inside : insides)
   { for (Part* inside_compare : insides) {
       if (inside == inside_compare || !inside_compare->is(Part::SEAM) ) continue;
-      bool all_match = true;
+      int count = 0;
       inside->each([&](QNode<Point>* pos) -> bool {
         Position *position = dynamic_cast<Position*>(pos);
         if (position->end_point()->queues_include(inside_compare))
-        { return true;
+        { count ++;
+          return true;
         }
-        all_match = false;
         return false;
       });
-      if (all_match) {
+      if (count == inside->size && count < inside_compare->size) {
         inside->type = Part::EXCLUSIVE;
         inside->trasmuted = true;
         break;
@@ -222,4 +223,3 @@ void Partitionable::trasmute_parts()
     }
   }
 }
-

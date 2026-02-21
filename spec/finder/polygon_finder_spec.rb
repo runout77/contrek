@@ -26,4 +26,11 @@ RSpec.describe Contrek::Finder::PolygonFinder, type: :class do
   describe "shared_test", heavy: true do
     include_examples "heavy"
   end
+
+  describe "shared_test", connections: true do
+    before do
+      @matcher = Contrek::Matchers::ValueNotMatcher.new(" ")
+    end
+    include_examples "connections"
+  end
 end

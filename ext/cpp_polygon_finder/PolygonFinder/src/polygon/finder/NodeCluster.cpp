@@ -14,6 +14,7 @@
 #include <string>
 #include <vector>
 #include <utility>
+#include <deque>
 #include "NodeCluster.h"
 #include "Node.h"
 #include "RectBounds.h"
@@ -30,15 +31,9 @@ NodeCluster::NodeCluster(int h, int w, pf_Options *options) {
   this->nodes = 0;
 
   this->vert_nodes.resize(h);
-  for (int i = 0; i < h; ++i) {
-    this->vert_nodes[i].reserve(w/2);
-  }
-
   this->root_nodes = this->lists.add_list();
   this->inner_plot = this->lists.add_list();
   this->inner_new = this->lists.add_list();
-
-  this->points.reserve(w * h);
 }
 
 NodeCluster::~NodeCluster() {
@@ -74,32 +69,33 @@ void NodeCluster::compress_coords(std::list<Polygon>& polygons, pf_Options optio
 void NodeCluster::build_tangs_sequence() {
   for (auto& line : vert_nodes) {
     for (Node& node : line) {
-      node.precalc_tangs_sequences(this->points);
+      node.precalc_tangs_sequences(*this);
     }
   }
 }
 
-Node* NodeCluster::add_node(int min_x, int max_x, int y, char name) {
+Node* NodeCluster::add_node(int min_x, int max_x, int y, char name, int offset) {
   vert_nodes[y].emplace_back(min_x, max_x, y, name);
 
   Node& node = vert_nodes[y].back();
-  node.data_pointer = this->lists.get_data_pointer();
   node.abs_x_index = vert_nodes[y].size() - 1;
   this->nodes++;
 
   root_nodes->push_back(&node);
 
   if (y > 0) {
-    std::vector<Node>& up_nodes = vert_nodes[y - 1];
+    std::deque<Node>& up_nodes = vert_nodes[y - 1];
     if (!up_nodes.empty()) {
       auto it = std::lower_bound(up_nodes.begin(), up_nodes.end(), node.min_x,
-        [](const Node& a, int val) {
-            return a.max_x < val;
+        [&](const Node& a, int val) {
+          return ((a.max_x + offset) < val);
         });
+
       while (it != up_nodes.end()) {
-        if (it->min_x > node.max_x) break;
-        node.add_intersection(&(*it));
-        it->add_intersection(&node);
+        if ((it->min_x - offset) > node.max_x) break;
+        int current_index = std::distance(up_nodes.begin(), it);
+        node.add_intersection(*it, current_index);
+        it->add_intersection(node, node.abs_x_index);
         ++it;
       }
     }
@@ -159,13 +155,20 @@ void NodeCluster::plot(int versus) {
 
         first->inner_index = index_inner;
 
-        Node *next_node;
-        if (first->get_trackmax())
-        { if (inner_v == Node::A)  next_node = first->tangs[Node::T_UP].front();
-          else                     next_node = first->tangs[Node::T_DOWN].front();
+        Node* next_node = nullptr;
+
+        if (first->get_trackmax()) {
+          if (inner_v == Node::A) {
+            if (first->upper_end >= 0) next_node = &this->vert_nodes[first->y + Node::T_UP][first->upper_start];
+          } else {
+            if (first->lower_end >= 0) next_node = &this->vert_nodes[first->y + Node::T_DOWN][first->lower_start];
+          }
         } else {
-          if (inner_v == Node::A)  next_node = first->tangs[Node::T_DOWN].back();
-          else                     next_node = first->tangs[Node::T_UP].back();
+          if (inner_v == Node::A) {
+            if (first->lower_end >= 0) next_node = &this->vert_nodes[first->y + Node::T_DOWN][first->lower_end];
+          } else {
+            if (first->upper_end >= 0) next_node = &this->vert_nodes[first->y + Node::T_UP][first->upper_end];
+          }
         }
 
         if (next_node != nullptr)
@@ -308,22 +311,4 @@ void NodeCluster::plot_node(std::vector<Point*>& sequence_coords, Node *node, No
     }
     current_node = next_node;
   }
-}
-
-void NodeCluster::list_track(Node *node, std::list<Node*> *list) {
-  std::list<Node*>::iterator i = std::find(list->begin(), list->end(), node);
-  if (i == list->end())  list->push_back(node);
-  else                   list_delete(node, list);
-}
-
-void NodeCluster::list_delete(Node *node, std::list<Node*> *list) {
-  std::list<Node*>::iterator i;
-  while ((i = std::find(list->begin(), list->end(), node)) !=  list->end())
-  {  list->erase(i);
-  }
-}
-
-bool NodeCluster::list_present(Node *node, std::list<Node*> *list) {
-  std::list<Node*>::iterator i = std::find(list->begin(), list->end(), node);
-  return(!(i == list->end()));
 }

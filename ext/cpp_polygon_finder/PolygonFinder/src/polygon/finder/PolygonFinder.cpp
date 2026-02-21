@@ -37,6 +37,7 @@ PolygonFinder::PolygonFinder(Bitmap *bitmap,
       end_x(end_x == -1 ? bitmap->w() : end_x)
 { this->rgb_matcher = dynamic_cast<RGBMatcher*>(matcher);
   if (options != nullptr) FinderUtils::sanitize_options(this->options, options);
+
   this->node_cluster = new NodeCluster(source_bitmap->h(), source_bitmap->w(), &this->options);
 
   //= SCAN ==============//
@@ -82,17 +83,18 @@ PolygonFinder::~PolygonFinder() {
 
 void PolygonFinder::scan() {
     int bpp = this->source_bitmap->get_bytes_per_pixel();
+    int offset = options.connectivity_offset;
 
     RGBMatcher* rgb_m = dynamic_cast<RGBMatcher*>(this->matcher);
 
     if (bpp == 1) {
       auto fetcher = [](const unsigned char* p) { return static_cast<unsigned int>(p[0]); };
-      if (rgb_m) run_loop(rgb_m, fetcher);
-      else       run_loop(this->matcher, fetcher);
+      if (rgb_m) run_loop(rgb_m, fetcher, offset);
+      else       run_loop(this->matcher, fetcher, offset);
     } else {
       auto fetcher = [](const unsigned char* p) { return *reinterpret_cast<const uint32_t*>(p); };
-      if (rgb_m) run_loop(rgb_m, fetcher);
-      else       run_loop(this->matcher, fetcher);
+      if (rgb_m) run_loop(rgb_m, fetcher, offset);
+      else       run_loop(this->matcher, fetcher, offset);
     }
 }
 

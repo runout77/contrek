@@ -11,6 +11,8 @@
 #include <string>
 #include <vector>
 #include <list>
+#include <limits>
+#include <algorithm>
 #include <map>
 #include "List.h"
 
@@ -32,10 +34,9 @@ struct Tangent {
 };
 struct NodeDescriptor;
 
-
 class Node : public  Listable {
  public:
-  static const int T_UP = 0;
+  static const int T_UP = -1;
   static const int T_DOWN = 1;
   static const int O = 0;
   static const int A = 1;
@@ -50,7 +51,6 @@ class Node : public  Listable {
   static const int OUTER = 0;
   static const int INNER = 1;
 
-  std::vector<Node*> tangs[2];
   int y;
   int abs_x_index;
   int up_indexer, down_indexer;
@@ -58,8 +58,12 @@ class Node : public  Listable {
   char name;
   int track;
   int outer_index, inner_index;
-  bool tangs_with(Node *node);
-  void add_intersection(Node *other_node);
+  int upper_start = std::numeric_limits<int>::max();
+  int upper_end   = -1;
+  int lower_start = std::numeric_limits<int>::max();
+  int lower_end   = -1;
+  Point start_point, end_point;
+  void add_intersection(Node& other_node, int other_node_index);
   std::vector<NodeDescriptor> tangs_sequence;
   Point* coords_entering_to(Node *enter_to, int mode, int tracking);
   Node* my_next_outer(Node *last, int versus);
@@ -68,14 +72,10 @@ class Node : public  Listable {
   bool track_complete();
   bool get_trackmax();
 
- private:
-  static bool sort_min_x(Node *a, Node *b);
-  static bool sort_max_x(Node *a, Node *b);
-
  public:
   int min_x, max_x;
   Node(int min_x, int max_x, int y, char name);
-  void precalc_tangs_sequences(std::vector<Point>& points);
+  void precalc_tangs_sequences(NodeCluster& cluster);
   bool processed = false;
 };
 

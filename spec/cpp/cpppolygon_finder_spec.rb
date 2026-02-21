@@ -38,6 +38,13 @@ RSpec.describe CPPPolygonFinder, type: :class do
     include_examples "heavy"
   end
 
+  describe "shared_test", connections: true do
+    before do
+      @matcher = CPPValueNotMatcher.new(" ")
+    end
+    include_examples "connections"
+  end
+
   describe "shared_test", treemap: true do
     before do
       @matcher = CPPValueNotMatcher.new(" ")

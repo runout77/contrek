@@ -25,13 +25,3 @@ List *Lists::add_list() {
   lists.push_back(list);
   return(list);
 }
-
-std::vector<Link> Lists::get_data_pointer() {
-  std::vector<Link> data(this->lists.size());
-  for (auto& dt : data) {
-    dt.inside = false;
-    dt.next = nullptr;
-    dt.prev = nullptr;
-  }
-  return data;
-}

@@ -8,13 +8,21 @@
  */
 
 #pragma once
+#include <array>
 
-#include <vector>
-#include "Lists.h"
-struct Link;
+// Forward declaration
+class Listable;
+
+// Definizione completa di Link (necessaria per std::array)
+struct Link {
+  Listable* next = nullptr;
+  Listable* prev = nullptr;
+  bool inside = false;
+};
+
 class Listable {
  public:
-  std::vector<Link> data_pointer;
+  std::array<Link, 3> data_pointer;
 };
 
 class List {

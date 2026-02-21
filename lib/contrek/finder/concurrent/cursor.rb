@@ -106,8 +106,8 @@ module Contrek
 
       # rubocop:disable Lint/NonLocalExitFromIterator
       def traverse_outer(act_part, all_parts, shapes_sequence, outer_joined_polyline)
-        all_parts << act_part if all_parts.last != act_part
-
+        last_part = all_parts.last
+        all_parts << act_part if last_part != act_part
         if act_part.is?(Part::EXCLUSIVE)
           return if act_part.size == 0
           while (position = act_part.next_position)
@@ -117,14 +117,14 @@ module Contrek
             outer_joined_polyline.add(position)
           end
         else
+          return if act_part.dead_end && all_parts.size > 1 && last_part.is?(Part::SEAM) && last_part.polyline == act_part.polyline
           while (new_position = act_part.iterator)
             return if outer_joined_polyline.size > 1 &&
               outer_joined_polyline.head.payload == new_position.payload &&
               act_part == all_parts.first
             outer_joined_polyline.add(Position.new(position: new_position.payload, hub: @cluster.hub))
-
             act_part.polyline.next_tile_eligible_shapes.each do |shape|
-              if (part = shape.outer_polyline.find_first_part_by_position(new_position))
+              if (part = shape.outer_polyline.find_first_part_by_position(new_position, act_part.versus))
                 if all_parts[-2] != part
                   if all_parts.size >= 2
                     map = all_parts[-2..].map(&:type).uniq
@@ -132,12 +132,12 @@ module Contrek
                   end
                   shapes_sequence.add(part.polyline.shape)
                   part.next_position(new_position)
+                  part.dead_end = true
                   traverse_outer(part, all_parts, shapes_sequence, outer_joined_polyline)
                   return
                 end
               end
             end
-            act_part.passes += 1
             act_part.next_position
           end
         end

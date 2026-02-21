@@ -1,7 +1,7 @@
 module Contrek
   module Finder
     class NodeCluster
-      attr_reader :root_nodes, :sequences, :polygons, :lists, :treemap, :vert_nodes
+      attr_reader :root_nodes, :sequences, :polygons, :lists, :treemap, :vert_nodes, :options
       VERSUS_INVERTER = {a: :o, o: :a}
 
       def initialize(h, options)
@@ -44,7 +44,7 @@ module Contrek
       def build_tangs_sequence
         @vert_nodes.each do |line|
           line.each do |node|
-            node.precalc_tangs_sequences
+            node.precalc_tangs_sequences(cluster: self)
           end
         end
       end
@@ -103,9 +103,15 @@ module Contrek
             # end
 
             next_node = if (first.track & Contrek::Finder::Node::OMAX) != 0
-              (inner_v == :a) ? first.tangs[Contrek::Finder::Node::T_UP].first : first.tangs[Contrek::Finder::Node::T_DOWN].first
+              if inner_v == :a
+                vert_nodes[first.y + Node::T_UP][first.upper_start]
+              else
+                vert_nodes[first.y + Node::T_DOWN][first.lower_start]
+              end
+            elsif inner_v == :a
+              vert_nodes[first.y + Node::T_DOWN][first.lower_end]
             else
-              (inner_v == :a) ? first.tangs[Contrek::Finder::Node::T_DOWN].last : first.tangs[Contrek::Finder::Node::T_UP].last
+              vert_nodes[first.y + Node::T_UP][first.upper_end]
             end
 
             if !next_node.nil?
@@ -258,7 +264,7 @@ module Contrek
         plot_node(next_node, start_node, bounds, versus)
       end
 
-      def add_node(node)
+      def add_node(node, offset)
         @nodes += 1
         node.abs_x_index = @vert_nodes[node.y].size
 
@@ -273,17 +279,17 @@ module Contrek
             index = 0
             loop do
               up_node = up_nodes[index]
-              if up_node.max_x >= node.min_x
-                if up_node.min_x <= node.max_x
-                  node.add_intersection(up_node)
-                  up_node.add_intersection(node)
+              if (up_node.max_x + offset) >= node.min_x
+                if (up_node.min_x - offset) <= node.max_x
+                  node.add_intersection(up_node, index)
+                  up_node.add_intersection(node, node.abs_x_index)
                 end
                 return if (index += 1) == up_nodes_count
                 loop do
                   up_node = up_nodes[index]
-                  if up_node.min_x <= node.max_x
-                    node.add_intersection(up_node)
-                    up_node.add_intersection(node)
+                  if (up_node.min_x - offset) <= node.max_x
+                    node.add_intersection(up_node, index)
+                    up_node.add_intersection(node, node.abs_x_index)
                   else
                     return
                   end

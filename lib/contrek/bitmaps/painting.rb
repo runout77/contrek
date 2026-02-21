@@ -28,6 +28,7 @@ module Contrek
           png_image.draw_line(poly[:outer][0][:x], poly[:outer][0][:y], poly[:outer][-1][:x], poly[:outer][-1][:y], color)
           color = ChunkyPNG::Color("green @ 1.0")
           poly[:inner].each do |sequence|
+            next if sequence.empty?
             sequence.each_cons(2) do |coords|
               png_image.draw_line(coords[0][:x], coords[0][:y], coords[1][:x], coords[1][:y], color)
             end

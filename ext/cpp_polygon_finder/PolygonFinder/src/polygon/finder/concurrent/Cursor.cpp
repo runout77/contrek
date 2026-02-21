@@ -58,7 +58,8 @@ void Cursor::traverse_outer(Part* act_part,
                             std::vector<Shape*>& shapes_sequence,
                             Sequence* outer_joined_polyline) {
   while (act_part != nullptr) {
-    if (all_parts.empty() || all_parts.back() != act_part) {
+    Part* last_part = (!all_parts.empty()) ? all_parts.back() : nullptr;
+    if (all_parts.empty() || last_part != act_part) {
       all_parts.push_back(act_part);
     }
 
@@ -75,6 +76,10 @@ void Cursor::traverse_outer(Part* act_part,
         outer_joined_polyline->add(position);
       }
     } else {
+      if (act_part->dead_end &&
+         all_parts.size() > 1 &&
+         last_part->is(Part::SEAM) &&
+         last_part->polyline() == act_part->polyline()) return;
       while (Position *new_position = static_cast<Position*>(act_part->iterator())) {
         if (outer_joined_polyline->size > 1 &&
           outer_joined_polyline->head->payload == new_position->payload &&
@@ -83,8 +88,9 @@ void Cursor::traverse_outer(Part* act_part,
         }
         this->cluster.positions_pool.emplace_back(this->cluster.hub(), new_position->payload);
         outer_joined_polyline->add(&this->cluster.positions_pool.back());
+
         for (Shape *shape : act_part->polyline()->next_tile_eligible_shapes()) {
-          if (Part *part = shape->outer_polyline->find_first_part_by_position(new_position)) {
+          if (Part *part = shape->outer_polyline->find_first_part_by_position(new_position, act_part->versus())) {
             const auto n = all_parts.size();
             Part *last_last_part = n >= 2 ? all_parts[n - 2] : nullptr;
 
@@ -103,6 +109,7 @@ void Cursor::traverse_outer(Part* act_part,
                 shapes_sequence.push_back(part->polyline()->shape);
               }
               part->next_position(new_position);
+              part->dead_end = true;
               act_part = part;
               jumped_to_new_part = true;
               break;
@@ -110,7 +117,6 @@ void Cursor::traverse_outer(Part* act_part,
           }
         }
         if (jumped_to_new_part) break;
-        act_part->passes += 1;
         act_part->next_position(nullptr);
       }
     }

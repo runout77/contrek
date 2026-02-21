@@ -91,6 +91,7 @@ module Contrek
 
       # image scan
       def scan
+        offset = (@node_cluster.options[:connectivity] == 8) ? 1 : 0
         last_color = nil
         matching = false
         min_x = start_x
@@ -103,16 +104,16 @@ module Contrek
             matching = true
             if x == (end_x - 1)
               max_x = x
-              Contrek::Finder::Node.new(@node_cluster, min_x, max_x, y, last_color)
+              Contrek::Finder::Node.new(@node_cluster, min_x, max_x, y, last_color, offset)
               matching = false
             end
           elsif @matcher.unmatch?(color) && matching == true
             max_x = x - 1
-            Contrek::Finder::Node.new(@node_cluster, min_x, max_x, y, last_color)
+            Contrek::Finder::Node.new(@node_cluster, min_x, max_x, y, last_color, offset)
             matching = false
           elsif x == (end_x - 1) && matching == true
             max_x = x
-            Contrek::Finder::Node.new(@node_cluster, min_x, max_x, y, last_color)
+            Contrek::Finder::Node.new(@node_cluster, min_x, max_x, y, last_color, offset)
             matching = false
           end
         end

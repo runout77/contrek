@@ -41,6 +41,7 @@ Finder::Finder(int number_of_threads, Bitmap *bitmap, Matcher *matcher, std::vec
     TilePayload p { tile_index, x, tile_end_x };
     enqueue(p, [this](const TilePayload& payload) {
       std::vector<std::string> base_arguments = {"--bounds", "--versus=" + this->options.get_alpha_versus()};
+      if (this->options.connectivity_offset == 1) base_arguments.push_back("--connectivity=8");
       CpuTimer t;
       t.start();
       auto* finder = new ClippedPolygonFinder(

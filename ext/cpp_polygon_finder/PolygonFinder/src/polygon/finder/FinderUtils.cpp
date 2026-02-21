@@ -22,7 +22,7 @@ void FinderUtils::sanitize_options(pf_Options& options, std::vector<std::string>
   char** argv = &argv0[0];
   int argc = argv0.size() -1;
 
-  enum  optionIndex { COMPRESS_UNIQ, VERSUS, COMPRESS_VISVALINGAM, COMPRESS_LINEAR, NUMBER_OF_TILES, COMPRESS_VISVALINGAM_TOLERANCE, TREEMAP, NAMED_SEQUENCES, BOUNDS};
+  enum  optionIndex { COMPRESS_UNIQ, VERSUS, COMPRESS_VISVALINGAM, COMPRESS_LINEAR, NUMBER_OF_TILES, COMPRESS_VISVALINGAM_TOLERANCE, TREEMAP, NAMED_SEQUENCES, BOUNDS, CONNECTIVITY};
   const option::Descriptor usage[] = {
      //  {UNKNOWN, 0,"" , ""    ,option::Arg::None, 0},
      {COMPRESS_VISVALINGAM, 0, "" , "compress_visvalingam", option::Arg::None, 0},
@@ -34,6 +34,7 @@ void FinderUtils::sanitize_options(pf_Options& options, std::vector<std::string>
      {NAMED_SEQUENCES, 0, "", "named_sequences", option::Arg::None, 0},
      {BOUNDS, 0, "", "bounds", option::Arg::None, 0},
      {VERSUS, 0, "v", "versus", option::Arg::Optional, 0},
+     {CONNECTIVITY, 0, "c", "connectivity", option::Arg::Optional, 0},
      {0, 0, 0, 0, 0, 0}
   };
 
@@ -58,9 +59,19 @@ void FinderUtils::sanitize_options(pf_Options& options, std::vector<std::string>
   if (ioptions[NUMBER_OF_TILES].count() > 0)
   { try {
       options.number_of_tiles = std::stoi(ioptions[NUMBER_OF_TILES].arg);
+      if (options.number_of_tiles <= 0) options.number_of_tiles = 1;
     }
     catch (const std::invalid_argument&) {
-      std::cerr << "Errore: --number_of_tiles richiede un numero (non una lettera)\n";
+      std::cerr << "Errore: --number_of_tiles requires a number\n";
+    }
+  }
+  // CONNECTIVITY
+  if (ioptions[CONNECTIVITY].count() > 0)
+  { try {
+      if (std::stoi(ioptions[CONNECTIVITY].arg) == 8) options.connectivity_offset = 1;
+    }
+    catch (const std::invalid_argument&) {
+      std::cerr << "Errore: --connectivity requires a number\n";
     }
   }
   // TREEMAP

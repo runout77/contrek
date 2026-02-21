@@ -3,11 +3,19 @@ project(ContrekCore C CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD 11)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pthread -g -march=native -DNDEBUG -Ofast -flto")
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pthread -march=native -DNDEBUG -Ofast -flto")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -march=native -fPIC -DNDEBUG")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread -flto=auto -Wl,--no-as-needed")
 
 find_package(ZLIB REQUIRED)
+find_library(TCMALLOC_LIB tcmalloc) # <--- Cerca tcmalloc nel sistema
+
+if(TCMALLOC_LIB)
+    message(STATUS "Contrek: tcmalloc found in ${TCMALLOC_LIB}")
+else()
+    message(WARNING "Contrek: tcmalloc not found; standard one will be used.")
+endif()
 
 file(GLOB_RECURSE CPP_SOURCES "*.cpp")
 file(GLOB_RECURSE C_SOURCES "*.c")
@@ -32,7 +40,11 @@ if(BUILD_EXAMPLES)
     if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/examples/example.cpp")
         message(STATUS "Contrek: Compiling example option ON")
         add_executable(contrek_test examples/example.cpp)
-        target_link_libraries(contrek_test PRIVATE ContrekLib)
+        if(TCMALLOC_LIB)
+            target_link_libraries(contrek_test PRIVATE ContrekLib ${TCMALLOC_LIB})
+        else()
+            target_link_libraries(contrek_test PRIVATE ContrekLib)
+        endif()
     else()
         message(WARNING "Contrek: examples/example.cpp not found!")
     endif()

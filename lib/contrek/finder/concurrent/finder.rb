@@ -29,6 +29,7 @@ module Contrek
           @clusters = []
           @maximum_width = bitmap.w
           @number_of_tiles = options[:number_of_tiles] || (raise "number_of_tiles params is needed!")
+          @number_of_tiles = 1 if @number_of_tiles <= 0
 
           cw = @maximum_width.to_f / @number_of_tiles
           raise "One pixel tile width minimum!" if cw < 1.0
@@ -45,7 +46,7 @@ module Contrek
               finder = ClippedPolygonFinder.new(
                 bitmap: bitmap,
                 matcher: matcher,
-                options: {versus: current_versus, bounds: true},
+                options: {versus: current_versus, bounds: true, connectivity: @options[:connectivity]}.compact,
                 start_x: payload[:tile_start_x],
                 end_x: payload[:tile_end_x]
               )

@@ -14,6 +14,7 @@
 #include <utility>
 #include <vector>
 #include <unordered_map>
+#include <string>
 #include "Partitionable.h"
 #include "../RectBounds.h"
 
@@ -47,6 +48,7 @@ class Polyline : public Partitionable {
   bool vert_intersect(Polyline& other);
   void reset_tracked_endpoints();
   bool mixed_tile_origin = false;
+  std::string info();
 
  private:
   std::vector<Point*> raw_;

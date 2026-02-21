@@ -1,9 +1,19 @@
 require "mkmf-rice"
 
+has_tcmalloc = find_library("tcmalloc", "malloc")
+
 # rubocop:disable Style/GlobalVars
 
-$CXXFLAGS << " -std=c++17 -pthread -march=native -DNDEBUG -Ofast -flto -g -fno-omit-frame-pointer"
-$CFLAGS << " -std=c99 -pthread -march=native -DNDEBUG -Ofast -flto -g -fno-omit-frame-pointer"
+$CXXFLAGS << " -std=c++17 -pthread -march=native -DNDEBUG -Ofast -flto"
+$CFLAGS << " -std=c11 -pthread -march=native -DNDEBUG -Ofast -flto"
+
+if has_tcmalloc
+  $LDFLAGS << " -Wl,--no-as-needed -ltcmalloc"
+  puts "tcmalloc linked to gem."
+else
+  puts "tcmalloc not found; standard malloc will be used."
+end
+
 $LDFLAGS << " -lz -lstdc++ -flto -pthread"
 
 $objs = [

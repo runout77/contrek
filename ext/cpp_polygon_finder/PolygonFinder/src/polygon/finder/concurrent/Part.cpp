@@ -10,6 +10,8 @@
 #include "Part.h"
 #include <iostream>
 #include <vector>
+#include <string>
+#include <sstream>
 #include "Polyline.h"
 #include "Tile.h"
 #include "Cluster.h"
@@ -93,4 +95,35 @@ std::vector<EndPoint*> Part::remove_adjacent_pairs(const std::vector<EndPoint*>&
     }
   }
   return result;
+}
+
+void Part::orient()
+{ if (this->size <= 1) {
+    this->versus_ = 0;
+  } else {
+    this->versus_ = (this->tail->payload->y - this->head->payload->y) > 0 ? 1 : -1;
+  }
+}
+
+std::string Part::inspect() {
+  size_t part_index = 0;
+  auto it = std::find(this->polyline()->parts().begin(), this->polyline()->parts().end(), this);
+  if (it != this->polyline()->parts().end()) {
+    part_index = std::distance(this->polyline()->parts().begin(), it);
+  }
+  std::stringstream ss;
+  ss << "part " << part_index
+  << " (versus=" << this->versus_
+  << " inv=" << this->inverts
+  << " trm=" << this->trasmuted
+  << " touched=" << this->touched_
+  << " dead_end=" << this->dead_end
+  << ", " << this->size << "x) of " << this->polyline()->tile->name()
+  << " (" << std::to_string(static_cast<uint32_t>(type)) << ") (";
+  this->each([&](QNode<Point>* pos) -> bool {
+    ss << pos->payload->toString();
+    return true;
+  });
+  ss << ")";
+  return ss.str();
 }

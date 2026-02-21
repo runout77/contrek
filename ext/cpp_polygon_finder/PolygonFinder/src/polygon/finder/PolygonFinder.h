@@ -41,6 +41,7 @@ struct pf_Options {
   bool compress_visvalingam = false;
   bool named_sequences = false;
   bool bounds = false;
+  int connectivity_offset = 0;
   float compress_visvalingam_tolerance = 10.0;
   int number_of_tiles = 1;
   std::string get_alpha_versus() {
@@ -94,7 +95,7 @@ class PolygonFinder {
   CpuTimer cpu_timer;
 
   template <typename M, typename F>
-  void run_loop(M* specific_matcher, F&& fetch_color) {
+  void run_loop(M* specific_matcher, F&& fetch_color, int offset) {
     int img_h = this->source_bitmap->h();
     int bpp = this->source_bitmap->get_bytes_per_pixel();
     for (int y = 0; y < img_h; y++) {
@@ -114,11 +115,11 @@ class PolygonFinder {
             matching = true;
           }
           if (x == this->end_x - 1) {
-            this->node_cluster->add_node(min_x, x, y, last_red_value);
+            this->node_cluster->add_node(min_x, x, y, last_red_value, offset);
             matching = false;
           }
         } else if (matching) {
-          this->node_cluster->add_node(min_x, x - 1, y, last_red_value);
+          this->node_cluster->add_node(min_x, x - 1, y, last_red_value, offset);
           matching = false;
         }
       }

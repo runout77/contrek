@@ -3,7 +3,8 @@ module Contrek
     class Node
       include Listable
 
-      attr_reader :min_x, :max_x, :y, :name, :tangs, :tangs_sequence, :tangs_count, :data_pointer
+      attr_reader :min_x, :max_x, :y, :name, :tangs_sequence, :tangs_count, :data_pointer,
+        :upper_start, :upper_end, :lower_start, :lower_end
       attr_accessor :track, :abs_x_index, :outer_index, :inner_index
 
       T_UP = -1
@@ -24,12 +25,11 @@ module Contrek
       OUTER = 0
       INNER = 1
 
-      def initialize(cluster, min_x, max_x, y, name)
+      def initialize(cluster, min_x, max_x, y, name, connectivity_offset = 0)
         @name = name
         @min_x = min_x
         @max_x = max_x
         @y = y
-        @tangs = {T_UP => [], T_DOWN => []}
         @tangs_sequence = nil
         @tangs_count = 0
         @track = 0
@@ -39,11 +39,12 @@ module Contrek
         @down_indexer = 0
         @outer_index = -1
         @inner_index = -1
-        cluster.add_node(self)
-      end
+        @upper_start = Float::INFINITY
+        @upper_end = -1
+        @lower_start = Float::INFINITY
+        @lower_end = -1
 
-      def tangs?(node)
-        @min_x <= node.max_x && node.min_x <= @max_x
+        cluster.add_node(self, connectivity_offset)
       end
 
       def my_next(last, versus, mode)
@@ -62,13 +63,11 @@ module Contrek
           end
 
         when :inner
-
           if versus == :o
             (last_node_index == 0) ? last_node_index = tangs_sequence.size - 1 : last_node_index -= 1
           else
             (last_node_index == tangs_sequence.size - 1) ? last_node_index = 0 : last_node_index += 1
           end
-
         end
         tangs_sequence.at(last_node_index)
       end
@@ -85,10 +84,6 @@ module Contrek
         coords_source[:point]
       end
 
-      def tangs_with_x?(x)
-        x.between?(@min_x, @max_x)
-      end
-
       def track_uncomplete
         (@track & OCOMPLETE) != OCOMPLETE
       end
@@ -97,28 +92,45 @@ module Contrek
         (@track & OCOMPLETE) == OCOMPLETE
       end
 
-      def add_intersection(other_node)
+      def add_intersection(other_node, other_node_index)
         if other_node.y < y
-          @tangs[T_UP] << other_node
+          @upper_start = other_node_index if other_node_index < @upper_start
+          @upper_end = other_node_index if other_node_index > @upper_end
         else
-          @tangs[T_DOWN] << other_node
+          @lower_start = other_node_index if other_node_index < @lower_start
+          @lower_end = other_node_index if other_node_index > @lower_end
         end
       end
 
-      def precalc_tangs_sequences
-        @tangs_sequence = Array.new(tangs[T_UP].size + tangs[T_DOWN].size)
-        tangs = self.tangs[T_UP].sort_by(&:min_x)
-        n = -1
-        @up_indexer = -tangs[0].abs_x_index if tangs.size > 0
-        tangs.each do |t_node|
-          nd = Contrek::Finder::PolygonFinder::NodeDescriptor.new(t_node, {point: {x: t_node.max_x, y: t_node.y}, m: OMAX}, {point: {x: t_node.min_x, y: t_node.y}, m: OMIN})
-          tangs_sequence[n += 1] = nd
+      def precalc_tangs_sequences(cluster:)
+        @tangs_sequence = []
+        @up_indexer = -cluster.vert_nodes[@y + T_UP][@upper_start].abs_x_index if @upper_end >= 0
+        if @upper_end >= 0
+          (@upper_start..@upper_end).each do |upper_pos|
+            t_node = cluster.vert_nodes[@y + T_UP][upper_pos]
+            @tangs_sequence << Contrek::Finder::PolygonFinder::NodeDescriptor.new(
+              t_node,
+              {point: {x: t_node.max_x, y: t_node.y}, m: OMAX},
+              {point: {x: t_node.min_x, y: t_node.y}, m: OMIN}
+            )
+          end
         end
-        tangs = self.tangs[T_DOWN].sort_by(&:min_x).reverse
-        @down_indexer = (tangs.last.abs_x_index + self.tangs[T_DOWN].size + self.tangs[T_UP].size - 1) if tangs.size > 0
-        tangs.each do |t_node|
-          nd = Contrek::Finder::PolygonFinder::NodeDescriptor.new(t_node, {point: {x: t_node.min_x, y: t_node.y}, m: OMIN}, {point: {x: t_node.max_x, y: t_node.y}, m: OMAX})
-          tangs_sequence[n += 1] = nd
+
+        if @lower_end >= 0
+          lower_size = (@lower_end >= 0) ? (@lower_end - @lower_start + 1) : 0
+          upper_size = (@upper_end >= 0) ? (@upper_end - @upper_start + 1) : 0
+          @down_indexer = (cluster.vert_nodes[@y + T_DOWN][@lower_start].abs_x_index + lower_size + upper_size - 1)
+        end
+
+        if @lower_end >= 0
+          @lower_end.downto(@lower_start).each do |lower_pos|
+            t_node = cluster.vert_nodes[@y + T_DOWN][lower_pos]
+            @tangs_sequence << Contrek::Finder::PolygonFinder::NodeDescriptor.new(
+              t_node,
+              {point: {x: t_node.min_x, y: t_node.y}, m: OMIN},
+              {point: {x: t_node.max_x, y: t_node.y}, m: OMAX}
+            )
+          end
         end
         @tangs_count = tangs_sequence.size
       end

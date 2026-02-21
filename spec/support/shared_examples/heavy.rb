@@ -6,7 +6,7 @@ RSpec.shared_examples "heavy" do
       rgb_matcher = @png_not_matcher.new(@png_not_matcher_color)
       polygonfinder = @polygon_finder_class.new(png_bitmap, rgb_matcher, nil, {versus: :a})
       result = polygonfinder.process_info
-      # store_sample(polygonfinder,filename)
+      # store_sample(polygonfinder,filename,result,png_bitmap)
       saved_poly = YAML.load_file("./spec/files/coordinates/#{filename}.yml")
       expect(result.points).to eq(saved_poly)
     end
@@ -16,7 +16,7 @@ RSpec.shared_examples "heavy" do
       rgb_matcher = @png_not_matcher.new(png_bitmap.rgb_value_at(0, 0))
       polygonfinder = @polygon_finder_class.new(png_bitmap, rgb_matcher, nil, {versus: :a})
       result = polygonfinder.process_info
-      # store_sample(polygonfinder,filename)
+      # store_sample(polygonfinder,filename,result,png_bitmap)
       saved_poly = YAML.load_file("./spec/files/coordinates/#{filename}.yml")
       expect(result.points).to eq(saved_poly)
     end
@@ -26,7 +26,7 @@ RSpec.shared_examples "heavy" do
       rgb_matcher = @png_not_matcher.new(png_bitmap.rgb_value_at(0, 0))
       polygonfinder = @polygon_finder_class.new(png_bitmap, rgb_matcher, nil, {versus: :a})
       result = polygonfinder.process_info
-      # store_sample(polygonfinder,filename,@result)
+      # store_sample(polygonfinder,filename,result,png_bitmap)
       saved_poly = YAML.load_file("./spec/files/coordinates/#{filename}.yml")
       expect(result.points).to eq(saved_poly)
     end
@@ -42,11 +42,10 @@ RSpec.shared_examples "heavy" do
     end
   end
 
-  def store_sample(polygonfinder, filename, result)
-    test_bitmap = Contrek::Bitmaps::PngBitmap.new("./spec/files/images/#{filename}")
-    polygonfinder.draw_shapelines(test_bitmap)
-    polygonfinder.draw_polygons(test_bitmap)
-    test_bitmap.save("./spec/files/images/processed_#{filename}")
-    # File.write("./spec/coordinates/#{filename}.yml", @result.points.to_yaml)
+  def store_sample(polygonfinder, filename, result, bitmap)
+    test_bitmap = Contrek::Bitmaps::CustomBitmap.new(w: bitmap.w, h: bitmap.h, color: ChunkyPNG::Color::WHITE)
+    Contrek::Bitmaps::Painting.direct_draw_polygons(result.points, test_bitmap)
+    test_bitmap.save("./spec/files/stored_samples/#{filename}")
+    File.write("./spec/coordinates/#{filename}.yml", @result.points.to_yaml)
   end
 end

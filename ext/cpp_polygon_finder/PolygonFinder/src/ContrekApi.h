@@ -26,6 +26,11 @@ enum class MatchMode {
   EXACT_COLOR   // Tracks border of what exactly matchs target color
 };
 
+enum class Connectivity {
+  ORTHOGONAL = 4,        // up, down, left, right 4 directions
+  OMNIDIRECTIONAL = 8    // 8 directions
+};
+
 struct Config {
   int threads = 4;
   int tiles = 2;
@@ -35,6 +40,7 @@ struct Config {
   bool treemap = false;
   int32_t target_color = -1;
   MatchMode mode = MatchMode::NOT_COLOR;
+  Connectivity connectivity_mode = Connectivity::ORTHOGONAL;
 };
 
 inline std::unique_ptr<ProcessResult> trace(const std::string& image_path, const Config& cfg = Config()) {
@@ -64,6 +70,9 @@ inline std::unique_ptr<ProcessResult> trace(const std::string& image_path, const
       if (m.flag) internal_args.emplace_back(m.arg);
   }
   internal_args.push_back("--number_of_tiles=" + std::to_string(cfg.tiles));
+  if(cfg.connectivity_mode == Connectivity::OMNIDIRECTIONAL) {
+    internal_args.push_back("--connectivity=" + std::to_string(8));
+  }
 
   Finder finder(cfg.threads, bitmap.get(), matcher.get(), &internal_args);
 

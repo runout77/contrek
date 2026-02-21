@@ -15,7 +15,6 @@ Gem::Specification.new do |s|
   end
   s.metadata = {
     "homepage_uri" => "https://github.com/runout77/contrek",
-    "source_code_uri" => "https://github.com/runout77/contrek",
     "documentation_uri" => "https://github.com/runout77/contrek#readme",
     "changelog_uri" => "https://github.com/runout77/contrek/blob/main/CHANGELOG.md"
   }

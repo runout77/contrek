@@ -10,6 +10,7 @@
 #pragma once
 #include <list>
 #include <vector>
+#include <deque>
 #include <map>
 #include <string>
 #include <utility>
@@ -32,24 +33,21 @@ class NodeCluster {
   int versus_inverter[2];
   int count = 0;
   int nodes;
-  std::vector<Point> points;
+  int width;
 
  public:
   pf_Options *options;
   std::vector<std::pair<int, int>> treemap;  // [a,b] a = index of parent outer, b = index of inner of parent outer
   std::pair<int, int> test_in_hole_a(Node* node);
   std::pair<int, int> test_in_hole_o(Node* node);
-  std::vector<std::vector<Node>> vert_nodes;
-  void list_track(Node *node, std::list<Node*> *list);
-  void list_delete(Node *node, std::list<Node*> *list);
-  bool list_present(Node *node, std::list<Node*> *list);
+  std::vector<std::deque<Node>> vert_nodes;
   void compress_coords(std::list<Polygon>& polygons, pf_Options options);
   List *root_nodes;
-  int height, width;
+  int height;
   std::list<Polygon> polygons;
   NodeCluster(int h, int w, pf_Options *options);
   virtual ~NodeCluster();
-  Node* add_node(int min_x, int max_x, int y, char name);
+  Node* add_node(int min_x, int max_x, int y, char name, int offset);
   void calc_root_nodes();
   void build_tangs_sequence();
   void plot(int versus);

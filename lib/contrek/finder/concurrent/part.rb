@@ -8,18 +8,19 @@ module Contrek
       ADDED = 2
 
       attr_reader :polyline, :index, :touched
-      attr_accessor :next, :circular_next, :prev, :type, :passes, :inverts, :trasmuted, :delayed
+      attr_accessor :next, :circular_next, :prev, :type, :dead_end, :inverts, :trasmuted, :delayed, :versus
       def initialize(type, polyline)
         @type = type
         @polyline = polyline
         @next = nil
         @circular_next = nil
         @prev = nil
-        @passes = 0
+        @dead_end = false
         @touched = false
         @inverts = false
         @trasmuted = false
         @delayed = false
+        @versus = 0
       end
 
       def is?(type)
@@ -60,7 +61,7 @@ module Contrek
       end
 
       def inspect
-        "part #{polyline.parts.index(self)} (inv=#{@inverts} trm=#{@trasmuted} touched=#{@touched} passes=#{@passes}, #{size}x) of #{polyline.info} (#{name}) (#{to_a.map { |e| "[#{e[:x]},#{e[:y]}]" }.join})"
+        "part #{polyline.parts.index(self)} (versus=#{@versus} inv=#{@inverts} trm=#{@trasmuted} touched=#{@touched} dead_end =#{@dead_end}, #{size}x) of #{polyline.info} (#{name}) (#{to_a.map { |e| "[#{e[:x]},#{e[:y]}]" }.join})"
       end
 
       def innerable?
@@ -76,6 +77,14 @@ module Contrek
 
       def to_endpoints
         map(&:end_point)
+      end
+
+      def orient!
+        @versus = if size <= 1
+          0
+        else
+          (tail.payload[:y] - head.payload[:y]).positive? ? 1 : -1
+        end
       end
 
       def self.remove_adjacent_pairs(array = nil)

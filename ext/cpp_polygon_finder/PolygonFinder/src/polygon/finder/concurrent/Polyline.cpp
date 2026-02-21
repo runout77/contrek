@@ -10,6 +10,7 @@
 #include <vector>
 #include <limits>
 #include <unordered_set>
+#include <sstream>
 #include "Polyline.h"
 #include "Tile.h"
 #include "Shape.h"
@@ -113,4 +114,16 @@ void Polyline::clear() {
 
 bool Polyline::is_empty() {
   return raw_.empty();
+}
+
+std::string Polyline::info() {
+  Shape* shape = this->shape;
+  size_t part_index = 0;
+  auto it = std::find(this->tile->shapes().begin(), this->tile->shapes().end(), shape);
+  if (it != this->tile->shapes().end()) {
+    part_index = std::distance(this->tile->shapes().begin(), it);
+  }
+  std::stringstream ss;
+  ss << "b" << this->tile->name() << " S" << part_index;
+  return ss.str();
 }

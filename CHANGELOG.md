@@ -48,3 +48,8 @@ All notable changes to this project will be documented in this file.
 ## [1.1.2] - 2026-02-09
 ### Changed
 - Transitioned to an Open Core licensing model: Ruby Gem (MIT) and C++ Core Engine (AGPLv3).
+
+## [1.1.3] - 2026-02-21
+### Changed
+- Added support for 8-way pixel connectivity (omnidirectional) in addition to the standard 4-way mode.
+- Optimized C++ and Ruby algorithms for initial spatial pixel tracking to improve performance. 

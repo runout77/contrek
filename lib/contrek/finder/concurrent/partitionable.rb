@@ -14,6 +14,8 @@ module Contrek
         last.next = last.circular_next = new_part if last
         new_part.circular_next = @parts.first
         new_part.prev = last
+
+        new_part.orient! if new_part.is?(Part::SEAM)
       end
 
       def insert_after(part, new_part)
@@ -25,10 +27,10 @@ module Contrek
         part.next = part.circular_next = new_part
       end
 
-      def find_first_part_by_position(position)
+      def find_first_part_by_position(position, versus)
         @parts.find do |part|
           part.is?(Part::SEAM) &&
-            part.passes == 0 &&
+            part.versus == -versus &&
             position.end_point.queues.include?(part)
         end
       end
@@ -144,10 +146,10 @@ module Contrek
 
             count = 0
             inside.each do |position|
-              break unless position.end_point.queues.include?(inside_compare)
-              count += 1
+              inclusion = position.end_point.queues.include?(inside_compare)
+              count += 1 if inclusion
             end
-            if count == inside.size
+            if count == inside.size && count < inside_compare.size
               inside.type = Part::EXCLUSIVE
               inside.trasmuted = true
               break

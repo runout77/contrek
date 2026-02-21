@@ -20,8 +20,9 @@ class Partitionable {
   explicit Partitionable() {}
   virtual ~Partitionable() = default;
   void partition();
-  Part* find_first_part_by_position(Position* position);
+  Part* find_first_part_by_position(Position* position, int versus);
   std::optional<SewReturnData> sew(std::vector<std::pair<int, int>> intersection, Polyline* other);
+  const std::vector<Part*> parts() const { return parts_; }
 
  protected:
   std::vector<Part*> parts_;

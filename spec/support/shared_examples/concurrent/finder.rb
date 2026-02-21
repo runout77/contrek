@@ -1,6 +1,19 @@
 # rubocop:disable Layout/ArrayAlignment, Layout/FirstArrayElementIndentation
 RSpec.shared_examples "finder" do
   describe "various simple cases" do
+    it "number_of_tiles 0 is ignored and forced to 1" do
+      chunk = "111" \
+              "111" \
+              "111"
+      result = @polygon_finder_class.new(
+        bitmap: @bitmap_class.new(chunk, 3),
+        matcher: @matcher,
+        options: {number_of_tiles: 0, versus: :o, compress: {uniq: true, linear: true}}
+      ).process_info
+      expect(result.points).to eq([{outer: [{x: 2, y: 0}, {x: 2, y: 2}, {x: 0, y: 2}, {x: 0, y: 0}],
+                                    inner: []}])
+    end
+
     it "unsupported width" do
       chunk = "1" \
               "1" \

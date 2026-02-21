@@ -32,6 +32,7 @@ class Part : public Queueable<Point> {
   bool inverts = false;
   bool trasmuted = false;
   bool delayed = false;
+  bool dead_end = false;
   Part* next = nullptr;
   Part* prev = nullptr;
   Part* circular_next = nullptr;
@@ -39,17 +40,20 @@ class Part : public Queueable<Point> {
   Polyline* polyline() { return polyline_; }
   Position* next_position(Position* force_position);
   void add_position(Point* point);
-  int passes = 0;
   Types type;
   bool innerable();
   const bool touched() const { return touched_; }
+  const int versus() const { return versus_; }
   void touch();
   bool intersect_part(Part* other_part);
   void set_polyline(Polyline* polyline) { this->polyline_ = polyline; }
   std::vector<EndPoint*> to_endpoints();
   static std::vector<EndPoint*> remove_adjacent_pairs(const std::vector<EndPoint*>& input);
+  void orient();
+  std::string inspect();
 
  private:
+  int versus_ = 0;
   bool touched_ = false;
   Polyline* polyline_;
 };
