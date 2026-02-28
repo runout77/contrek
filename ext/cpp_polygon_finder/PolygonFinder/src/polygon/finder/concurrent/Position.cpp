@@ -30,12 +30,9 @@ Position::Position(EndPoint* end_point)
 }
 
 void Position::before_rem(Queueable<Point>* q)  {
-  if (this->end_point_ != nullptr) {
-    auto& queues = this->end_point_->queues();
-    queues.erase(std::remove(queues.begin(), queues.end(), q), queues.end());
-  }
+  if (this->end_point_ != nullptr) this->end_point_->queues().erase(q);
 }
 
 void Position::after_add(Queueable<Point>* q)  {
-  if (this->end_point_ != nullptr) this->end_point_->queues().push_back(q);
+  if (this->end_point_ != nullptr) this->end_point_->queues().insert(q);
 }

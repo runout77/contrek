@@ -242,7 +242,7 @@ std::vector<Sequence*> Cursor::collect_inner_sequences(Sequence* outer_seq) {
         for (Part* part : all_parts)
         { part->touch();
           retme_sequence->move_from(*part, [&](QNode<Point>* pos) -> bool {
-          Position *position = dynamic_cast<Position*>(pos);
+          Position *position = static_cast<Position*>(pos);
           if (part->is(Part::ADDED) &&
              !(position->payload->y >= bounds.min &&
               position->payload->y <= bounds.max)) {
@@ -283,6 +283,8 @@ void Cursor::traverse_inner(Part* act_part, std::vector<Part*>& all_parts, Bound
           for (Shape *shape : act_part->polyline()->next_tile_eligible_shapes()) {
             for (Part* dest_part : shape->outer_polyline->parts()) {
               if (dest_part->trasmuted || dest_part->is(Part::EXCLUSIVE)) continue;
+              int dest_part_versus = dest_part->versus();
+              if (dest_part_versus != 0 && dest_part_versus == act_part->versus()) continue;
               if (dest_part->intersect_part(act_part)) {
                 std::vector<EndPoint*> link_seq = duplicates_intersection(*dest_part, *act_part);
                 if (!link_seq.empty()) {

@@ -9,6 +9,7 @@
 
 #pragma once
 #include <vector>
+#include <unordered_set>
 #include "Part.h"
 
 class Part;
@@ -19,9 +20,9 @@ class EndPoint {
 
   void set_point(Point* p) { point_ = p; }
   Point* get_point() const { return point_; }
-  std::vector<Queueable<Point>*>& queues() { return queues_; }
+  std::unordered_set<Queueable<Point>*>& queues() { return queues_; }
   bool queues_include(Queueable<Point>* q) const;
  private:
   Point* point_;
-  std::vector<Queueable<Point>*> queues_;
+  std::unordered_set<Queueable<Point>*> queues_;
 };

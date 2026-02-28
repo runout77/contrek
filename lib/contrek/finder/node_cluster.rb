@@ -62,21 +62,18 @@ module Contrek
           bounds = Bounds.empty
           # external polygon
           @plot_sequence << root_node
-          next_node_nd = if versus == :a
-            root_node.tangs_sequence.last
+
+          next_node = if versus == :a
+            root_node.get_tangent_node_by_virtual_index(root_node.tangs_sequence.last)
           else
-            root_node.tangs_sequence.first
+            root_node.get_tangent_node_by_virtual_index(root_node.tangs_sequence.first)
           end
-          #---------------
-          if !next_node_nd.nil?
-            next_node = next_node_nd.node
+          if !next_node.nil?
             coord = next_node.coords_entering_to(root_node, VERSUS_INVERTER[versus], Contrek::Finder::Node::OUTER)
             @sequence_coords << coord
             bounds.expand(x: coord[:x], y: coord[:y])
           end
-          #---------------
-
-          plot_node(next_node, root_node, bounds, versus) if @nodes > 0 && !next_node_nd.nil?
+          plot_node(next_node, root_node, bounds, versus) if @nodes > 0 && !next_node.nil?
 
           draw_sequence(bitmap, "X") unless bitmap.nil?
           @polygons << {outer: @sequence_coords, inner: [], bounds: (bounds.to_h if @options[:bounds])}.compact if @sequence_coords.size >= 2
@@ -198,13 +195,13 @@ module Contrek
         @root_nodes.delete(node)
         @inner_plot.delete(node)
         last_node = @plot_sequence.last
-        next_node_nd = node.my_next(last_node, versus, :inner)
-        next_node = next_node_nd.node
+        next_node = node.my_next(last_node, versus, :inner)
         @plot_sequence << node
 
         plot = true
         if next_node.y == last_node.y
-          plot = (node.tangs_sequence.send((versus == :a) ? :first : :last).node == next_node)
+          virtual_index = node.tangs_sequence.send((versus == :a) ? :first : :last)
+          plot = (node.get_tangent_node_by_virtual_index(virtual_index) == next_node)
         end
         if plot
           @sequence_coords << last_node.coords_entering_to(node, VERSUS_INVERTER[versus], Contrek::Finder::Node::INNER)
@@ -231,14 +228,14 @@ module Contrek
 
         node.outer_index = start_node.outer_index
         last_node = @plot_sequence.last
-        next_node_nd = node.my_next(last_node, versus, :outer)
-        next_node = next_node_nd.node
+        next_node = node.my_next(last_node, versus, :outer)
 
         @plot_sequence << node
 
         plot = true
         if next_node.y == last_node.y
-          plot = (node.tangs_sequence.send((versus == :a) ? :last : :first).node == next_node)
+          virtual_index = node.tangs_sequence.send((versus == :a) ? :last : :first)
+          plot = (node.get_tangent_node_by_virtual_index(virtual_index) == next_node)
         end
 
         # coord

@@ -17,9 +17,10 @@
 #include "Node.h"
 #include "NodeCluster.h"
 
-Node::Node(int min_x, int max_x, int y, char name)
+Node::Node(int min_x, int max_x, int y, NodeCluster* cluster, char name)
 : start_point(min_x, y),
-  end_point(max_x, y) {
+  end_point(max_x, y),
+  cluster(cluster) {
   this->name = name;
   this->min_x = min_x;
   this->max_x = max_x;
@@ -67,24 +68,14 @@ void Node::precalc_tangs_sequences(NodeCluster& cluster) {
   }
   // --- CLOCKWISE (UP) ---
   for (int upper_pos = this->upper_start; upper_pos <= this->upper_end; upper_pos++) {
-    Node& t_node = cluster.vert_nodes[y + T_UP][upper_pos];
-    tangs_sequence.emplace_back(NodeDescriptor{
-      &t_node,
-      Tangent{ &t_node.end_point, OMAX},
-      Tangent{ &t_node.start_point, OMIN}
-    });
+    tangs_sequence.push_back(-(upper_pos + 1));
   }
   if (this->lower_end >= 0) {
     this->down_indexer = (cluster.vert_nodes[y + T_DOWN][this->lower_start].abs_x_index + lower_size + upper_size - 1);
   }
   // --- COUNTER-CLOCKWISE (DOWN) ---
   for (int lower_pos = this->lower_end; lower_pos >= this->lower_start; lower_pos--) {
-    Node& t_node = cluster.vert_nodes[y + T_DOWN][lower_pos];
-    tangs_sequence.emplace_back(NodeDescriptor{
-      &t_node,
-      Tangent{&t_node.start_point, OMIN},
-      Tangent{&t_node.end_point, OMAX}
-    });
+    tangs_sequence.push_back(lower_pos);
   }
   this->tangs_count = this->tangs_sequence.size();
 }
@@ -95,7 +86,7 @@ Node* Node::my_next_inner(Node *last, int versus) {
   else            last_node_index = this->down_indexer - last->abs_x_index;
   if (versus == Node::O) last_node_index == 0 ? last_node_index = this->tangs_sequence.size() - 1 : last_node_index--;
   else          last_node_index == this->tangs_sequence.size() - 1 ? last_node_index = 0 : last_node_index++;
-  return((this->tangs_sequence)[last_node_index].node);
+  return get_tangent_node_by_virtual_index(this->tangs_sequence[last_node_index]);
 }
 
 Node* Node::my_next_outer(Node *last, int versus) {
@@ -104,15 +95,42 @@ Node* Node::my_next_outer(Node *last, int versus) {
   else                   last_node_index = this->down_indexer - last->abs_x_index;
   if (versus == Node::O) last_node_index == this->tangs_sequence.size() - 1 ? last_node_index = 0 : last_node_index++;
   else                   last_node_index == 0 ? last_node_index = this->tangs_sequence.size() - 1 : last_node_index--;
-  return((this->tangs_sequence)[last_node_index].node);
+  return get_tangent_node_by_virtual_index(this->tangs_sequence[last_node_index]);
 }
 
 Point* Node::coords_entering_to(Node *enter_to, int mode, int tracking) {
   int enter_to_index;
   if (enter_to->y < this->y) enter_to_index = enter_to->abs_x_index + this->up_indexer;
   else                       enter_to_index = this->down_indexer - enter_to->abs_x_index;
-  NodeDescriptor ds = (this->tangs_sequence)[enter_to_index];
-  Tangent t = (mode == Node::O ? ds.o : ds.a);
-  enter_to->track |= TURNER[tracking][t.mode - 1];
-  return(t.point);
+
+  int tg_index = this->tangs_sequence[enter_to_index];
+  Point* point;
+  if (tg_index < 0) {
+    Node& node_up = cluster->vert_nodes[y + T_UP][-(tg_index + 1)];
+    if (mode == Node::A) {
+      enter_to->track |= TURNER[tracking][OMAX - 1];
+      point = &node_up.end_point;
+    } else {
+      enter_to->track |= TURNER[tracking][OMIN - 1];
+      point = &node_up.start_point;
+    }
+  } else {
+    Node& node_down = cluster->vert_nodes[y + T_DOWN][tg_index];
+    if (mode == Node::A) {
+      enter_to->track |= TURNER[tracking][OMIN - 1];
+      point = &node_down.start_point;
+    } else {
+      enter_to->track |= TURNER[tracking][OMAX - 1];
+      point = &node_down.end_point;
+    }
+  }
+  return point;
+}
+
+Node* Node::get_tangent_node_by_virtual_index(int virtual_index) {
+  if (virtual_index < 0) {
+    return &(this->cluster->vert_nodes[y + T_UP][-(virtual_index + 1)]);
+  } else {
+    return &(this->cluster->vert_nodes[y + T_DOWN][virtual_index]);
+  }
 }

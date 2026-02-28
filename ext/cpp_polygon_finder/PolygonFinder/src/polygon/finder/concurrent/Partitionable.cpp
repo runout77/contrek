@@ -48,7 +48,7 @@ void Partitionable::insert_after(Part* part, Part* new_part) {
 
 void Partitionable::partition()
 { this->parts_.clear();
-  Polyline *polyline = dynamic_cast<Polyline*>(this);
+  Polyline *polyline = static_cast<Polyline*>(this);
   PartPool& pool = polyline->tile->cluster->parts_pool;
   Part *current_part = nullptr;
   int n = 0;
@@ -159,7 +159,7 @@ std::optional<SewReturnData> Partitionable::sew(std::vector<std::pair<int, int>>
   }
 
   std::vector<Part*> all_parts;
-  Polyline* polyline = dynamic_cast<Polyline*>(this);
+  Polyline* polyline = static_cast<Polyline*>(this);
   all_parts.reserve(before_parts.size() + after_parts.size());
   all_parts.insert(all_parts.end(), before_parts.begin(), before_parts.end());
   all_parts.insert(all_parts.end(), after_parts.begin(), after_parts.end());
@@ -208,9 +208,9 @@ void Partitionable::trasmute_parts()
       if (inside == inside_compare || !inside_compare->is(Part::SEAM) ) continue;
       int count = 0;
       inside->each([&](QNode<Point>* pos) -> bool {
-        Position *position = dynamic_cast<Position*>(pos);
+        Position *position = static_cast<Position*>(pos);
         if (position->end_point()->queues_include(inside_compare))
-        { count ++;
+        { count++;
           return true;
         }
         return false;

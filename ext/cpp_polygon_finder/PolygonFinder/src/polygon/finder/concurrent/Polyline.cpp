@@ -9,6 +9,7 @@
 
 #include <vector>
 #include <limits>
+#include <string>
 #include <unordered_set>
 #include <sstream>
 #include "Polyline.h"
@@ -77,7 +78,7 @@ std::vector<std::pair<int, int>> Polyline::intersection(const Polyline* other) c
       auto& part = parts_[i];
       if (!part->is(Part::SEAM) && part->trasmuted) continue;
       part->each([&](QNode<Point>* pos) -> bool {
-        Position *position = dynamic_cast<Position*>(pos);
+        Position *position = static_cast<Position*>(pos);
         if (position->end_point() != nullptr)
         { this->tracked_endpoints[position->end_point()] = i;
         }
@@ -93,7 +94,7 @@ std::vector<std::pair<int, int>> Polyline::intersection(const Polyline* other) c
       continue;
     }
     other_part->each([&](QNode<Point>* pos) -> bool {
-      Position *position = dynamic_cast<Position*>(pos);
+      Position *position = static_cast<Position*>(pos);
       auto it = this->tracked_endpoints.find(position->end_point());
       if (it != this->tracked_endpoints.end()) {
         int self_index = it->second;

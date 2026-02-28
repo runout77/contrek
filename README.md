@@ -112,7 +112,7 @@ Regarding multithreading:
 
 - The treemap option is currently ignored (multithreaded treemap support will be introduced in upcoming revisions).
 
-By not declaring native option CPP Multithreading optimized code is used. In the above example a [105 MP image](spec/files/images/sample_10240x10240.png) is examined by 4 threads working on 4 tiles (total compute time about 1.53 secs with image load).
+By not declaring native option CPP Multithreading optimized code is used. In the above example a [105 MP image](spec/files/images/sample_10240x10240.png) is examined by 4 threads working on 4 tiles (total compute time about 1.2 secs with image load).
 
 ```ruby
 result = Contrek.contour!(
@@ -126,11 +126,11 @@ result = Contrek.contour!(
 )
 puts result.metadata[:benchmarks].inspect
 
-{ compress: 13.0815,
-  init: 453.245,
-  inner: 27.0072,
-  outer: 66.9162,
-  total: 466.326
+{ compress: 26.37,
+  init: 354.339,
+  inner: 17.9427,
+  outer: 93.6252,
+  total: 380.709
 }
 
 ```
@@ -288,23 +288,24 @@ This process is applied recursively, merging bands until a single final band rem
 One of the most complex test you can find under the spec folder is named "scans poly 1200x800", scans this [image](spec/files/images/sample_1200x800.png) computing coordinates to draw polygons drawn in this [result](spec/files/stored_samples/sample_1200x800.png).
 On pure ruby implementation kept time
 ```ruby
-{ :scan=>801.494,
-  :build_tangs_sequence=>160.491,
-  :plot=>86.633,
+{ :scan=>775.435,
+  :build_tangs_sequence=>38.916,
+  :plot=>101.876,
   :compress=>0.002,
-  :total=>1048.62}
+  :total=>916.229
+}
 ```
 This the one for the native C++
 ```ruby
-{ scan: 7.1146329999999995,
-  build_tangs_sequence: 3.063812,
-  plot: 4.474851999999999,
-  compress: 0.0031999999999999997
-  total: 14.656496999999998
+{ scan: 5.077878999999999,
+  build_tangs_sequence: 0.697222999999999,
+  plot: 2.00479,
+  compress: 0.00071,
+  total: 7.780602
 }
 ```
 
-About 75x faster. Times are in microseconds; system: AMD Ryzen 7 3700X 8-Core Processor (BogoMIPS: 7199,99) on Ubuntu distro.
+About 130x faster. Times are in microseconds; system: AMD Ryzen 7 3700X 8-Core Processor (BogoMIPS: 7199,99) on Ubuntu distro.
 
 ## 🛠 C++ Standalone Library Usage
 

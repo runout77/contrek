@@ -64,7 +64,7 @@ void Part::touch()
 bool Part::intersect_part(Part* other_part)
 { bool intersect = false;
   other_part->each([&](QNode<Point>* pos) -> bool {
-    Position *position = dynamic_cast<Position*>(pos);
+    Position *position = static_cast<Position*>(pos);
     if (position->end_point()->queues_include(this))
     { intersect = true;
       return(false);
@@ -78,7 +78,7 @@ std::vector<EndPoint*> Part::to_endpoints() {
   std::vector<EndPoint*> out;
   QNode<Point>* current = head;
   while (current) {
-    out.push_back((dynamic_cast<Position*>(current))->end_point());
+    out.push_back((static_cast<Position*>(current))->end_point());
     current = current->next;
   }
   return out;

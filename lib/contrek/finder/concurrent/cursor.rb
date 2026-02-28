@@ -189,6 +189,8 @@ module Contrek
               act_part.polyline.next_tile_eligible_shapes.each do |shape|
                 shape.outer_polyline.parts.each do |dest_part|
                   next if dest_part.trasmuted || dest_part.is?(Part::EXCLUSIVE)
+                  dest_part_versus = dest_part.versus
+                  next if dest_part_versus != 0 && dest_part_versus == act_part.versus
 
                   if dest_part.intersect_part?(act_part)
                     link_seq = duplicates_intersection(dest_part, act_part)

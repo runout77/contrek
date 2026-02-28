@@ -52,4 +52,9 @@ All notable changes to this project will be documented in this file.
 ## [1.1.3] - 2026-02-21
 ### Changed
 - Added support for 8-way pixel connectivity (omnidirectional) in addition to the standard 4-way mode.
-- Optimized C++ and Ruby algorithms for initial spatial pixel tracking to improve performance. 
+- Optimized C++ and Ruby algorithms for initial spatial pixel tracking to improve performance.
+
+## [1.1.4] - 2026-02-28
+### Changed
+- Fixed an infinite loop bug in multithreading during inner sequence joining in Omnidirectional mode.
+- Optimized C++ and Ruby algorithms for initial spatial tangential sequence determination.

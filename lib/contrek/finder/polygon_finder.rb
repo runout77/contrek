@@ -3,7 +3,6 @@ require "benchmark"
 module Contrek
   module Finder
     class PolygonFinder
-      NodeDescriptor = Struct.new(:node, :a, :o)
       def initialize(bitmap, matcher, test_bitmap = nil, options = {})
         @options = {versus: :a}.merge(options)
         sanitize_options

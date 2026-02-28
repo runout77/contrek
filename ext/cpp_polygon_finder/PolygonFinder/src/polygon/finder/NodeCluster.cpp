@@ -75,7 +75,7 @@ void NodeCluster::build_tangs_sequence() {
 }
 
 Node* NodeCluster::add_node(int min_x, int max_x, int y, char name, int offset) {
-  vert_nodes[y].emplace_back(min_x, max_x, y, name);
+  vert_nodes[y].emplace_back(min_x, max_x, y, this, name);
 
   Node& node = vert_nodes[y].back();
   node.abs_x_index = vert_nodes[y].size() - 1;
@@ -115,8 +115,11 @@ void NodeCluster::plot(int versus) {
     this->plot_sequence.push_back(root_node);
     Polygon poly;
 
-    if ((root_node)->tangs_sequence.size() > 0)  // front() on empty list is undefined
-    { versus == Node::A ? next_node = root_node->tangs_sequence.back().node : next_node = root_node->tangs_sequence.front().node;
+    if ((root_node)->tangs_sequence.size() > 0)  // front() or back() on empty list is undefined
+    { versus == Node::A ?
+        next_node = root_node->get_tangent_node_by_virtual_index(root_node->tangs_sequence.back()) :
+        next_node = root_node->get_tangent_node_by_virtual_index(root_node->tangs_sequence.front());
+
       if (next_node != nullptr)
       { Point* p = next_node->coords_entering_to(root_node, versus_inverter[versus], Node::OUTER);
         poly.outer.push_back(p);
@@ -254,7 +257,11 @@ void NodeCluster::plot_inner_node(std::vector<Point*>& sequence_coords, Node *no
 
     bool plot = true;
     if (next_node->y == last_node->y) {
-      Node *n = (versus == Node::A ? current_node->tangs_sequence.front().node : current_node->tangs_sequence.back().node);
+      Node *n;
+      int virtual_index = (versus == Node::A ?
+        current_node->tangs_sequence.front() :
+        current_node->tangs_sequence.back());
+      n = current_node->get_tangent_node_by_virtual_index(virtual_index);
       plot = (n == next_node);
     }
     if (plot) {
@@ -289,7 +296,10 @@ void NodeCluster::plot_node(std::vector<Point*>& sequence_coords, Node *node, No
 
     bool plot = true;
     if (next_node->y == last_node->y) {
-      Node *n = (versus == Node::A ? current_node->tangs_sequence.back().node : current_node->tangs_sequence.front().node);
+      int virtual_index = (versus == Node::A ?
+          current_node->tangs_sequence.back() :
+          current_node->tangs_sequence.front());
+      Node *n = current_node->get_tangent_node_by_virtual_index(virtual_index);
       plot = (n == next_node);
     }
     if (plot) {

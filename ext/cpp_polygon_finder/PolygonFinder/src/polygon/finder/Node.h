@@ -28,11 +28,6 @@ struct Point {
   }
   Point(int x_, int y_) : x(x_), y(y_) {}
 };
-struct Tangent {
-  Point   *point;
-  int   mode;
-};
-struct NodeDescriptor;
 
 class Node : public  Listable {
  public:
@@ -63,24 +58,20 @@ class Node : public  Listable {
   int lower_start = std::numeric_limits<int>::max();
   int lower_end   = -1;
   Point start_point, end_point;
+  NodeCluster* cluster;
   void add_intersection(Node& other_node, int other_node_index);
-  std::vector<NodeDescriptor> tangs_sequence;
+  std::vector<int> tangs_sequence;
   Point* coords_entering_to(Node *enter_to, int mode, int tracking);
   Node* my_next_outer(Node *last, int versus);
   Node* my_next_inner(Node *last, int versus);
+  Node* get_tangent_node_by_virtual_index(int vitual_index);
   bool track_uncomplete();
   bool track_complete();
   bool get_trackmax();
 
  public:
   int min_x, max_x;
-  Node(int min_x, int max_x, int y, char name);
+  Node(int min_x, int max_x, int y, NodeCluster* cluster, char name);
   void precalc_tangs_sequences(NodeCluster& cluster);
   bool processed = false;
-};
-
-struct NodeDescriptor {
-  Node  *node;
-  Tangent a;
-  Tangent o;
 };

@@ -44,6 +44,8 @@ FastPngBitmap::FastPngBitmap(std::string filename) : Bitmap("", 0) {
         spng_ctx_free(ctx);
         this->png_error = error;
       }
+    } else {
+      throw std::runtime_error("Unable open file: " + filename);
     }
   }
 }

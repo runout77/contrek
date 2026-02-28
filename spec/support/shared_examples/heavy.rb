@@ -16,6 +16,7 @@ RSpec.shared_examples "heavy" do
       rgb_matcher = @png_not_matcher.new(png_bitmap.rgb_value_at(0, 0))
       polygonfinder = @polygon_finder_class.new(png_bitmap, rgb_matcher, nil, {versus: :a})
       result = polygonfinder.process_info
+      # puts result.metadata[:benchmarks].inspect
       # store_sample(polygonfinder,filename,result,png_bitmap)
       saved_poly = YAML.load_file("./spec/files/coordinates/#{filename}.yml")
       expect(result.points).to eq(saved_poly)
@@ -37,7 +38,7 @@ RSpec.shared_examples "heavy" do
       rgb_matcher = @png_not_matcher.new(png_bitmap.rgb_value_at(0, 0))
       polygonfinder = @polygon_finder_class.new(png_bitmap, rgb_matcher, nil, {versus: :a})
       result = polygonfinder.process_info
-      puts result[:benchmarks].inspect
+      puts result.metadata[:benchmarks].inspect
       expect(result.points).to eq(JSON.parse(File.read("./spec/files/coordinates/#{filename}.json"), symbolize_names: true))
     end
   end

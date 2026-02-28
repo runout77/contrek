@@ -70,7 +70,7 @@ inline std::unique_ptr<ProcessResult> trace(const std::string& image_path, const
       if (m.flag) internal_args.emplace_back(m.arg);
   }
   internal_args.push_back("--number_of_tiles=" + std::to_string(cfg.tiles));
-  if(cfg.connectivity_mode == Connectivity::OMNIDIRECTIONAL) {
+  if (cfg.connectivity_mode == Connectivity::OMNIDIRECTIONAL) {
     internal_args.push_back("--connectivity=" + std::to_string(8));
   }
 
