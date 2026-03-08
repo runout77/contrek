@@ -30,12 +30,10 @@ RemoteFastPngBitmap::RemoteFastPngBitmap(std::string *dataurl) : FastPngBitmap("
     struct spng_ihdr ihdr;
     int error = spng_get_ihdr(ctx, &ihdr);
     if (!error) {
-      this->width = ihdr.width;
-      this->height = ihdr.height;
       size_t out_size;  // RGBA8 dimension
       spng_decoded_image_size(ctx, SPNG_FMT_RGBA8, &out_size);
-      this->image.resize(out_size);
-      error = spng_decode_image(ctx, image.data(), out_size, SPNG_FMT_RGBA8, SPNG_DECODE_TRNS);
+      this->define(ihdr.width, ihdr.height, 4, false);
+      error = spng_decode_image(ctx, image.get(), out_size, SPNG_FMT_RGBA8, SPNG_DECODE_TRNS);
     }
     if (error != 0) {
       std::cout << "spng error: " << spng_strerror(error) << std::endl;

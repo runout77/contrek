@@ -28,6 +28,7 @@ module Contrek
           @options = options
           @clusters = []
           @maximum_width = bitmap.w
+          @height = bitmap.h
           @number_of_tiles = options[:number_of_tiles] || (raise "number_of_tiles params is needed!")
           @number_of_tiles = 1 if @number_of_tiles <= 0
 
@@ -62,11 +63,11 @@ module Contrek
 
             x = tile_end_x - 1
           end
-          process_tiles!(bitmap)
+          process_tiles!(bitmap, height: bitmap.h)
         end.real
       end
 
-      def process_info(bitmap = nil)
+      def process_info
         raw_polygons = @whole_tile.to_raw_polygons
 
         compress_time = Benchmark.measure do
@@ -83,14 +84,16 @@ module Contrek
             outer: (@whole_tile.benchmarks[:outer] * 1000).round(3),
             inner: (@whole_tile.benchmarks[:inner] * 1000).round(3),
             compress: ((compress_time * 1000).round(3) if @options.has_key?(:compress))
-          }.compact
+          }.compact,
+          width: @maximum_width,
+          height: @height
         }
         Contrek::Finder::Result.new(raw_polygons, metadata)
       end
 
       private
 
-      def process_tiles!(bitmap)
+      def process_tiles!(bitmap, height:)
         arriving_tiles = []
         loop do
           tile = @tiles.pop
@@ -110,7 +113,7 @@ module Contrek
 
             # puts "start = #{start_x} end = #{end_x}"
 
-            cluster = Cluster.new(finder: self, height: bitmap.h, start_x:, end_x:)
+            cluster = Cluster.new(finder: self, height: height, start_x:, end_x:)
             if twin_tile.start_x == (tile.end_x - 1)
               cluster.add(tile)
               cluster.add(twin_tile)

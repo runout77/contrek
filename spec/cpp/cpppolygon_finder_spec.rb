@@ -27,6 +27,9 @@ RSpec.describe CPPPolygonFinder, type: :class do
   end
 
   describe "shared_test", simples: true do
+    before do
+      @matcher = CPPValueNotMatcher.new(" ")
+    end
     include_examples "simples"
   end
 

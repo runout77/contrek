@@ -20,6 +20,7 @@ class Queue {
     std::lock_guard<std::mutex> lock(mutex_);
     queue_.push(value);
     cond_.notify_one();
+    this->size_++;
   }
 
   T queue_pop() {
@@ -27,10 +28,14 @@ class Queue {
     cond_.wait(lock, [this]{ return !queue_.empty(); });
     T value = queue_.front();
     queue_.pop();
+    this->size_--;
     return value;
   }
 
+  int size() { return this->size_; }
+
  private:
+  int size_ = 0;
   std::queue<T> queue_;
   std::mutex mutex_;
   std::condition_variable cond_;

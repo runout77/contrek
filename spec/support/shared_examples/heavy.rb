@@ -44,7 +44,7 @@ RSpec.shared_examples "heavy" do
   end
 
   def store_sample(polygonfinder, filename, result, bitmap)
-    test_bitmap = Contrek::Bitmaps::CustomBitmap.new(w: bitmap.w, h: bitmap.h, color: ChunkyPNG::Color::WHITE)
+    test_bitmap = Contrek::Bitmaps::RawBitmap.new(w: bitmap.w, h: bitmap.h, color: ChunkyPNG::Color::WHITE)
     Contrek::Bitmaps::Painting.direct_draw_polygons(result.points, test_bitmap)
     test_bitmap.save("./spec/files/stored_samples/#{filename}")
     File.write("./spec/coordinates/#{filename}.yml", @result.points.to_yaml)

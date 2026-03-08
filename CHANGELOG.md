@@ -58,3 +58,8 @@ All notable changes to this project will be documented in this file.
 ### Changed
 - Fixed an infinite loop bug in multithreading during inner sequence joining in Omnidirectional mode.
 - Optimized C++ and Ruby algorithms for initial spatial tangential sequence determination.
+
+## [1.1.5] - 2026-03-08
+### Changed
+- **RawBitmap Integration (Ruby/C++):** Introduced a native buffer class for direct contour extraction, bypassing PNG encoding to significantly reduce latency and memory overhead.
+- **Tiled Polygon Merger:** Added a spatial merger for `Finder` outputs to stitch polygons from discrete sub-areas (requiring only a 1px overlap). This multi-phase workflow supports coordinate translation and eliminates monolithic buffer requirements, optimizing the peak memory footprint.

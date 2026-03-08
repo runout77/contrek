@@ -20,73 +20,37 @@
 #include "FastPngBitmap.h"
 #include "spng.h"
 
-FastPngBitmap::FastPngBitmap(std::string filename) : Bitmap("", 0) {
-  if (filename.length() > 0)
-  { std::ifstream file(filename, std::ios::binary | std::ios::ate);
-    if (file.is_open())
-    { std::streamsize size = file.tellg();
+FastPngBitmap::FastPngBitmap(std::string filename) : RawBitmap() {
+  if (filename.length() > 0) {
+    std::ifstream file(filename, std::ios::binary | std::ios::ate);
+    if (file.is_open()) {
+      std::streamsize size = file.tellg();
       file.seekg(0, std::ios::beg);
       std::vector<unsigned char> file_buffer(size);
-      if (!file.read(reinterpret_cast<char*>(file_buffer.data()), size))
-      { this->png_error = -1;
+      if (!file.read(reinterpret_cast<char*>(file_buffer.data()), size)) {
+        this->png_error = -1;
       } else {
         spng_ctx *ctx = spng_ctx_new(0);
         spng_set_png_buffer(ctx, file_buffer.data(), file_buffer.size());
         struct spng_ihdr ihdr;
         spng_get_ihdr(ctx, &ihdr);
-        this->width = ihdr.width;
-        this->height = ihdr.height;
         size_t out_size;
         spng_decoded_image_size(ctx, SPNG_FMT_RGBA8, &out_size);
-        this->image.resize(out_size);
-        madvise(this->image.data(), out_size, MADV_HUGEPAGE);
-        int error = spng_decode_image(ctx, image.data(), out_size, SPNG_FMT_RGBA8, SPNG_DECODE_TRNS);
+        this->define(ihdr.width, ihdr.height, 4, false);
+        unsigned char* raw_ptr = this->image.get();
+        madvise(raw_ptr, out_size, MADV_HUGEPAGE);
+        int error = spng_decode_image(ctx, raw_ptr, out_size, SPNG_FMT_RGBA8, SPNG_DECODE_TRNS);
         spng_ctx_free(ctx);
         this->png_error = error;
       }
     } else {
-      throw std::runtime_error("Unable open file: " + filename);
+      throw std::runtime_error("Unable to open file: " + filename);
     }
   }
 }
 
-bool FastPngBitmap::pixel_match(int x, int y, Matcher *matcher)
-{ int32_t index = ((y * width) + x) * 4;
-  unsigned int color;
-  unsigned char *red = &image[index];
-  std::memcpy(&color, red, 3);
-  if (typeid(*matcher) == typeid(RGBMatcher))  return((reinterpret_cast<RGBMatcher*>(matcher))->match(color));
-  if (typeid(*matcher) == typeid(RGBNotMatcher)) return((reinterpret_cast<RGBNotMatcher*>(matcher))->match(color));
-  return(false);
-}
-
-int FastPngBitmap::w() {
-  return this->width;
-}
-
-int FastPngBitmap::h() {
-  return this->height;
-}
-
 int FastPngBitmap::error() {
   return this->png_error;
-}
-char FastPngBitmap::value_at(int x, int y) {
-  return(0);
-}
-
-// source image format RGBA => returning uint ABGR
-unsigned int FastPngBitmap::rgb_value_at(int x, int y) {
-  uint32_t index = (uint32_t(y) * width + x) * 4;
-  return *reinterpret_cast<const uint32_t*>(&image[index]);
-}
-
-const unsigned char* FastPngBitmap::get_row_ptr(int y) const {
-  return image.data() + (static_cast<size_t>(y) * static_cast<size_t>(width) * 4);
-}
-
-int FastPngBitmap::get_bytes_per_pixel() const {
-  return 4;  // RGBA
 }
 
 void FastPngBitmap::loadFile(std::vector<unsigned char>& buffer, const std::string& filename)  // designed for loading files from hard disk in an std::vector

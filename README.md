@@ -1,10 +1,10 @@
 # Contrek
-Contrek is a Ruby gem powered by a <u>standalone C++17 core library</u> for fast contour tracing and edge detection in PNG images. It employs a **topological approach** to extract polygonal contours, representing shapes as a connected graph of shared endpoints. This ensures perfect adjacency and structural integrity for shape analysis and raster-to-vector workflows, such as PNG to SVG conversion, managed via libspng (0.7.4) with multithreading support.
+Contrek is a Ruby gem powered by a <u>standalone C++17 core library</u> for fast contour tracing and edge detection in PNG images and raw memory streams. It employs a **topological approach** to extract polygonal contours, representing shapes as a connected graph of shared endpoints. This ensures perfect adjacency and structural integrity for shape analysis and raster-to-vector workflows, such as PNG to SVG conversion, managed via libspng (0.7.4) with multithreading support.
 
 
 ## About Contrek library
 
-Contrek (**con**tour **trek**king) simply scans your png bitmap and returns shape contour as close polygonal lines, both for the external and internal sides. It can compute the nesting level of the polygons found with a tree structure. It supports various levels and modes of compression and approximation of the found coordinates. It is capable of multithreaded processing, splitting the image into vertical strips and recombining the coordinates in pairs.
+Contrek (**con**tour **trek**king) simply scans your png/raw bitmap and returns shape contour as close polygonal lines, both for the external and internal sides. It can compute the nesting level of the polygons found with a tree structure. It supports various levels and modes of compression and approximation of the found coordinates. It is capable of multithreaded processing, splitting the image into vertical strips and recombining the coordinates in pairs.
 
 In the following image all the non-white pixels have been examined and the result is the red polygon for the outer contour and the green one for the inner one
 ![alt text](contrek.png "Contour tracing")
@@ -84,6 +84,24 @@ png_image.save('result.png') # => inspect the image to feedback the result
 You can also read base64 png images
 ```ruby
 png_bitmap = CPPRemotePngBitMap.new("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+P+/HgAFhAJ/wlseKgAAAABJRU5ErkJggg==")
+```
+
+You can process from a raw stream
+```ruby
+  raw_bitmap = CPPRawBitMap.new
+  # set 20 as width, 30 as height, 4 as bytes per pixel and clears the content (true)
+  raw_bitmap.define(20,30,4,true)
+  # draws a polygon
+  4.upto(5) do |y|
+    5.upto(8) do |x|
+      raw_bitmap.draw_pixel(x, y, 1, 0, 0, 0);
+    end
+  end
+  not_matcher = CPPRGBNotMatcher.new(raw_bitmap.rgb_value_at(0, 0))
+  result = CPPPolygonFinder.new(raw_bitmap, not_matcher, nil,{compress: {uniq: true, linear: true}}).process_info
+  puts result.points.inspect
+  =>
+  [{:outer=>[{:x=>5, :y=>4}, {:x=>5, :y=>5}, {:x=>8, :y=>5}, {:x=>8, :y=>4}], :inner=>[]}]
 ```
 
 Multithreaded contour processing is supported. However, on Ruby MRI (the standard Ruby implementation, at least up to 3.x), the Global Interpreter Lock (GIL) prevents more than one thread from executing Ruby code simultaneously. As a consequence, execution remains effectively serialized even on multicore systems, unless the gem is used under JRuby or TruffleRuby (not tested).

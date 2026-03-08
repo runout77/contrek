@@ -18,6 +18,7 @@
 #include "polygon/finder/concurrent/ClippedPolygonFinder.h"
 #include "polygon/bitmaps/Bitmap.h"
 #include "polygon/bitmaps/FastPngBitmap.h"
+#include "polygon/bitmaps/RawBitmap.h"
 #include "polygon/bitmaps/RemoteFastPngBitmap.h"
 #include "polygon/matchers/Matcher.h"
 #include "polygon/matchers/RGBMatcher.h"
@@ -25,6 +26,7 @@
 #include "polygon/matchers/ValueNotMatcher.h"
 #include "polygon/finder/optionparser.h"
 #include "polygon/finder/concurrent/Finder.h"
+#include "polygon/finder/concurrent/HorizontalMerger.h"
 #include "polygon/finder/concurrent/Sequence.h"
 #include "polygon/finder/concurrent/Position.h"
 #include "polygon/finder/Polygon.h"
@@ -141,7 +143,7 @@ void Tests::test_d()
   FastPngBitmap png_bitmap("../images/sample_10240x10240.png");
   // FastPngBitmap png_bitmap("images/labyrinth.png");
   std::cout << "image_w=" << png_bitmap.w() << " image_h=" << png_bitmap.h() << std::endl;
-  std::cout << "immagine =" << cpu_timer.stop() << std::endl;
+  std::cout << "image reading time =" << cpu_timer.stop() << std::endl;
 
   int color = png_bitmap.value_at(0, 0);
   std::cout << "color =" << color << std::endl;
@@ -169,7 +171,7 @@ void Tests::test_e()
   Finder pl(2, &png_bitmap, &not_matcher, &arguments);
   ProcessResult *o = pl.process_info();
   o->print_info();
-  std::cout << "polygons =" << o->groups << std::endl;
+  std::cout << "polygons = " << o->groups << std::endl;
   delete o;
 }
 
@@ -183,4 +185,71 @@ void Tests::test_f()
   RemoteFastPngBitmap bitmap(&data_url);
   std::cout << "image_w=" << bitmap.w() << " image_h=" << bitmap.h() << std::endl;
   std::cout << "load_error=" << bitmap.error() << std::endl;
+}
+
+void Tests::test_g()
+{ RawBitmap raw_bitmap;
+  raw_bitmap.define(50, 50, 4);
+
+  // draw a polygon start_x = 5, start_y = 4, end_x = 8, end_y = 5
+  for (int y : {4, 5}) {
+    for (int x = 5; x <= 8; ++x) {
+      raw_bitmap.draw_pixel(x, y, 1, 0, 0);
+    }
+  }
+
+  int color = raw_bitmap.rgb_value_at(0, 0);
+  std::cout << "color = " << color << std::endl;
+  RGBNotMatcher not_matcher(color);
+
+  std::vector<std::string> arguments = {"--versus=a", "--compress_uniq", "--number_of_tiles=2"};
+  Finder pl(2, &raw_bitmap, &not_matcher, &arguments);
+  ProcessResult *o = pl.process_info();
+  // o->print_info();
+  // o->print_polygons();
+  std::cout << "polygons = " << o->groups << std::endl;
+  delete o;
+}
+
+void Tests::test_h()
+{ std::string left =
+              "0000000000" \
+              "0000000000" \
+              "00        " \
+              "00        " \
+              "00        " \
+              "00        " \
+              "00        " \
+              "0000000000" \
+              "0000000000";
+  std::vector<std::string> arguments = {"--versus=a", "--compress_uniq"};
+  ValueNotMatcher matcher(' ');
+  Bitmap b_left(left, 10);
+  PolygonFinder pl_left(&b_left, &matcher, nullptr, &arguments);
+  ProcessResult *left_result = pl_left.process_info();
+
+  std::string right =
+              "0000000000" \
+              "0000000000" \
+              "      0000" \
+              "      0000" \
+              "      0000" \
+              "      0000" \
+              "      0000" \
+              "0000000000" \
+              "0000000000";
+  Bitmap b_right(right, 10);
+  PolygonFinder pl_right(&b_right, &matcher, nullptr, &arguments);
+  ProcessResult *right_result = pl_right.process_info();
+
+  std::vector<std::string> merger_arguments = {};
+  HorizontalMerger hmerger(1, &arguments);
+  hmerger.add_tile(*left_result);
+  hmerger.add_tile(*right_result);
+  ProcessResult *merged_result = hmerger.process_info();
+  merged_result->print_polygons();
+
+  delete merged_result;
+  delete left_result;
+  delete right_result;
 }

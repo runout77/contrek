@@ -8,6 +8,9 @@ RSpec.describe Contrek::Cpp::CPPConcurrentFinder, type: :class do
     @color_class = Contrek::Bitmaps::RgbCppColor
     @ruby_bitmap_class = Contrek::Bitmaps::ChunkyBitmap
     @ruby_matcher = Contrek::Matchers::ValueNotMatcher.new(" ")
+    @simple_polygon_finder = CPPPolygonFinder
+    @merger = Contrek::Cpp::CPPConcurrentHorizontalMerger
+    @vertical_merger = Contrek::Cpp::CPPConcurrentVerticalMerger
   end
 
   describe "node test" do
@@ -70,5 +73,25 @@ RSpec.describe Contrek::Cpp::CPPConcurrentFinder, type: :class do
 
   describe "shared_test" do
     include_examples "multiprocessing"
+  end
+
+  describe "bitmap", bitmap: true do
+    it "allocates a blank area to draw polygon" do
+      raw_bitmap = CPPRawBitMap.new
+      expect(raw_bitmap.w).to eq(0)
+      expect(raw_bitmap.h).to eq(0)
+      raw_bitmap.define(20, 20, 4, true)
+      expect(raw_bitmap.w).to eq(20)
+      expect(raw_bitmap.h).to eq(20)
+      4.upto(5) do |y|
+        5.upto(8) do |x|
+          raw_bitmap.draw_pixel(x, y, 1, 0, 0, 0)
+        end
+      end
+      not_matcher = CPPRGBNotMatcher.new(raw_bitmap.rgb_value_at(0, 0))
+      result = CPPPolygonFinder.new(raw_bitmap, not_matcher, nil, {compress: {uniq: true, linear: true}}).process_info
+      expect(result.metadata[:groups]).to eq(1)
+      expect(result.points).to eq([{outer: [{x: 5, y: 4}, {x: 5, y: 5}, {x: 8, y: 5}, {x: 8, y: 4}], inner: []}])
+    end
   end
 end

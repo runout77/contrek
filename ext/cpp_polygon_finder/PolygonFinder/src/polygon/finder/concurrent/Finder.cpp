@@ -27,7 +27,8 @@ Finder::Finder(int number_of_threads, Bitmap *bitmap, Matcher *matcher, std::vec
   bitmap(bitmap),
   matcher(matcher),
   input_options(*options),
-  maximum_width_(bitmap->w())
+  maximum_width_(bitmap->w()),
+  height(bitmap->h())
 { cpu_timer.start();
   if (options != nullptr) FinderUtils::sanitize_options(this->options, options);
 
@@ -67,6 +68,11 @@ Finder::Finder(int number_of_threads, Bitmap *bitmap, Matcher *matcher, std::vec
   reports["init"] = cpu_timer.stop();
 }
 
+Finder::Finder(int number_of_threads, std::vector<std::string> *options)
+: Poolable(number_of_threads), bitmap(nullptr), matcher(nullptr), input_options(*options), maximum_width_(0) {
+  if (options != nullptr) FinderUtils::sanitize_options(this->options, options);
+  reports["init"] = 0;
+}
 
 void Finder::process_tiles() {
   std::vector<Tile*> arriving_tiles;
@@ -97,7 +103,7 @@ void Finder::process_tiles() {
         end_x = tile->end_x();
       }
 
-      Cluster *cluster = new Cluster(this, this->bitmap->h(), start_x, end_x);
+      Cluster *cluster = new Cluster(this, this->height, start_x, end_x);
 
       if (twin_tile->start_x() == (tile->end_x() - 1)) {
         cluster->add(tile);
@@ -137,6 +143,8 @@ ProcessResult* Finder::process_info() {
   ProcessResult *pr = new ProcessResult();
   pr->polygons = std::move(this->whole_tile->to_raw_polygons());
   pr->groups = pr->polygons.size();
+  pr->width = this->maximum_width_;
+  pr->height = this->height;
   FakeCluster fake_cluster(pr->polygons, this->options);
   cpu_timer.start();
   fake_cluster.compress_coords(pr->polygons, this->options);

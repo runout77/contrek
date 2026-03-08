@@ -1,39 +1,41 @@
 RSpec.shared_examples "simples" do
   describe "simple cases" do
     it "detects only one sequence" do
-      chunk = "0000000000000000" \
-                 "000000AAAA000000" \
-                 "0000000000000000" \
-                 "0000000000000000" \
-                 "0000000000000000" \
-                 "0000000000000000" \
-                 "0000000000000000"
+      chunk = "                " \
+                 "      AAAA      " \
+                 "                " \
+                 "                " \
+                 "                " \
+                 "                " \
+                 "                "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("A")
       expect(result.metadata[:groups]).to eq(1)
+      expect(result.metadata[:width]).to eq(16)
+      expect(result.metadata[:height]).to eq(7)
       expect(result.points).to eq([])
     end
     it "detects 3 blocks" do
       chunk = "AAAAAAAAAAAAAAAA" \
-              "0000000000000000" \
-              "0000000000000000" \
-              "0000000000000000" \
-              "0000000000000000" \
-              "0000000000000000" \
-              "B00000000000000C"
+              "                " \
+              "                " \
+              "                " \
+              "                " \
+              "                " \
+              "B              C"
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("A-B-C")
       expect(result.metadata[:groups]).to eq(3)
       expect(result.points).to eq([])
     end
     it "empty" do
-      chunk = "0000000000000000" \
-                 "0000000000000000" \
-                 "0000000000000000" \
-                 "0000000000000000" \
-                 "0000000000000000" \
-                 "0000000000000000" \
-                 "0000000000000000"
+      chunk = "                " \
+                 "                " \
+                 "                " \
+                 "                " \
+                 "                " \
+                 "                " \
+                 "                "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("")
       expect(result.metadata[:groups]).to eq(0)
@@ -73,13 +75,13 @@ RSpec.shared_examples "simples" do
     end
 
     it "problem", test_problem: true do
-      chunk = "00AAAAAAAAAAAA00" \
-                "0BB00MMMMMMMMMM0" \
-                "0CC00LL0000000N0" \
-                "0DDDDDD000SS00O0" \
-                "0EE000II00RR00P0" \
-                "00FF00HHH0000QQ0" \
-                "000GGGGGGGGGGG00"
+      chunk = "  AAAAAAAAAAAA  " \
+                " BB  MMMMMMMMMM " \
+                " CC  LL       N " \
+                " DDDDDD   SS  O " \
+                " EE   II  RR  P " \
+                "  FF  HHH    QQ " \
+                "   GGGGGGGGGGG  "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("ABCDEFGQPONMA-SRS")
       expect(result.metadata[:groups]).to eq(2)
@@ -97,19 +99,19 @@ RSpec.shared_examples "simples" do
     end
 
     it "problem 2", test_problem2: true do
-      chunk = "00AAAAAAAAAAAA00" \
-                "0BB00MMMMMMMMMM0" \
-                "0CC00LLLLLLLLLL0" \
-                "0DDDDDDDDDDDDDD0" \
-                "0EEEEEEEEEEEEEE0" \
-                "0FFFFFFF000000F0" \
-                "0NNNNNNNN00RR0N0" \
-                "0PPPPPPPP00SS0P0" \
-                "0QQQQQQQQ00000Q0" \
-                "0GGGGGGGGGGGGGG0" \
-                "0HH000IIIIIIIII0" \
-                "00LL00LLLLLLLLL0" \
-                "000MMMMMMMMMMMM0"
+      chunk = "  AAAAAAAAAAAA  " \
+                " BB  MMMMMMMMMM " \
+                " CC  LLLLLLLLLL " \
+                " DDDDDDDDDDDDDD " \
+                " EEEEEEEEEEEEEE " \
+                " FFFFFFF      F " \
+                " NNNNNNNN  RR N " \
+                " PPPPPPPP  SS P " \
+                " QQQQQQQQ     Q " \
+                " GGGGGGGGGGGGGG " \
+                " HH   IIIIIIIII " \
+                "  LL  LLLLLLLLL " \
+                "   MMMMMMMMMMMM "
       pf = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true})
       result = pf.process_info
       expect(result.metadata[:named_sequence]).to eq("ABCDEFNPQGHLMLIGQPNFEDLMA-RSR")
@@ -136,13 +138,13 @@ RSpec.shared_examples "simples" do
     end
 
     it "is triangle full" do
-      chunk = "AAAAAAA000000000" \
-                 "BBBBBB0000000000" \
-                 "CCCCC00000000000" \
-                 "DDDD000000000000" \
-                 "EEE0000000000000" \
-                 "FF00000000000000" \
-                 "G000000000000000"
+      chunk = "AAAAAAA         " \
+                 "BBBBBB          " \
+                 "CCCCC           " \
+                 "DDDD            " \
+                 "EEE             " \
+                 "FF              " \
+                 "G               "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("ABCDEFGFEDCBA")
       expect(result.metadata[:groups]).to eq(1)
@@ -153,13 +155,13 @@ RSpec.shared_examples "simples" do
     end
 
     it "is triangle full with compression", tcompression: true do
-      chunk = "AAAAAAA000000000" \
-                 "BBBBBB0000000000" \
-                 "CCCCC00000000000" \
-                 "DDDD000000000000" \
-                 "EEE0000000000000" \
-                 "FF00000000000000" \
-                 "G000000000000000"
+      chunk = "AAAAAAA         " \
+                 "BBBBBB          " \
+                 "CCCCC           " \
+                 "DDDD            " \
+                 "EEE             " \
+                 "FF              " \
+                 "G               "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true, compress: {uniq: true, linear: true}}).process_info
       expect(result.metadata[:named_sequence]).to eq("ABCDEFGFEDCBA")
       expect(result.metadata[:groups]).to eq(1)
@@ -170,13 +172,13 @@ RSpec.shared_examples "simples" do
     end
 
     it "find a rectangle" do
-      chunk = "0000000000000000" \
-                 "000000AA00000000" \
-                 "000000BB00000000" \
-                 "000000CC00000000" \
-                 "000000DD00000000" \
-                 "0000000000000000" \
-                 "0000000000000000"
+      chunk = "                " \
+                 "      AA        " \
+                 "      BB        " \
+                 "      CC        " \
+                 "      DD        " \
+                 "                " \
+                 "                "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("ABCDCBA")
       expect(result.metadata[:groups]).to eq(1)
@@ -186,13 +188,13 @@ RSpec.shared_examples "simples" do
       ])
     end
     it "find a rectangle clockwise" do
-      chunk = "0000000000000000" \
-                 "000000AA00000000" \
-                 "000000BB00000000" \
-                 "000000CC00000000" \
-                 "000000DD00000000" \
-                 "0000000000000000" \
-                 "0000000000000000"
+      chunk = "                " \
+                 "      AA        " \
+                 "      BB        " \
+                 "      CC        " \
+                 "      DD        " \
+                 "                " \
+                 "                "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {versus: :o, named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("ABCDCBA")
       expect(result.metadata[:groups]).to eq(1)
@@ -202,13 +204,13 @@ RSpec.shared_examples "simples" do
       ])
     end
     it "finds two blocks but only one polygon", i_alone: true do
-      chunk = "00AAAAAAAAAAAA00" \
-                 "00H0000000000B00" \
-                 "00G000III0000C00" \
-                 "00F0000000000D00" \
-                 "00EEEEEEEEEEEE00" \
-                 "0000000000000000" \
-                 "0000000000000000"
+      chunk = "  AAAAAAAAAAAA  " \
+                 "  H          B  " \
+                 "  G   III    C  " \
+                 "  F          D  " \
+                 "  EEEEEEEEEEEE  " \
+                 "                " \
+                 "                "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("AHGFEDCBA-I")
       expect(result.metadata[:groups]).to eq(2)
@@ -218,13 +220,13 @@ RSpec.shared_examples "simples" do
       ])
     end
     it "finds two blocks but only one polygon clockwise" do
-      chunk = "00AAAAAAAAAAAA00" \
-                 "00HH00000000BB00" \
-                 "00GG00III000CC00" \
-                 "00FF00000000DD00" \
-                 "00EEEEEEEEEEEE00" \
-                 "0000000000000000" \
-                 "0000000000000000"
+      chunk = "  AAAAAAAAAAAA  " \
+                 "  HH        BB  " \
+                 "  GG  III   CC  " \
+                 "  FF        DD  " \
+                 "  EEEEEEEEEEEE  " \
+                 "                " \
+                 "                "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {versus: :a, named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("AHGFEDCBA-I")
       expect(result.metadata[:groups]).to eq(2)
@@ -234,13 +236,13 @@ RSpec.shared_examples "simples" do
       ])
     end
     it "finds one polygon ignores I and L", ignore_il: true do
-      chunk = "00AAAAAAAAAAAA00" \
-                 "00H0000000000B00" \
-                 "00G000III0000C00" \
-                 "00F000LLL0000D00" \
-                 "00EEEEEEEEEEEE00" \
-                 "0000000000000000" \
-                 "0000000000000000"
+      chunk = "  AAAAAAAAAAAA  " \
+                 "  H          B  " \
+                 "  G   III    C  " \
+                 "  F   LLL    D  " \
+                 "  EEEEEEEEEEEE  " \
+                 "                " \
+                 "                "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("AHGFEDCBA")
       expect(result.metadata[:groups]).to eq(1)
@@ -250,13 +252,13 @@ RSpec.shared_examples "simples" do
       ])
     end
     it "finds three blocks two polygons", tbtp: true do
-      chunk = "0000000000000000" \
-                 "000AAAA000CCCC00" \
-                 "000BBBB000DDDD00" \
-                 "0000000000000000" \
-                 "0000000000000000" \
-                 "0000000EEE000000" \
-                 "0000000000000000"
+      chunk = "                " \
+                 "   AAAA   CCCC  " \
+                 "   BBBB   DDDD  " \
+                 "                " \
+                 "                " \
+                 "       EEE      " \
+                 "                "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("ABA-CDC-E")
       expect(result.metadata[:groups]).to eq(3)

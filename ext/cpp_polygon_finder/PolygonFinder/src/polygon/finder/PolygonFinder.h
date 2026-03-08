@@ -50,6 +50,7 @@ struct pf_Options {
 };
 struct ProcessResult {
   int groups;
+  int width, height;
   std::map<std::string, double> benchmarks;
   std::list<Polygon> polygons;
   std::string named_sequence;
@@ -76,6 +77,17 @@ struct ProcessResult {
       std::cout << key << ": " << value << ", ";
     }
     std::cout << std::endl;
+  }
+
+  void translate(int x) {
+    for (auto& polygon : polygons) {
+      for (Point* p : polygon.outer) p->x += x;
+      for (const auto& seq : polygon.inner) {
+        for (Point* p : seq) p->x += x;
+      }
+      polygon.bounds.min_x += x;
+      polygon.bounds.max_x += x;
+    }
   }
 };
 

@@ -1957,6 +1957,235 @@ RSpec.shared_examples "finder" do
       ).process_info
       expect(result.points).to eq([{outer: [{x: 0, y: 0}, {x: 0, y: 23}, {x: 9, y: 23}, {x: 19, y: 23}, {x: 19, y: 0}, {x: 9, y: 0}], inner: [[{x: 1, y: 21}, {x: 1, y: 2}, {x: 16, y: 2}, {x: 16, y: 10}, {x: 9, y: 11}, {x: 6, y: 10}, {x: 9, y: 9}, {x: 11, y: 9}, {x: 11, y: 3}, {x: 9, y: 3}, {x: 4, y: 3}, {x: 4, y: 20}, {x: 9, y: 20}, {x: 16, y: 21}], [{x: 6, y: 7}, {x: 6, y: 5}, {x: 10, y: 5}, {x: 10, y: 7}], [{x: 16, y: 13}, {x: 16, y: 18}, {x: 6, y: 18}, {x: 6, y: 17}, {x: 9, y: 16}, {x: 10, y: 16}, {x: 10, y: 15}, {x: 9, y: 15}, {x: 6, y: 14}, {x: 6, y: 13}]]}])
     end
+
+    # this test demonstrate how trace contours on two different areas merging them later considering they share adjacent vertical
+    # stripe (one pixel)
+    it "merge mode" do
+      left = "0000000000" \
+              "0000000000" \
+              "00        " \
+              "00        " \
+              "00        " \
+              "00        " \
+              "00        " \
+              "0000000000" \
+              "0000000000"
+      result_left = @simple_polygon_finder.new(@bitmap_class.new(left, 10),
+        @matcher,
+        nil,
+        {versus: :a, bounds: true, compress: {uniq: true, linear: true}}).process_info
+
+      right = "0000000000" \
+              "0000000000" \
+              "      0000" \
+              "      0000" \
+              "      0000" \
+              "      0000" \
+              "      0000" \
+              "0000000000" \
+              "0000000000"
+      result_right = @simple_polygon_finder.new(@bitmap_class.new(right, 10),
+        @matcher,
+        nil,
+        {versus: :a, bounds: true, compress: {uniq: true, linear: true}}).process_info
+
+      step_finder = @merger.new
+      step_finder.add_tile(result_left)
+      step_finder.add_tile(result_right)
+      result = step_finder.process_info
+
+      expect(result.points).to eq([{outer: [{x: 0, y: 0}, {x: 0, y: 8}, {x: 9, y: 8}, {x: 18, y: 8}, {x: 18, y: 0}, {x: 9, y: 0}], inner: [[{x: 1, y: 6}, {x: 1, y: 2}, {x: 15, y: 2}, {x: 15, y: 6}]]}])
+    end
+
+    it "merge mode (example 2)" do
+      left = "0000000000" \
+              "0000000000" \
+              "00      00" \
+              "00      00" \
+              "0000000000" \
+              "0000000000" \
+              "00        " \
+              "00      00" \
+              "00      00" \
+              "00        " \
+              "0000000000" \
+              "0000000000"
+      result_left = @simple_polygon_finder.new(@bitmap_class.new(left, 10),
+        @matcher,
+        nil,
+        {versus: :a, bounds: true, compress: {uniq: true, linear: true}}).process_info
+
+      right = "0000000000" \
+              "0000000000" \
+              "00    0000" \
+              "00    0000" \
+              "0000000000" \
+              "0000000000" \
+              "      0000" \
+              "00    0000" \
+              "00    0000" \
+              "      0000" \
+              "0000000000" \
+              "0000000000"
+      result_right = @simple_polygon_finder.new(@bitmap_class.new(right, 10),
+        @matcher,
+        nil,
+        {versus: :a, bounds: true, compress: {uniq: true, linear: true}}).process_info
+
+      step_finder = @merger.new
+      step_finder.add_tile(result_left)
+      step_finder.add_tile(result_right)
+      result = step_finder.process_info
+      expect(result.points).to eq([{outer: [{x: 0, y: 0}, {x: 0, y: 11}, {x: 9, y: 11}, {x: 18, y: 11}, {x: 18, y: 0}, {x: 9, y: 0}], inner: [[{x: 1, y: 2}, {x: 8, y: 2}, {x: 8, y: 3}, {x: 1, y: 3}], [{x: 1, y: 9}, {x: 1, y: 6}, {x: 15, y: 6}, {x: 15, y: 9}], [{x: 10, y: 2}, {x: 15, y: 2}, {x: 15, y: 3}, {x: 10, y: 3}]]}, {outer: [{x: 8, y: 7}, {x: 8, y: 8}, {x: 9, y: 8}, {x: 10, y: 8}, {x: 10, y: 7}, {x: 9, y: 7}], inner: []}])
+    end
+
+    it "merge mode (example 3 vertical)" do
+      up = "000000000000" \
+           "000000000000" \
+           "000      000" \
+           "000      000" \
+           "000      000"
+      result_up = @simple_polygon_finder.new(@bitmap_class.new(up, 12),
+        @matcher,
+        nil,
+        {versus: :a, bounds: true, compress: {uniq: true, linear: true}}).process_info
+      expect(result_up.metadata[:width]).to eq(12)
+      expect(result_up.metadata[:height]).to eq(5)
+
+      down = "000      000" \
+             "000      000" \
+             "000      000" \
+             "000000000000" \
+             "000000000000"
+      result_down = @simple_polygon_finder.new(@bitmap_class.new(down, 12),
+        @matcher,
+        nil,
+        {versus: :a, bounds: true, compress: {uniq: true, linear: true}}).process_info
+      expect(result_down.metadata[:width]).to eq(12)
+      expect(result_down.metadata[:height]).to eq(5)
+
+      step_finder = @vertical_merger.new
+      step_finder.add_tile(result_up)
+      step_finder.add_tile(result_down)
+      result = step_finder.process_info
+      expect(result.metadata[:width]).to eq(12)
+      expect(result.metadata[:height]).to eq(9)
+      expect(result.points).to eq([{outer: [{x: 0, y: 0}, {x: 0, y: 4}, {x: 0, y: 8}, {x: 11, y: 8}, {x: 11, y: 4}, {x: 11, y: 0}], inner: [[{x: 2, y: 2}, {x: 9, y: 2}, {x: 9, y: 6}, {x: 2, y: 6}]]}])
+    end
+
+    it "merge mode (example 4)" do
+      left = "0000" \
+              "0000" \
+              "0000" \
+              "00  " \
+              "00  " \
+              "00  " \
+              "00  " \
+              "00  " \
+              "00  " \
+              "0000" \
+              "0000" \
+              "0000"
+      result_left = @simple_polygon_finder.new(@bitmap_class.new(left, 4),
+        @matcher,
+        nil,
+        {versus: :a, bounds: true, compress: {uniq: true, linear: true}}).process_info
+
+      right = "0000" \
+              "0000" \
+              "0000" \
+              "  00" \
+              "  00" \
+              "  00" \
+              "  00" \
+              "  00" \
+              "  00" \
+              "0000" \
+              "0000" \
+              "0000"
+      result_right = @simple_polygon_finder.new(@bitmap_class.new(right, 4),
+        @matcher,
+        nil,
+        {versus: :a, bounds: true, compress: {uniq: true, linear: true}}).process_info
+
+      step_finder = @merger.new
+      step_finder.add_tile(result_left)
+      step_finder.add_tile(result_right)
+      result = step_finder.process_info
+      expect(result.metadata[:width]).to eq(7)
+      expect(result.metadata[:height]).to eq(12)
+      expect(result.points).to eq([{outer: [{x: 0, y: 0}, {x: 0, y: 11}, {x: 3, y: 11}, {x: 6, y: 11}, {x: 6, y: 0}, {x: 3, y: 0}], inner: [[{x: 1, y: 8}, {x: 1, y: 3}, {x: 5, y: 3}, {x: 5, y: 8}]]}])
+    end
+
+    it "merge mode (example 5 vertical)" do
+      up = "000000000000" \
+           "000000000000" \
+           "000      000" \
+           "000      000" \
+           "000      000"
+      result_up = @simple_polygon_finder.new(@bitmap_class.new(up, 12),
+        @matcher,
+        nil,
+        {versus: :o, bounds: true, compress: {uniq: true, linear: true}}).process_info
+
+      down = "000      000" \
+             "000      000" \
+             "000      000" \
+             "000000000000" \
+             "000000000000"
+      result_down = @simple_polygon_finder.new(@bitmap_class.new(down, 12),
+        @matcher,
+        nil,
+        {versus: :o, bounds: true, compress: {uniq: true, linear: true}}).process_info
+
+      step_finder = @vertical_merger.new
+      step_finder.add_tile(result_up)
+      step_finder.add_tile(result_down)
+      result = step_finder.process_info
+      expect(result.metadata[:width]).to eq(12)
+      expect(result.metadata[:height]).to eq(9)
+      expect(result.points).to eq([{outer: [{x: 11, y: 0}, {x: 11, y: 4}, {x: 11, y: 8}, {x: 0, y: 8}, {x: 0, y: 4}, {x: 0, y: 0}], inner: [[{x: 9, y: 2}, {x: 2, y: 2}, {x: 2, y: 6}, {x: 9, y: 6}]]}])
+    end
+
+    it "merge mode (example 6 vertical)" do
+      up = "000000000000" \
+           "000000000000" \
+           "000      000" \
+           "000      000"
+      result_up = @simple_polygon_finder.new(@bitmap_class.new(up, 12),
+        @matcher,
+        nil,
+        {versus: :o, bounds: true, compress: {uniq: true, linear: true}}).process_info
+
+      mid = "000      000" \
+            "000      000" \
+            "000000000000" \
+            "000000000000" \
+            "000      000" \
+            "000      000"
+      result_mid = @simple_polygon_finder.new(@bitmap_class.new(mid, 12),
+        @matcher,
+        nil,
+        {versus: :o, bounds: true, compress: {uniq: true, linear: true}}).process_info
+
+      down = "000      000" \
+             "000      000" \
+             "000000000000" \
+             "000000000000"
+      result_down = @simple_polygon_finder.new(@bitmap_class.new(down, 12),
+        @matcher,
+        nil,
+        {versus: :o, bounds: true, compress: {uniq: true, linear: true}}).process_info
+
+      step_finder = @vertical_merger.new
+      step_finder.add_tile(result_up)
+      step_finder.add_tile(result_mid)
+      step_finder.add_tile(result_down)
+      result = step_finder.process_info
+      expect(result.metadata[:width]).to eq(12)
+      expect(result.metadata[:height]).to eq(12)
+      expect(result.points).to eq([{outer: [{x: 11, y: 0}, {x: 11, y: 3}, {x: 11, y: 8}, {x: 11, y: 11}, {x: 0, y: 11}, {x: 0, y: 8}, {x: 0, y: 3}, {x: 0, y: 0}], inner: [[{x: 9, y: 2}, {x: 2, y: 2}, {x: 2, y: 4}, {x: 9, y: 4}], [{x: 9, y: 7}, {x: 2, y: 7}, {x: 2, y: 9}, {x: 9, y: 9}]]}])
+    end
   end
 end
 # rubocop:enable Layout/ArrayAlignment, Layout/FirstArrayElementIndentation

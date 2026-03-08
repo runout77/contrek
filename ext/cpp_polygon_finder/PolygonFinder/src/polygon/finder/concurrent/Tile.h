@@ -30,7 +30,6 @@ class Tile {
   std::list<Shape*> shapes_;
   std::list<Shape*> boundary_shapes_;
   bool boundary_shapes_initialized_ = false;
-  void assign_raw_polygons(const std::list<Polygon>& raw_polylines);
 
  public:
   Tile(Finder *finder, int start_x, int end_x, std::string name, const Benchmarks& b);
@@ -52,6 +51,7 @@ class Tile {
   void info();
   bool tg_border(const Point& coord);
   void assign_shapes(std::list<Shape*>& shapes);
+  void assign_raw_polygons(const std::list<Polygon>& raw_polylines);
   std::list<Polygon> to_raw_polygons();
   Benchmarks benchmarks;
 };

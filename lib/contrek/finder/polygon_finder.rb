@@ -47,6 +47,8 @@ module Contrek
           groups: @node_cluster.sequences.size,
           groups_names: @node_cluster.root_nodes.map(&:name).join,
           benchmarks: format_benchmarks,
+          width: @source_bitmap.w,
+          height: @source_bitmap.h,
           treemap: (@node_cluster.treemap if @options.has_key?(:treemap))
         }
         Result.new(@node_cluster.polygons, metadata)

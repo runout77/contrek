@@ -104,6 +104,8 @@ ProcessResult* PolygonFinder::process_info() {
   pr->polygons = std::move(this->node_cluster->polygons);
   pr->benchmarks = std::move(this->reports);
   pr->treemap = this->node_cluster->treemap;
+  pr->width = this->source_bitmap->w();
+  pr->height = this->source_bitmap->h();
 
   if (this->node_cluster->options->named_sequences && typeid(*this->source_bitmap) == typeid(Bitmap))
   { std::string sequence;

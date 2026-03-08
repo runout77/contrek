@@ -27,6 +27,8 @@
 #include "PolygonFinder/src/polygon/finder/Polygon.h"
 #include "PolygonFinder/src/polygon/bitmaps/Bitmap.h"
 #include "PolygonFinder/src/polygon/bitmaps/Bitmap.cpp"
+#include "PolygonFinder/src/polygon/bitmaps/RawBitmap.h"
+#include "PolygonFinder/src/polygon/bitmaps/RawBitmap.cpp"
 #include "PolygonFinder/src/polygon/bitmaps/FastPngBitmap.h"
 #include "PolygonFinder/src/polygon/bitmaps/FastPngBitmap.cpp"
 #include "PolygonFinder/src/polygon/bitmaps/RemoteFastPngBitmap.h"
@@ -81,6 +83,12 @@
 #include "PolygonFinder/src/polygon/finder/concurrent/Sequence.cpp"
 #include "PolygonFinder/src/polygon/finder/concurrent/PartPool.h"
 #include "PolygonFinder/src/polygon/finder/concurrent/PartPool.cpp"
+#include "PolygonFinder/src/polygon/finder/concurrent/Merger.h"
+#include "PolygonFinder/src/polygon/finder/concurrent/Merger.cpp"
+#include "PolygonFinder/src/polygon/finder/concurrent/HorizontalMerger.h"
+#include "PolygonFinder/src/polygon/finder/concurrent/HorizontalMerger.cpp"
+#include "PolygonFinder/src/polygon/finder/concurrent/VerticalMerger.h"
+#include "PolygonFinder/src/polygon/finder/concurrent/VerticalMerger.cpp"
 extern "C" {
   #include "PolygonFinder/src/polygon/bitmaps/spng.h"
 }
@@ -164,6 +172,8 @@ class To_Ruby<ProcessResult*>
     return_me[Symbol("benchmarks")] = benchmarks_rb;
     return_me[Symbol("groups")] = pr->groups;
     return_me[Symbol("named_sequence")] = pr->named_sequence;
+    return_me[Symbol("width")] = pr->width;
+    return_me[Symbol("height")] = pr->height;
 
     Rice::Array out;
     for (Polygon& x : pr->polygons)
@@ -186,6 +196,14 @@ class To_Ruby<ProcessResult*>
         inner_collection.push(sequence_flat);
       }
       poly_hash[Symbol("inner")] = inner_collection;
+      // BOUNDS
+      Rice::Hash bounds_hash = Rice::Hash();
+      bounds_hash[Symbol("min_x")] = x.bounds.min_x;
+      bounds_hash[Symbol("max_x")] = x.bounds.max_x;
+      bounds_hash[Symbol("min_y")] = x.bounds.min_y;
+      bounds_hash[Symbol("max_y")] = x.bounds.max_y;
+      poly_hash[Symbol("bounds")] = bounds_hash;
+
       out.push(poly_hash);
     }
     rr->polygons = out;
@@ -212,6 +230,53 @@ class To_Ruby<ProcessResult*>
   }
 };
 
+// converts back ProcessResult
+ProcessResult ruby_result_to_process_result(Rice::Object rb_result) {
+  ProcessResult pr;
+
+  Rice::Hash metadata = rb_result.iv_get("@metadata_storage");
+  pr.width = detail::From_Ruby<int>().convert(metadata[Symbol("width")].value());
+  pr.height = detail::From_Ruby<int>().convert(metadata[Symbol("height")].value());
+
+  Rice::Array rb_polygons = rb_result.iv_get("@polygons_storage");
+  for (size_t i = 0; i < rb_polygons.size(); ++i) {
+    // Cast esplicito a Rice::Hash per evitare il Proxy
+    Rice::Hash rb_poly = (Rice::Hash)rb_polygons[i];
+    Polygon poly;
+    // BOUNDS
+    Rice::Object rb_bounds_obj = rb_poly[Symbol("bounds")];
+    if (!rb_bounds_obj.is_nil()) {
+        Rice::Hash rb_bounds = (Rice::Hash)rb_bounds_obj;
+        poly.bounds.min_x = detail::From_Ruby<int>().convert(rb_bounds[Symbol("min_x")].value());
+        poly.bounds.max_x = detail::From_Ruby<int>().convert(rb_bounds[Symbol("max_x")].value());
+        poly.bounds.min_y = detail::From_Ruby<int>().convert(rb_bounds[Symbol("min_y")].value());
+        poly.bounds.max_y = detail::From_Ruby<int>().convert(rb_bounds[Symbol("max_y")].value());
+    }
+    // OUTER
+    Rice::Array outer_flat = (Rice::Array)rb_poly[Symbol("outer")];
+    for (size_t j = 0; j < outer_flat.size(); j += 2) {
+      int px = detail::From_Ruby<int>().convert(outer_flat[j].value());
+      int py = detail::From_Ruby<int>().convert(outer_flat[j+1].value());
+      poly.outer.push_back(new Point(px, py));
+    }
+    // INNER
+    Rice::Array inner_collection = (Rice::Array)rb_poly[Symbol("inner")];
+    for (size_t j = 0; j < inner_collection.size(); ++j) {
+      Rice::Array sequence_flat = (Rice::Array)inner_collection[j];
+      std::vector<Point*> hole;
+      for (size_t k = 0; k < sequence_flat.size(); k += 2) {
+        int px = detail::From_Ruby<int>().convert(sequence_flat[k].value());
+        int py = detail::From_Ruby<int>().convert(sequence_flat[k+1].value());
+        hole.push_back(new Point(px, py));
+      }
+      poly.inner.push_back(hole);
+    }
+    pr.polygons.push_back(poly);
+  }
+  return pr;
+}
+
+
 }  // namespace Rice::detail
 
 extern "C"
@@ -226,6 +291,15 @@ void Init_cpp_polygon_finder() {
     .define_method("error", &Bitmap::error)
     .define_method("clear", &Bitmap::clear)
     .define_method("print", &Bitmap::print);
+
+  Data_Type<RawBitmap> rb_cRawBitmap =
+    define_class<RawBitmap, Bitmap>("CPPRawBitMap")
+    .define_constructor(Constructor<RawBitmap>())
+    .define_method("rgb_value_at", &RawBitmap::rgb_value_at)
+    .define_method("w", &RawBitmap::w)
+    .define_method("h", &RawBitmap::h)
+    .define_method("define", &RawBitmap::define)
+    .define_method("draw_pixel", &RawBitmap::draw_pixel);
 
   Data_Type<RemoteFastPngBitmap> rb_cRemotePngBitmap =
     define_class<RemoteFastPngBitmap, Bitmap>("CPPRemotePngBitMap")
@@ -279,6 +353,23 @@ void Init_cpp_polygon_finder() {
     define_class<Finder>("CPPFinder")
     .define_constructor(Constructor<Finder, int, Bitmap*, Matcher*, std::vector<std::string>*>(), Arg("number_of_threads"), Arg("bitmap"), Arg("matcher"), Arg("options") = nullptr, Rice::Arg("yield_gvl") = true)
     .define_method("process_info", &Finder::process_info, Rice::Arg("yield_gvl") = true);
+
+  Data_Type<Merger> rb_cMerger =
+    define_class<Merger, Finder>("CPPMerger")
+    .define_constructor(Constructor<Merger, int, std::vector<std::string>*>(), Arg("number_of_threads"), Arg("options") = nullptr, Rice::Arg("yield_gvl") = true)
+    .define_method("add_tile", [](Merger& self, Object rb_result) {
+      ProcessResult pr = Rice::detail::ruby_result_to_process_result(rb_result);
+      self.add_tile(pr);
+    })
+    .define_method("process_info", &Merger::process_info, Rice::Arg("yield_gvl") = true);
+
+  Data_Type<HorizontalMerger> rb_cHorizontalMerger =
+    define_class<HorizontalMerger, Merger>("CPPHorizontalMerger")
+    .define_constructor(Constructor<HorizontalMerger, int, std::vector<std::string>*>(), Arg("number_of_threads"), Arg("options") = nullptr, Arg("yield_gvl") = true);
+
+    Data_Type<VerticalMerger> rb_cVerticalMerger =
+    define_class<VerticalMerger, Merger>("CPPVerticalMerger")
+    .define_constructor(Constructor<VerticalMerger, int, std::vector<std::string>*>(), Arg("number_of_threads"), Arg("options") = nullptr, Arg("yield_gvl") = true);
 
   Data_Type<RubyResult> rb_cResult =
     define_class_under<RubyResult>(rb_cFinder, "Result")

@@ -35,19 +35,23 @@ class Finder : public Poolable {
   Matcher *matcher;
   pf_Options options;
   std::vector<std::string> input_options;
-  int maximum_width_;
-  Queue<Tile*> tiles;
   Tile* whole_tile = nullptr;
-  void process_tiles();
   std::queue<ClippedPolygonFinder*> finders;
   std::mutex finders_mutex;
   std::map<std::string, double> reports;
   CpuTimer cpu_timer;
 
+ protected:
+  Queue<Tile*> tiles;
+  int maximum_width_;
+  int height = 0;
+  void process_tiles();
+
  public:
   using Poolable::Poolable;
   Finder(int number_of_threads, Bitmap *bitmap, Matcher *matcher, std::vector<std::string> *options);
+  Finder(int number_of_threads, std::vector<std::string> *options);
   virtual ~Finder();
   int maximum_width() const { return maximum_width_; }
-  ProcessResult* process_info();
+  virtual ProcessResult* process_info();
 };

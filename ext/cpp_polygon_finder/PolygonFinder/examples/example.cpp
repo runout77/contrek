@@ -21,7 +21,9 @@ void run_test() {
   // test_suite.test_c();
   // test_suite.test_d();
   // test_suite.test_e();
-  test_suite.test_f();
+  // test_suite.test_f();
+  // test_suite.test_g();
+  // test_suite.test_h();
   std::cout << "compute time =" << cpu_timer.stop() << std::endl;
 }
 

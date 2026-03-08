@@ -74,8 +74,6 @@ module Contrek
         "#{self.class}[#{@name}]"
       end
 
-      private
-
       def assign_raw_polygons!(raw_polylines)
         @shapes = []
         raw_polylines.each do |raw_polyline|

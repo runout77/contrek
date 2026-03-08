@@ -5,7 +5,7 @@ module Contrek
         start_p = @points[0]
         end_p = @points[1]
         dir = seq_dir(start_p, end_p)
-        @points[2..].map.with_index do |point, i|
+        @points[2..].each.with_index do |point, i|
           if (act_seq = seq_dir(end_p, point)) == dir
             @points.delete_at(@points.index(end_p))
           else

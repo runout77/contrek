@@ -8,6 +8,9 @@ RSpec.describe Contrek::Concurrent::Finder, type: :class do
     @png_bitmap_class = Contrek::Bitmaps::PngBitmap
     @png_not_matcher = Contrek::Matchers::ValueNotMatcher
     @color_class = Contrek::Bitmaps::RgbColor
+    @simple_polygon_finder = Contrek::Finder::PolygonFinder
+    @merger = Contrek::Concurrent::HorizontalMerger
+    @vertical_merger = Contrek::Concurrent::VerticalMerger
   end
 
   describe "shared_test" do
