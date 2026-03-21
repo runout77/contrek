@@ -10,6 +10,9 @@
 #pragma once
 #include <limits>
 #include <algorithm>
+#include <string>
+#include <sstream>
+#include <iostream>
 
 struct RectBounds {
   int min_x = std::numeric_limits<int>::max();
@@ -36,5 +39,14 @@ struct RectBounds {
   inline int width() const {
     if (is_empty()) return 0;
     return(max_x - min_x);
+  }
+
+  std::string to_string() const {
+    if (is_empty()) return "RectBounds: empty";
+    std::stringstream ss;
+    ss << "RectBounds ["
+       << "X(min=" << min_x << ",max=" << max_x << ") "
+       << "Y(min=" << min_y << ",max=" << max_y << ")]";
+    return ss.str();
   }
 };

@@ -11,9 +11,10 @@ RSpec.describe Contrek::Cpp::CPPConcurrentFinder, type: :class do
     @simple_polygon_finder = CPPPolygonFinder
     @merger = Contrek::Cpp::CPPConcurrentHorizontalMerger
     @vertical_merger = Contrek::Cpp::CPPConcurrentVerticalMerger
+    @result = Contrek::Cpp::CPPResult
   end
 
-  describe "node test" do
+  describe "base tests", base: true do
     it "verify costants difference" do
       chunk = "  XXXXXXXXXXX   " \
               "  XX       XX   " \
@@ -31,8 +32,6 @@ RSpec.describe Contrek::Cpp::CPPConcurrentFinder, type: :class do
          inner: []}
       ])
     end
-    # this test has a different behaviour on ruby side is:
-    # [{:inner=>[[{:x=>3, :y=>3}, {:x=>3, :y=>1}, {:x=>11, :y=>1}, {:x=>11, :y=>3}]]
     it "case during cpp porting" do
       chunk = "  XXXXXXXXXXX   " \
               "  XX       XX   " \
@@ -42,40 +41,13 @@ RSpec.describe Contrek::Cpp::CPPConcurrentFinder, type: :class do
       result = @polygon_finder_class.new(
         bitmap: @bitmap_class.new(chunk, 16),
         matcher: @matcher,
-        options: {number_of_tiles: 2, versus: "o", compress: {uniq: true, linear: true}}
+        options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
       expect(result.points).to eq(
         [{outer: [{x: 7, y: 0}, {x: 12, y: 0}, {x: 12, y: 4}, {x: 2, y: 4}, {x: 2, y: 0}],
           inner: [[{x: 3, y: 1}, {x: 3, y: 3}, {x: 11, y: 3}, {x: 11, y: 1}]]}]
       )
     end
-  end
-
-  describe "shared_test" do
-    include_examples "finder_extension"
-  end
-
-  describe "shared_test" do
-    include_examples "finder"
-  end
-
-  describe "shared_test" do
-    include_examples "connectivity"
-  end
-
-  describe "shared_test" do
-    include_examples "finder_img"
-  end
-
-  describe "shared_test" do
-    include_examples "finder_img_bis"
-  end
-
-  describe "shared_test" do
-    include_examples "multiprocessing"
-  end
-
-  describe "bitmap", bitmap: true do
     it "allocates a blank area to draw polygon" do
       raw_bitmap = CPPRawBitMap.new
       expect(raw_bitmap.w).to eq(0)
@@ -93,5 +65,29 @@ RSpec.describe Contrek::Cpp::CPPConcurrentFinder, type: :class do
       expect(result.metadata[:groups]).to eq(1)
       expect(result.points).to eq([{outer: [{x: 5, y: 4}, {x: 5, y: 5}, {x: 8, y: 5}, {x: 8, y: 4}], inner: []}])
     end
+  end
+
+  describe "shared_test" do
+    include_examples "finder"
+  end
+
+  describe "shared_test" do
+    include_examples "finder_extension"
+  end
+
+  describe "shared_test" do
+    include_examples "connectivity"
+  end
+
+  describe "shared_test" do
+    include_examples "finder_img"
+  end
+
+  describe "shared_test" do
+    include_examples "finder_img_bis"
+  end
+
+  describe "shared_test" do
+    include_examples "multiprocessing"
   end
 end

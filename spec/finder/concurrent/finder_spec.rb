@@ -11,6 +11,26 @@ RSpec.describe Contrek::Concurrent::Finder, type: :class do
     @simple_polygon_finder = Contrek::Finder::PolygonFinder
     @merger = Contrek::Concurrent::HorizontalMerger
     @vertical_merger = Contrek::Concurrent::VerticalMerger
+    @result = Contrek::Finder::Result
+  end
+
+  describe "base tests", base: true do
+    it "case during cpp porting" do
+      chunk = "  XXXXXXXXXXX   " \
+              "  XX       XX   " \
+              "  XX       XX   " \
+              "  XX       XX   " \
+              "  XXXXXXXXXXX   "
+      result = @polygon_finder_class.new(
+        bitmap: @bitmap_class.new(chunk, 16),
+        matcher: @matcher,
+        options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
+      ).process_info
+      expect(result.points).to eq(
+        [{outer: [{x: 7, y: 0}, {x: 12, y: 0}, {x: 12, y: 4}, {x: 2, y: 4}, {x: 2, y: 0}],
+          inner: [[{x: 3, y: 1}, {x: 3, y: 3}, {x: 11, y: 3}, {x: 11, y: 1}]]}]
+      )
+    end
   end
 
   describe "shared_test" do

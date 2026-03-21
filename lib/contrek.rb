@@ -49,7 +49,7 @@ require "contrek/cpp/cpp_concurrent_finder"
 require "contrek/cpp/cpp_concurrent_merger"
 require "contrek/cpp/cpp_concurrent_horizontal_merger"
 require "contrek/cpp/cpp_concurrent_vertical_merger"
-require "contrek/results/cpp_result"
+require "contrek/cpp/cpp_result"
 
 module Contrek
   class << self

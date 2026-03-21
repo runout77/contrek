@@ -22,7 +22,9 @@ void FinderUtils::sanitize_options(pf_Options& options, std::vector<std::string>
   char** argv = &argv0[0];
   int argc = argv0.size() -1;
 
-  enum  optionIndex { COMPRESS_UNIQ, VERSUS, COMPRESS_VISVALINGAM, COMPRESS_LINEAR, NUMBER_OF_TILES, COMPRESS_VISVALINGAM_TOLERANCE, TREEMAP, NAMED_SEQUENCES, BOUNDS, CONNECTIVITY};
+  enum  optionIndex { COMPRESS_UNIQ, VERSUS, COMPRESS_VISVALINGAM, COMPRESS_LINEAR, NUMBER_OF_TILES,
+                      COMPRESS_VISVALINGAM_TOLERANCE, TREEMAP, NAMED_SEQUENCES, BOUNDS, CONNECTIVITY,
+                      STRICT_BOUNDS };
   const option::Descriptor usage[] = {
      //  {UNKNOWN, 0,"" , ""    ,option::Arg::None, 0},
      {COMPRESS_VISVALINGAM, 0, "" , "compress_visvalingam", option::Arg::None, 0},
@@ -33,6 +35,7 @@ void FinderUtils::sanitize_options(pf_Options& options, std::vector<std::string>
      {TREEMAP, 0, "", "treemap", option::Arg::None, 0},
      {NAMED_SEQUENCES, 0, "", "named_sequences", option::Arg::None, 0},
      {BOUNDS, 0, "", "bounds", option::Arg::None, 0},
+     {STRICT_BOUNDS, 0, "", "strict_bounds", option::Arg::None, 0},
      {VERSUS, 0, "v", "versus", option::Arg::Optional, 0},
      {CONNECTIVITY, 0, "c", "connectivity", option::Arg::Optional, 0},
      {0, 0, 0, 0, 0, 0}
@@ -85,6 +88,9 @@ void FinderUtils::sanitize_options(pf_Options& options, std::vector<std::string>
   // BOUNDS
   if (ioptions[BOUNDS].count() > 0)
   { options.bounds = true;
+  }
+  if (ioptions[STRICT_BOUNDS].count() > 0)
+  { options.strict_bounds = true;
   }
   // COMPRESS LINEAR
   if (ioptions[COMPRESS_LINEAR].count() > 0)

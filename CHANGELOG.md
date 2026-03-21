@@ -63,3 +63,8 @@ All notable changes to this project will be documented in this file.
 ### Changed
 - **RawBitmap Integration (Ruby/C++):** Introduced a native buffer class for direct contour extraction, bypassing PNG encoding to significantly reduce latency and memory overhead.
 - **Tiled Polygon Merger:** Added a spatial merger for `Finder` outputs to stitch polygons from discrete sub-areas (requiring only a 1px overlap). This multi-phase workflow supports coordinate translation and eliminates monolithic buffer requirements, optimizing the peak memory footprint.
+
+## [1.1.6] - 2026-03-21
+### Changed
+- Added strict_bounds tracing mode: enables more accurate shape tracing by strictly adhering to pixel boundaries.
+- Topological Consistency Fixes: improved the Topologically Consistent Merging algorithm to support progressive polygon tracing during sequential data streaming.

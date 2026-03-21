@@ -18,6 +18,7 @@
 #include "Lists.h"
 #include "RectBounds.h"
 #include "Polygon.h"
+#include "PointPool.h"
 
 class Node;
 struct Point;
@@ -34,6 +35,7 @@ class NodeCluster {
   int count = 0;
   int nodes;
   int width;
+  PointPool points_pool;
 
  public:
   pf_Options *options;

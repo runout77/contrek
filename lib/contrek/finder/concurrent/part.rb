@@ -69,10 +69,16 @@ module Contrek
       end
 
       def intersect_part?(other_part)
+        intersect = false
         other_part.each do |position|
-          return true if position.end_point.queues.include?(self)
+          if position.end_point.queues.include?(self)
+            intersect = true
+            false
+          else
+            true
+          end
         end
-        false
+        intersect
       end
 
       def to_endpoints
@@ -80,7 +86,7 @@ module Contrek
       end
 
       def orient!
-        @versus = if size <= 1
+        @versus = if size <= 1 || (size == 2 && @inverts)
           0
         else
           (tail.payload[:y] - head.payload[:y]).positive? ? 1 : -1

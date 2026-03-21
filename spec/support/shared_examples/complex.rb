@@ -2,23 +2,23 @@ require "yaml"
 RSpec.shared_examples "complex" do
   describe "simple cases" do
     it "faster indexing", faster_indexing: true do
-      chunk = "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000" \
-               "A0B0C0D0E0F0G0H0I0J0K0L0M0N0O0P0Q0R0S0T0U0V0W0X0Y0A0B0C0D0E0F0G0H0I0J0K0L0M0N0O0P0Q0R0S0T0U0V0W0X0Y0A0B0C0D0E0F0G0H0I0J0K0L0M0N0O0P0Q0R0S0T0U0V0W0X0Y0A0B0C0D0E0F0G0H0I0J0K0L0M0N0O0P0Q0R0S0T0U0V0W0X0Y0" \
+      chunk = "                                                                                                                                                                                                        " \
+               "A B C D E F G H I J K L M N O P Q R S T U V W X Y A B C D E F G H I J K L M N O P Q R S T U V W X Y A B C D E F G H I J K L M N O P Q R S T U V W X Y A B C D E F G H I J K L M N O P Q R S T U V W X Y " \
                "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ" \
-               "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+               "                                                                                                                                                                                                        "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 200), @matcher, nil, {named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("AZYZXZWZVZUZTZSZRZQZPZOZNZMZLZKZJZIZHZGZFZEZDZCZBZAZYZXZWZVZUZTZSZRZQZPZOZNZMZLZKZJZIZHZGZFZEZDZCZBZAZYZXZWZVZUZTZSZRZQZPZOZNZMZLZKZJZIZHZGZFZEZDZCZBZAZYZXZWZVZUZTZSZRZQZPZOZNZMZLZKZJZIZHZGZFZEZDZCZBZA")
       expect(result.metadata[:groups]).to eq(1)
       expect(result.points).to eq([{outer: [{x: 0, y: 1}, {x: 0, y: 2}, {x: 199, y: 2}, {x: 198, y: 1}, {x: 198, y: 1}, {x: 196, y: 1}, {x: 196, y: 1}, {x: 194, y: 1}, {x: 194, y: 1}, {x: 192, y: 1}, {x: 192, y: 1}, {x: 190, y: 1}, {x: 190, y: 1}, {x: 188, y: 1}, {x: 188, y: 1}, {x: 186, y: 1}, {x: 186, y: 1}, {x: 184, y: 1}, {x: 184, y: 1}, {x: 182, y: 1}, {x: 182, y: 1}, {x: 180, y: 1}, {x: 180, y: 1}, {x: 178, y: 1}, {x: 178, y: 1}, {x: 176, y: 1}, {x: 176, y: 1}, {x: 174, y: 1}, {x: 174, y: 1}, {x: 172, y: 1}, {x: 172, y: 1}, {x: 170, y: 1}, {x: 170, y: 1}, {x: 168, y: 1}, {x: 168, y: 1}, {x: 166, y: 1}, {x: 166, y: 1}, {x: 164, y: 1}, {x: 164, y: 1}, {x: 162, y: 1}, {x: 162, y: 1}, {x: 160, y: 1}, {x: 160, y: 1}, {x: 158, y: 1}, {x: 158, y: 1}, {x: 156, y: 1}, {x: 156, y: 1}, {x: 154, y: 1}, {x: 154, y: 1}, {x: 152, y: 1}, {x: 152, y: 1}, {x: 150, y: 1}, {x: 150, y: 1}, {x: 148, y: 1}, {x: 148, y: 1}, {x: 146, y: 1}, {x: 146, y: 1}, {x: 144, y: 1}, {x: 144, y: 1}, {x: 142, y: 1}, {x: 142, y: 1}, {x: 140, y: 1}, {x: 140, y: 1}, {x: 138, y: 1}, {x: 138, y: 1}, {x: 136, y: 1}, {x: 136, y: 1}, {x: 134, y: 1}, {x: 134, y: 1}, {x: 132, y: 1}, {x: 132, y: 1}, {x: 130, y: 1}, {x: 130, y: 1}, {x: 128, y: 1}, {x: 128, y: 1}, {x: 126, y: 1}, {x: 126, y: 1}, {x: 124, y: 1}, {x: 124, y: 1}, {x: 122, y: 1}, {x: 122, y: 1}, {x: 120, y: 1}, {x: 120, y: 1}, {x: 118, y: 1}, {x: 118, y: 1}, {x: 116, y: 1}, {x: 116, y: 1}, {x: 114, y: 1}, {x: 114, y: 1}, {x: 112, y: 1}, {x: 112, y: 1}, {x: 110, y: 1}, {x: 110, y: 1}, {x: 108, y: 1}, {x: 108, y: 1}, {x: 106, y: 1}, {x: 106, y: 1}, {x: 104, y: 1}, {x: 104, y: 1}, {x: 102, y: 1}, {x: 102, y: 1}, {x: 100, y: 1}, {x: 100, y: 1}, {x: 98, y: 1}, {x: 98, y: 1}, {x: 96, y: 1}, {x: 96, y: 1}, {x: 94, y: 1}, {x: 94, y: 1}, {x: 92, y: 1}, {x: 92, y: 1}, {x: 90, y: 1}, {x: 90, y: 1}, {x: 88, y: 1}, {x: 88, y: 1}, {x: 86, y: 1}, {x: 86, y: 1}, {x: 84, y: 1}, {x: 84, y: 1}, {x: 82, y: 1}, {x: 82, y: 1}, {x: 80, y: 1}, {x: 80, y: 1}, {x: 78, y: 1}, {x: 78, y: 1}, {x: 76, y: 1}, {x: 76, y: 1}, {x: 74, y: 1}, {x: 74, y: 1}, {x: 72, y: 1}, {x: 72, y: 1}, {x: 70, y: 1}, {x: 70, y: 1}, {x: 68, y: 1}, {x: 68, y: 1}, {x: 66, y: 1}, {x: 66, y: 1}, {x: 64, y: 1}, {x: 64, y: 1}, {x: 62, y: 1}, {x: 62, y: 1}, {x: 60, y: 1}, {x: 60, y: 1}, {x: 58, y: 1}, {x: 58, y: 1}, {x: 56, y: 1}, {x: 56, y: 1}, {x: 54, y: 1}, {x: 54, y: 1}, {x: 52, y: 1}, {x: 52, y: 1}, {x: 50, y: 1}, {x: 50, y: 1}, {x: 48, y: 1}, {x: 48, y: 1}, {x: 46, y: 1}, {x: 46, y: 1}, {x: 44, y: 1}, {x: 44, y: 1}, {x: 42, y: 1}, {x: 42, y: 1}, {x: 40, y: 1}, {x: 40, y: 1}, {x: 38, y: 1}, {x: 38, y: 1}, {x: 36, y: 1}, {x: 36, y: 1}, {x: 34, y: 1}, {x: 34, y: 1}, {x: 32, y: 1}, {x: 32, y: 1}, {x: 30, y: 1}, {x: 30, y: 1}, {x: 28, y: 1}, {x: 28, y: 1}, {x: 26, y: 1}, {x: 26, y: 1}, {x: 24, y: 1}, {x: 24, y: 1}, {x: 22, y: 1}, {x: 22, y: 1}, {x: 20, y: 1}, {x: 20, y: 1}, {x: 18, y: 1}, {x: 18, y: 1}, {x: 16, y: 1}, {x: 16, y: 1}, {x: 14, y: 1}, {x: 14, y: 1}, {x: 12, y: 1}, {x: 12, y: 1}, {x: 10, y: 1}, {x: 10, y: 1}, {x: 8, y: 1}, {x: 8, y: 1}, {x: 6, y: 1}, {x: 6, y: 1}, {x: 4, y: 1}, {x: 4, y: 1}, {x: 2, y: 1}, {x: 2, y: 1}, {x: 0, y: 1}], inner: []}])
     end
     it "scan complex tree", complex_tree: true do
-      chunk = "0000000000000000" \
-               "0000AAAAAAAA0000" \
-               "000BBB0000II0000" \
-               "00CC00HH0LLL0000" \
-               "0DDDD0GG00000000" \
-               "00EEEEEE00000000" \
-               "000FF00000000000"
+      chunk = "                " \
+               "    AAAAAAAA    " \
+               "   BBB    II    " \
+               "  CC  HH LLL    " \
+               " DDDD GG        " \
+               "  EEEEEE        " \
+               "   FF           "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("ABCDEFEGHGEDCBAILIA")
       expect(result.metadata[:groups]).to eq(1)
@@ -28,13 +28,13 @@ RSpec.shared_examples "complex" do
       ])
     end
     it "scan U polygon" do
-      chunk = "0000000000000000" \
-                  "000AAAA000EEEE00" \
-                  "000BBBB000DDDD00" \
-                  "000CCCCCCCCCCC00" \
-                  "0000000000000000" \
-                  "0000000000000000" \
-                  "0000000000000000"
+      chunk = "                " \
+                  "   AAAA   EEEE  " \
+                  "   BBBB   DDDD  " \
+                  "   CCCCCCCCCCC  " \
+                  "                " \
+                  "                " \
+                  "                "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("ABCDEDCBA")
       expect(result.metadata[:groups]).to eq(1)
@@ -44,13 +44,13 @@ RSpec.shared_examples "complex" do
       ])
     end
     it "scan U polygon clockwise" do
-      chunk = "0000000000000000" \
-                  "000AAAA000EEEE00" \
-                  "000BBBB000DDDD00" \
-                  "000CCCCCCCCCCC00" \
-                  "0000000000000000" \
-                  "0000000000000000" \
-                  "0000000000000000"
+      chunk = "                " \
+                  "   AAAA   EEEE  " \
+                  "   BBBB   DDDD  " \
+                  "   CCCCCCCCCCC  " \
+                  "                " \
+                  "                " \
+                  "                "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {versus: :o, named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("ABCDEDCBA")
       expect(result.metadata[:groups]).to eq(1)
@@ -60,13 +60,13 @@ RSpec.shared_examples "complex" do
       ])
     end
     it "scan U polygon wider baseline" do
-      chunk = "0000000000000000" \
-                 "000AAAA000FFFF00" \
-                 "000BBBB000EEEE00" \
-                 "000CCCCCCCCCCC00" \
-                 "000DDDDDDDDDDD00" \
-                 "0000000000000000" \
-                 "0000000000000000"
+      chunk = "                " \
+                 "   AAAA   FFFF  " \
+                 "   BBBB   EEEE  " \
+                 "   CCCCCCCCCCC  " \
+                 "   DDDDDDDDDDD  " \
+                 "                " \
+                 "                "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("ABCDCEFECBA")
       expect(result.metadata[:groups]).to eq(1)
@@ -76,13 +76,13 @@ RSpec.shared_examples "complex" do
       ])
     end
     it "scan N polygon" do
-      chunk = "0000000000000000" \
-               "000AAAAAAAAAAA00" \
-               "000BBBB000DDDD00" \
-               "000CCCC000EEEE00" \
-               "0000000000000000" \
-               "0000000000000000" \
-               "0000000000000000"
+      chunk = "                " \
+               "   AAAAAAAAAAA  " \
+               "   BBBB   DDDD  " \
+               "   CCCC   EEEE  " \
+               "                " \
+               "                " \
+               "                "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("ABCBADEDA")
       expect(result.metadata[:groups]).to eq(1)
@@ -90,13 +90,13 @@ RSpec.shared_examples "complex" do
                                     inner: []}])
     end
     it "scan N polygon clockwise" do
-      chunk = "0000000000000000" \
-               "000AAAAAAAAAAA00" \
-               "000BBBB000DDDD00" \
-               "000CCCC000EEEE00" \
-               "0000000000000000" \
-               "0000000000000000" \
-               "0000000000000000"
+      chunk = "                " \
+               "   AAAAAAAAAAA  " \
+               "   BBBB   DDDD  " \
+               "   CCCC   EEEE  " \
+               "                " \
+               "                " \
+               "                "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {versus: :o, named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("ADEDABCBA")
       expect(result.metadata[:groups]).to eq(1)
@@ -104,26 +104,26 @@ RSpec.shared_examples "complex" do
                                     inner: []}])
     end
     it "scans holed polygon" do
-      chunk = "0000000000000000" \
-                 "000000AAA0000000" \
-                 "00000BB0DDD00000" \
-                 "000000CCC0000000" \
-                 "0000000000000000" \
-                 "0000000000000000" \
-                 "0000000000000000"
+      chunk = "                " \
+                 "      AAA       " \
+                 "     BB DDD     " \
+                 "      CCC       " \
+                 "                " \
+                 "                " \
+                 "                "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("ABCDA")
       expect(result.metadata[:groups]).to eq(1)
       expect(result.points).to eq([{outer: [{x: 6, y: 1}, {x: 5, y: 2}, {x: 6, y: 3}, {x: 8, y: 3}, {x: 10, y: 2}, {x: 8, y: 1}], inner: [[{x: 6, y: 2}, {x: 8, y: 2}]]}])
     end
     it "scans holed polygon 2" do
-      chunk = "0000000000000000" \
-                 "000AAAAAAAAAAA00" \
-                 "000BBBB000HHHH00" \
-                 "000CCC00000GG000" \
-                 "00DDDD00FFFFF000" \
-                 "0000EEEEEEEE0000" \
-                 "0000000000000000"
+      chunk = "                " \
+                 "   AAAAAAAAAAA  " \
+                 "   BBBB   HHHH  " \
+                 "   CCC     GG   " \
+                 "  DDDD  FFFFF   " \
+                 "    EEEEEEEE    " \
+                 "                "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("ABCDEFGHA")
       expect(result.metadata[:groups]).to eq(1)
@@ -131,13 +131,13 @@ RSpec.shared_examples "complex" do
                                     inner: [[{x: 6, y: 2}, {x: 10, y: 2}, {x: 11, y: 3}, {x: 8, y: 4}, {x: 5, y: 4}, {x: 5, y: 3}]]}])
     end
     it "scan sequence" do
-      chunk = "0000000000000000" \
-                 "0000000000000000" \
-                 "0000000000000000" \
-                 "00AAAAAA00000E00" \
-                 "0000BBBBB0000DD0" \
-                 "0000000CCCCCCC00" \
-                 "0000000000000000"
+      chunk = "                " \
+                 "                " \
+                 "                " \
+                 "  AAAAAA     E  " \
+                 "    BBBBB    DD " \
+                 "       CCCCCCC  " \
+                 "                "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("ABCDEDCBA")
       expect(result.metadata[:groups]).to eq(1)
@@ -147,13 +147,13 @@ RSpec.shared_examples "complex" do
       ])
     end
     it "scan an opened polygon" do
-      chunk = "0000000000000000" \
-                 "0000000000000000" \
-                 "0000000000000000" \
-                 "00AAAAAA00000F00" \
-                 "0000BBBBB0000EE0" \
-                 "0000000CCCCCCC00" \
-                 "00000000DDDDD000"
+      chunk = "                " \
+                 "                " \
+                 "                " \
+                 "  AAAAAA     F  " \
+                 "    BBBBB    EE " \
+                 "       CCCCCCC  " \
+                 "        DDDDD   "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("ABCDCEFECBA")
       expect(result.metadata[:groups]).to eq(1)
@@ -161,13 +161,13 @@ RSpec.shared_examples "complex" do
                                     inner: []}])
     end
     it "scans M polygon" do
-      chunk = "0000000000000000" \
-                "000AAAAAAAAAAAA0" \
-                "000B00C00000D000" \
-                "0000000000000000" \
-                "0000000000000000" \
-                "0000000000000000" \
-                "0000000000000000"
+      chunk = "                " \
+                "   AAAAAAAAAAAA " \
+                "   B  C     D   " \
+                "                " \
+                "                " \
+                "                " \
+                "                "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("ABACADA")
       expect(result.metadata[:groups]).to eq(1)
@@ -177,13 +177,13 @@ RSpec.shared_examples "complex" do
       ])
     end
     it "scans W poligon" do
-      chunk = "0000000000000000" \
-                "000A000C0000D000" \
-                "000BBBBBBBBBB000" \
-                "0000000000000000" \
-                "0000000000000000" \
-                "0000000000000000" \
-                "0000000000000000"
+      chunk = "                " \
+                "   A   C    D   " \
+                "   BBBBBBBBBB   " \
+                "                " \
+                "                " \
+                "                " \
+                "                "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("ABDBCBA")
       expect(result.metadata[:groups]).to eq(1)
@@ -191,13 +191,13 @@ RSpec.shared_examples "complex" do
                                     inner: []}])
     end
     it "scan W inverted polygon" do
-      chunk = "0000000000000000" \
-                "0000000000000000" \
-                "000B00C00000D000" \
-                "000AAAAAAAAAAAA0" \
-                "00000000000000E0" \
-                "0000000000000000" \
-                "0000000000000000"
+      chunk = "                " \
+                "                " \
+                "   B  C     D   " \
+                "   AAAAAAAAAAAA " \
+                "              E " \
+                "                " \
+                "                "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("BAEADACAB")
       expect(result.metadata[:groups]).to eq(1)
@@ -205,13 +205,13 @@ RSpec.shared_examples "complex" do
                                     inner: []}])
     end
     it "scans N polygon" do
-      chunk = "0000000000000000" \
-                 "000000000000AA00" \
-                 "0000FFFFFF00BB00" \
-                 "0000GG00EE00CC00" \
-                 "0000HH00DDDDDD00" \
-                 "0000000000000000" \
-                 "0000000000000000"
+      chunk = "                " \
+                 "            AA  " \
+                 "    FFFFFF  BB  " \
+                 "    GG  EE  CC  " \
+                 "    HH  DDDDDD  " \
+                 "                " \
+                 "                "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("ABCDEFGHGFEDCBA")
       expect(result.metadata[:groups]).to eq(1)
@@ -219,13 +219,13 @@ RSpec.shared_examples "complex" do
                                     inner: []}])
     end
     it "scans N polygon clockwise" do
-      chunk = "0000000000000000" \
-                 "000000000000AA00" \
-                 "0000FFFFFF00BB00" \
-                 "0000GG00EE00CC00" \
-                 "0000HH00DDDDDD00" \
-                 "0000000000000000" \
-                 "0000000000000000"
+      chunk = "                " \
+                 "            AA  " \
+                 "    FFFFFF  BB  " \
+                 "    GG  EE  CC  " \
+                 "    HH  DDDDDD  " \
+                 "                " \
+                 "                "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {versus: :o, named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("ABCDEFGHGFEDCBA")
       expect(result.metadata[:groups]).to eq(1)
@@ -233,13 +233,13 @@ RSpec.shared_examples "complex" do
                                     inner: []}])
     end
     it "scans N polygon other root node" do
-      chunk = "0000000000000000" \
-               "0000000000000000" \
-               "0000AAAAAA00GG00" \
-               "0000BB00DD00FF00" \
-               "0000CC00EEEEEE00" \
-               "0000000000000000" \
-               "0000000000000000"
+      chunk = "                " \
+               "                " \
+               "    AAAAAA  GG  " \
+               "    BB  DD  FF  " \
+               "    CC  EEEEEE  " \
+               "                " \
+               "                "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("ABCBADEFGFEDA")
       expect(result.metadata[:groups]).to eq(1)
@@ -247,13 +247,13 @@ RSpec.shared_examples "complex" do
                                     inner: []}])
     end
     it "scan snake" do
-      chunk = "0000000000000000" \
-               "0000000000000A00" \
-               "000P0LLL0FFF0B00" \
-               "000O0M0I0G0E0C00" \
-               "000NNN0HHH0DDD00" \
-               "0000000000000000" \
-               "0000000000000000"
+      chunk = "                " \
+               "             A  " \
+               "   P LLL FFF B  " \
+               "   O M I G E C  " \
+               "   NNN HHH DDD  " \
+               "                " \
+               "                "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("ABCDEFGHILMNOPONMLIHGFEDCBA")
       expect(result.metadata[:groups]).to eq(1)
@@ -261,12 +261,12 @@ RSpec.shared_examples "complex" do
                                     inner: []}])
     end
     it "scan complex" do
-      chunk = "000000000000000A" \
-              "NNNNNNNNNNNNNN0B" \
-              "M000000000000O0C" \
-              "L0R0000000000P0D" \
-              "I0QQQQQQQQQQQQ0E" \
-              "H00000000000000F" \
+      chunk = "               A" \
+              "NNNNNNNNNNNNNN B" \
+              "M            O C" \
+              "L R          P D" \
+              "I QQQQQQQQQQQQ E" \
+              "H              F" \
               "GGGGGGGGGGGGGGGG"
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("ABCDEFGHILMNOPQRQPONMLIHGFEDCBA")
@@ -275,13 +275,13 @@ RSpec.shared_examples "complex" do
                                     inner: []}])
     end
     it "scan open sequence" do
-      chunk = "AAAAAAAAA0000000" \
-               "00000000BBB00000" \
-               "0000000000CCCC00" \
-               "000FFFF000DDDD00" \
-               "000EEEEEEEEEEE00" \
-               "0000000000000000" \
-               "0000000000000000"
+      chunk = "AAAAAAAAA       " \
+               "        BBB     " \
+               "          CCCC  " \
+               "   FFFF   DDDD  " \
+               "   EEEEEEEEEEE  " \
+               "                " \
+               "                "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("ABCDEFEDCBA")
       expect(result.metadata[:groups]).to eq(1)
@@ -289,13 +289,13 @@ RSpec.shared_examples "complex" do
                                     inner: []}])
     end
     it "scan open sequence clockwise" do
-      chunk = "AAAAAAAAA0000000" \
-               "00000000BBB00000" \
-               "0000000000CCCC00" \
-               "000FFFF000DDDD00" \
-               "000EEEEEEEEEEE00" \
-               "0000000000000000" \
-               "0000000000000000"
+      chunk = "AAAAAAAAA       " \
+               "        BBB     " \
+               "          CCCC  " \
+               "   FFFF   DDDD  " \
+               "   EEEEEEEEEEE  " \
+               "                " \
+               "                "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {versus: :o, named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("ABCDEFEDCBA")
       expect(result.metadata[:groups]).to eq(1)
@@ -303,13 +303,13 @@ RSpec.shared_examples "complex" do
                                     inner: []}])
     end
     it "scan inverse two times" do
-      chunk = "0000000000000000" \
-               "0000000000000000" \
-               "0000000000AAAA00" \
-               "000DDDD000BBBB00" \
-               "000CCCCCCCCCCC00" \
-               "0000000000000000" \
-               "0000000000000000"
+      chunk = "                " \
+               "                " \
+               "          AAAA  " \
+               "   DDDD   BBBB  " \
+               "   CCCCCCCCCCC  " \
+               "                " \
+               "                "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("ABCDCBA")
       expect(result.metadata[:groups]).to eq(1)
@@ -317,13 +317,13 @@ RSpec.shared_examples "complex" do
                                     inner: []}])
     end
     it "case A" do
-      chunk = "AA00000000000000" \
-                 "0BB0000000000000" \
-                 "00CC000000000000" \
-                 "000DDDDDDDDDD000" \
-                 "000000000000EE00" \
-                 "0000000000000FF0" \
-                 "00000000000000GG"
+      chunk = "AA              " \
+                 " BB             " \
+                 "  CC            " \
+                 "   DDDDDDDDDD   " \
+                 "            EE  " \
+                 "             FF " \
+                 "              GG"
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("ABCDEFGFEDCBA")
       expect(result.metadata[:groups]).to eq(1)
@@ -331,13 +331,13 @@ RSpec.shared_examples "complex" do
                                     inner: []}])
     end
     it "case B arrow" do
-      chunk = "00000000000000AA" \
-                 "0000000000000BB0" \
-                 "000000000000CC00" \
-                 "DDDDDDDDDDDDD000" \
-                 "000000000000EE00" \
-                 "0000000000000FF0" \
-                 "00000000000000GG"
+      chunk = "              AA" \
+                 "             BB " \
+                 "            CC  " \
+                 "DDDDDDDDDDDDD   " \
+                 "            EE  " \
+                 "             FF " \
+                 "              GG"
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("ABCDEFGFEDCBA")
       expect(result.metadata[:groups]).to eq(1)
@@ -345,13 +345,13 @@ RSpec.shared_examples "complex" do
                                     inner: []}])
     end
     it "scans V inverted" do
-      chunk = "0000000000000000" \
-                 "0000000AAA000000" \
-                 "00000BBBBBB00000" \
-                 "000CCCC00FFFFFFF" \
-                 "00DDDD00000GGG00" \
-                 "000EE0000000H000" \
-                 "0000000000000000"
+      chunk = "                " \
+                 "       AAA      " \
+                 "     BBBBBB     " \
+                 "   CCCC  FFFFFFF" \
+                 "  DDDD     GGG  " \
+                 "   EE       H   " \
+                 "                "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("ABCDEDCBFGHGFBA")
       expect(result.metadata[:groups]).to eq(1)
@@ -359,13 +359,13 @@ RSpec.shared_examples "complex" do
                                     inner: []}])
     end
     it "scans V inverted clockwise" do
-      chunk = "0000000000000000" \
-                 "0000000AAA000000" \
-                 "00000BBBBBB00000" \
-                 "000CCCC00FFFFFFF" \
-                 "00DDDD00000GGG00" \
-                 "000EE0000000H000" \
-                 "0000000000000000"
+      chunk = "                " \
+                 "       AAA      " \
+                 "     BBBBBB     " \
+                 "   CCCC  FFFFFFF" \
+                 "  DDDD     GGG  " \
+                 "   EE       H   " \
+                 "                "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {versus: :o, named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("ABFGHGFBCDEDCBA")
       expect(result.metadata[:groups]).to eq(1)
@@ -373,14 +373,14 @@ RSpec.shared_examples "complex" do
                                     inner: []}])
     end
     it "scans butterfly" do
-      chunk = "0000000000000000" \
-               "0000AAA000LL0000" \
-               "000BBBB00IIII000" \
-               "00CCCCCCCCCCCC00" \
-               "00DDDDDDDDDDDD00" \
-               "000EEEE00GGGG000" \
-               "0000FF0000HH0000" \
-               "0000000000000000"
+      chunk = "                " \
+               "    AAA   LL    " \
+               "   BBBB  IIII   " \
+               "  CCCCCCCCCCCC  " \
+               "  DDDDDDDDDDDD  " \
+               "   EEEE  GGGG   " \
+               "    FF    HH    " \
+               "                "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("ABCDEFEDGHGDCILICBA")
       expect(result.metadata[:groups]).to eq(1)
@@ -388,14 +388,14 @@ RSpec.shared_examples "complex" do
                                     inner: []}])
     end
     it "scans butterfly 2" do
-      chunk = "0000000000AA0000" \
-               "0000FFF000BB0000" \
-               "000EEEE00CCCC000" \
-               "00DDDDDDDDDDDD00" \
-               "00GGGGGGGGGGGG00" \
-               "000HHHH00LLLL000" \
-               "0000II0000MM0000" \
-               "0000000000000000"
+      chunk = "          AA    " \
+               "    FFF   BB    " \
+               "   EEEE  CCCC   " \
+               "  DDDDDDDDDDDD  " \
+               "  GGGGGGGGGGGG  " \
+               "   HHHH  LLLL   " \
+               "    II    MM    " \
+               "                "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("ABCDEFEDGHIHGLMLGDCBA")
       expect(result.metadata[:groups]).to eq(1)
@@ -403,14 +403,14 @@ RSpec.shared_examples "complex" do
                                     inner: []}])
     end
     it "scans butterfly 2 visval compression" do
-      chunk = "0000000000AA0000" \
-               "0000FFF000BB0000" \
-               "000EEEE00CCCC000" \
-               "00DDDDDDDDDDDD00" \
-               "00GGGGGGGGGGGG00" \
-               "000HHHH00LLLL000" \
-               "0000II0000MM0000" \
-               "0000000000000000"
+      chunk = "          AA    " \
+               "    FFF   BB    " \
+               "   EEEE  CCCC   " \
+               "  DDDDDDDDDDDD  " \
+               "  GGGGGGGGGGGG  " \
+               "   HHHH  LLLL   " \
+               "    II    MM    " \
+               "                "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true, compress: {visvalingam: {tolerance: 1.5}}}).process_info
       expect(result.metadata[:named_sequence]).to eq("ABCDEFEDGHIHGLMLGDCBA")
       expect(result.metadata[:groups]).to eq(1)
@@ -418,13 +418,13 @@ RSpec.shared_examples "complex" do
                                     inner: []}])
     end
     it "scans butterfly 3" do
-      chunk = "0000000000000000" \
-               "0000AAA000III000" \
-               "000BBBB00HHHHH00" \
-               "00CCCCCCCCCCCC00" \
-               "000DDDD00FFFFF00" \
-               "0000EE0000GG0000" \
-               "0000000000000000"
+      chunk = "                " \
+               "    AAA   III   " \
+               "   BBBB  HHHHH  " \
+               "  CCCCCCCCCCCC  " \
+               "   DDDD  FFFFF  " \
+               "    EE    GG    " \
+               "                "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("ABCDEDCFGFCHIHCBA")
       expect(result.metadata[:groups]).to eq(1)
@@ -432,13 +432,13 @@ RSpec.shared_examples "complex" do
                                     inner: []}])
     end
     it "scans block 3" do
-      chunk = "0000000000000000" \
-              "AAA000EEE000GGG0" \
-              "BBB000DDD000FFF0" \
-              "CCCCCCCCCCCCCCC0" \
-              "0000000000000000" \
-              "0000000000000000" \
-              "0000000000000000"
+      chunk = "                " \
+              "AAA   EEE   GGG " \
+              "BBB   DDD   FFF " \
+              "CCCCCCCCCCCCCCC " \
+              "                " \
+              "                " \
+              "                "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("ABCFGFCDEDCBA")
       expect(result.metadata[:groups]).to eq(1)
@@ -446,13 +446,13 @@ RSpec.shared_examples "complex" do
                                     inner: []}])
     end
     it "scans block 3 inverted" do
-      chunk = "0000000000000000" \
-              "AAAAAAAAAAAAAAA0" \
-              "BBB000DDD000FFF0" \
-              "CCC000EEE000GGG0" \
-              "0000000000000000" \
-              "0000000000000000" \
-              "0000000000000000"
+      chunk = "                " \
+              "AAAAAAAAAAAAAAA " \
+              "BBB   DDD   FFF " \
+              "CCC   EEE   GGG " \
+              "                " \
+              "                " \
+              "                "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("ABCBADEDAFGFA")
       expect(result.metadata[:groups]).to eq(1)
@@ -460,13 +460,13 @@ RSpec.shared_examples "complex" do
                                     inner: []}])
     end
     it "scans 3 holed polygon", thp: true do
-      chunk = "0000000000000000" \
-              "AAAAAAAAAAAAAAA0" \
-              "BB00MM00NN000HH0" \
-              "CC00LL00OO000GG0" \
-              "DD00II00PP000FF0" \
-              "EEEEEEEEEEEEEEE0" \
-              "0000000000000000"
+      chunk = "                " \
+              "AAAAAAAAAAAAAAA " \
+              "BB  MM  NN   HH " \
+              "CC  LL  OO   GG " \
+              "DD  II  PP   FF " \
+              "EEEEEEEEEEEEEEE " \
+              "                "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("ABCDEFGHA")
       expect(result.metadata[:groups]).to eq(1)
@@ -482,13 +482,13 @@ RSpec.shared_examples "complex" do
       ])
     end
     it "scans 2 holed polygon" do
-      chunk = "0AAAAAAAAAAAAAA0" \
-              "0BB00HHHHHHHHHH0" \
-              "0CC00IIIIIIIIII0" \
-              "0DDDDDDDDDDDDDD0" \
-              "0EE00LLLLLLLLLL0" \
-              "0FF00MMMMMMMMMM0" \
-              "0GGGGGGGGGGGGGG0"
+      chunk = " AAAAAAAAAAAAAA " \
+              " BB  HHHHHHHHHH " \
+              " CC  IIIIIIIIII " \
+              " DDDDDDDDDDDDDD " \
+              " EE  LLLLLLLLLL " \
+              " FF  MMMMMMMMMM " \
+              " GGGGGGGGGGGGGG "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("ABCDEFGMLDIHA")
       expect(result.metadata[:groups]).to eq(1)
@@ -502,13 +502,13 @@ RSpec.shared_examples "complex" do
     end
 
     it "scans 2 holed polygon complex", pocomp: true do
-      chunk = "0000000000000000" \
-              "AAAAAAAAAAAAAAA0" \
-              "BB00MM0000000HH0" \
-              "CC00LL00OO000GG0" \
-              "DD00II00PP000FF0" \
-              "EEEEEEEEEEEEEEE0" \
-              "0000000000000000"
+      chunk = "                " \
+              "AAAAAAAAAAAAAAA " \
+              "BB  MM       HH " \
+              "CC  LL  OO   GG " \
+              "DD  II  PP   FF " \
+              "EEEEEEEEEEEEEEE " \
+              "                "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("ABCDEFGHA")
       expect(result.metadata[:groups]).to eq(1)
@@ -523,12 +523,12 @@ RSpec.shared_examples "complex" do
 
     it "loses some mia", mia: true do
       chunk = "AAAAAAAAAAAAAAAA" \
-              "BBBBBBBBBBBBBB0C" \
-              "DDDDD0000000EE0F" \
-              "I0000000000000GG" \
+              "BBBBBBBBBBBBBB C" \
+              "DDDDD       EE F" \
+              "I             GG" \
               "HHHHHHHHHHHHHHHH" \
-              "0000000000000000" \
-              "0000000000000000"
+              "                " \
+              "                "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {versus: :a, named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("ABDIHGFCA")
       expect(result.metadata[:groups]).to eq(1)
@@ -538,11 +538,11 @@ RSpec.shared_examples "complex" do
 
     it "scans 2 holed polygon outer full" do
       chunk = "AAAAAAAAAAAAAAAA" \
-               "BBBBB00NNNNNNNNN" \
-               "CCCC000000MMMMMM" \
-               "DDD00000000LLLLL" \
-               "EEEE000000IIIIII" \
-               "FFFFFFF00HHHHHHH" \
+               "BBBBB  NNNNNNNNN" \
+               "CCCC      MMMMMM" \
+               "DDD        LLLLL" \
+               "EEEE      IIIIII" \
+               "FFFFFFF  HHHHHHH" \
                "GGGGGGGGGGGGGGGG"
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("ABCDEFGHILMNA")
@@ -554,11 +554,11 @@ RSpec.shared_examples "complex" do
     end
     it "scans 2 holed polygon outer full clockwise", hopi: true do
       chunk = "AAAAAAAAAAAAAAAA" \
-               "BBBBB00NNNNNNNNN" \
-               "CCCC000000MMMMMM" \
-               "DDD00000000LLLLL" \
-               "EEEE000000IIIIII" \
-               "FFFFFFF00HHHHHHH" \
+               "BBBBB  NNNNNNNNN" \
+               "CCCC      MMMMMM" \
+               "DDD        LLLLL" \
+               "EEEE      IIIIII" \
+               "FFFFFFF  HHHHHHH" \
                "GGGGGGGGGGGGGGGG"
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {versus: :o, named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("ANMLIHGFEDCBA")
@@ -570,13 +570,13 @@ RSpec.shared_examples "complex" do
     end
 
     it "problem", test_problem: true do
-      chunk = "00AAAAAAAAAAAA00" \
-                "0BB00MMMMMMMMMM0" \
-                "0CC00LL0000000N0" \
-                "0DDDDDD000SS00O0" \
-                "0EE000II00RR00P0" \
-                "00FF00HHH0000QQ0" \
-                "000GGGGGGGGGGG00"
+      chunk = "  AAAAAAAAAAAA  " \
+                " BB  MMMMMMMMMM " \
+                " CC  LL       N " \
+                " DDDDDD   SS  O " \
+                " EE   II  RR  P " \
+                "  FF  HHH    QQ " \
+                "   GGGGGGGGGGG  "
       finder = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true})
       result = finder.process_info
       expect(result.metadata[:named_sequence]).to eq("ABCDEFGQPONMA-SRS")
@@ -591,13 +591,13 @@ RSpec.shared_examples "complex" do
     end
 
     it "j form", j_form: true do
-      chunk = "00000000AAAAAA00000000000000000" \
-              "BBBBB00CCCCCCCC0000000000000000" \
-              "0DDDDD00EE0FFFF0000000000000000" \
-              "0GGGGG00HHHH0III000000000000000" \
-              "0JJJJJJJJJJJJ0KKK00000000000000" \
-              "0000LLLLLLLLLL0MM00000000000000" \
-              "0000NNN0OOOOOOOOOO0000000000000"
+      chunk = "        AAAAAA                 " \
+              "BBBBB  CCCCCCCC                " \
+              " DDDDD  EE FFFF                " \
+              " GGGGG  HHHH III               " \
+              " JJJJJJJJJJJJ KKK              " \
+              "    LLLLLLLLLL MM              " \
+              "    NNN OOOOOOOOOO             "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 31), @matcher, nil, {named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("ACEHJGDBDGJLNLOMKIFCA")
       expect(result.metadata[:groups]).to eq(1)
@@ -605,19 +605,19 @@ RSpec.shared_examples "complex" do
     end
 
     it "problem 2", test_problem2: true do
-      chunk = "00AAAAAAAAAAAA00" \
-                "0BB00MMMMMMMMMM0" \
-                "0CC00LLLLLLLLLL0" \
-                "0DDDDDDDDDDDDDD0" \
-                "0EEEEEEEEEEEEEE0" \
-                "0FFFFFFF000000F0" \
-                "0NNNNNNNN00RR0N0" \
-                "0PPPPPPPP00SS0P0" \
-                "0QQQQQQQQ00000Q0" \
-                "0GGGGGGGGGGGGGG0" \
-                "0HH000IIIIIIIII0" \
-                "00LL00LLLLLLLLL0" \
-                "000MMMMMMMMMMMM0"
+      chunk = "  AAAAAAAAAAAA  " \
+                " BB  MMMMMMMMMM " \
+                " CC  LLLLLLLLLL " \
+                " DDDDDDDDDDDDDD " \
+                " EEEEEEEEEEEEEE " \
+                " FFFFFFF      F " \
+                " NNNNNNNN  RR N " \
+                " PPPPPPPP  SS P " \
+                " QQQQQQQQ     Q " \
+                " GGGGGGGGGGGGGG " \
+                " HH   IIIIIIIII " \
+                "  LL  LLLLLLLLL " \
+                "   MMMMMMMMMMMM "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {treemap: true, named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("ABCDEFNPQGHLMLIGQPNFEDLMA-RSR")
       expect(result.metadata[:groups]).to eq(2)
@@ -626,23 +626,23 @@ RSpec.shared_examples "complex" do
     end
 
     it "was a failing case" do
-      chunk = "0010000000101000000" \
-                "0001000010000000000" \
-                "0001011011110100010" \
-                "1111100111111110010" \
-                "0111110011011110100" \
-                "0111110011110111001" \
-                "0111111111111011100" \
-                "0010111111111101100" \
-                "10001110CCCCCCCCCC0" \
-                "11000AAAA00BBBB0111" \
-                "111110DDDDDD0011111" \
-                "1110000011111110111" \
-                "1111001111111101111" \
-                "1111011111000111111" \
-                "1111011100111111111" \
-                "0011111111111100000" \
-                "1111110111110000010" \
+      chunk = "  1       1 1      " \
+                "   1    1          " \
+                "   1 11 1111 1   1 " \
+                "11111  11111111  1 " \
+                " 11111  11 1111 1  " \
+                " 11111  1111 111  1" \
+                " 111111111111 111  " \
+                "  1 1111111111 11  " \
+                "1   111 CCCCCCCCCC " \
+                "11   AAAA  BBBB 111" \
+                "11111 DDDDDD  11111" \
+                "111     1111111 111" \
+                "1111  11111111 1111" \
+                "1111 11111   111111" \
+                "1111 111  111111111" \
+                "  111111111111     " \
+                "111111 11111     1 " \
                 "1111111111111111111"
       dest = @bitmap_class.new(chunk, 19)
       dest.clear(" ")
@@ -704,15 +704,15 @@ RSpec.shared_examples "complex" do
 
     it "works like a charm", charm: true do
       chunk = "AAAAAAAAAAAAAAAAAAAAA" \
-                "BB00000000000000000TT" \
-                "CC03333333333333330SS" \
-                "DD02200000000000440RR" \
-                "EE011000WWWWW000550QQ" \
-                "FF0ZZZZZZ000$000660PP" \
-                "GG0YY000%%%%%000770OO" \
-                "HH0XX00000000000880NN" \
-                "II0VVVVV00000999990MM" \
-                "JJ0000UU00000!!0000LL" \
+                "BB                 TT" \
+                "CC 333333333333333 SS" \
+                "DD 22           44 RR" \
+                "EE 11   WWWWW   55 QQ" \
+                "FF ZZZZZZ   $   66 PP" \
+                "GG YY   %%%%%   77 OO" \
+                "HH XX           88 NN" \
+                "II VVVVV     99999 MM" \
+                "JJ    UU     !!    LL" \
                 "KKKKKKKKKKKKKKKKKKKKK"
       dest = @bitmap_class.new(chunk, 21)
       dest.clear(" ")
@@ -727,11 +727,11 @@ RSpec.shared_examples "complex" do
                                     ]}])
     end
     it "was a failing case 2", prob5: true do
-      chunk = "0000AAAAAAAAAA00000" \
-                "0000BBB0CCCCCCCCCC0" \
-                "00000DDDD00EEEE0FFF" \
-                "000000GGGGGG00HHHHH" \
-                "00000000IIIIIII0LLL"
+      chunk = "    AAAAAAAAAA     " \
+                "    BBB CCCCCCCCCC " \
+                "     DDDD  EEEE FFF" \
+                "      GGGGGG  HHHHH" \
+                "        IIIIIII LLL"
       dest = @bitmap_class.new(chunk, 19)
       dest.clear(" ")
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 19), @matcher, dest, {versus: :a, named_sequences: true}).process_info
@@ -744,11 +744,11 @@ RSpec.shared_examples "complex" do
                                       [{x: 8, y: 2}, {x: 11, y: 2}]]}])
     end
     it "was a failing case 3", prob5o: true do
-      chunk = "0000AAAAAAAAAA00000" \
-                "0000BBB0CCCCCCCCCC0" \
-                "00000DDDD00EEEE0FFF" \
-                "000000GGGGGG00HHHHH" \
-                "00000000IIIIIII0LLL"
+      chunk = "    AAAAAAAAAA     " \
+                "    BBB CCCCCCCCCC " \
+                "     DDDD  EEEE FFF" \
+                "      GGGGGG  HHHHH" \
+                "        IIIIIII LLL"
       dest = @bitmap_class.new(chunk, 19)
       dest.clear(" ")
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 19), @matcher, dest, {versus: :o, named_sequences: true}).process_info
@@ -764,13 +764,13 @@ RSpec.shared_examples "complex" do
     end
 
     it "was a failing case 4", prob2: true do
-      chunk = "00000000AAAAAA00000000000000000" \
-               "BBBBB00CCCCCCCC0000000000000000" \
-               "0DDDDD00EE0FFFF0000000000000000" \
-               "0GGGGG00HHHH0III000000000000000" \
-               "0JJJJJJJJJJJJ0KKK00000000000000" \
-               "0000LLLLLLLLLL0MM00000000000000" \
-               "0000NNN0OOOOOOOOOO0000000000000"
+      chunk = "        AAAAAA                 " \
+               "BBBBB  CCCCCCCC                " \
+               " DDDDD  EE FFFF                " \
+               " GGGGG  HHHH III               " \
+               " JJJJJJJJJJJJ KKK              " \
+               "    LLLLLLLLLL MM              " \
+               "    NNN OOOOOOOOOO             "
       dest = @bitmap_class.new(chunk, 31)
       dest.clear(" ")
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 31), @matcher, dest, {versus: :a, named_sequences: true}).process_info
@@ -785,41 +785,41 @@ RSpec.shared_examples "complex" do
     end
 
     it "multiple sequence", prob3: true do
-      chunk = "00000000000000000000000000000000000" \
-            "000000000000000AAAAA00BBBB000000000" \
-            "00000000000000CCCCCCC0DDDD000100000" \
-            "000000000000EEEE00FFF00GGG00HHH0III" \
-            "000000000000JJ0KKKKK010000011110111" \
-            "00000000000LL00MMMMMMMM000111110111" \
-            "0001110000NN00OOOOOOOOOO00111110001" \
-            "000111100PPP0QQQQ001111100111110000" \
-            "00011100111110000111111011011100111" \
-            "00001101111101011111110111011000111" \
-            "00000011111101011111100111111111111" \
-            "00000111111111000001110111111111111" \
-            "00001111111111110100111010111111111" \
-            "00011011100001011111110111100000000" \
-            "00011011101000000111110111000000001" \
-            "00011011100011111111111110000000001" \
-            "00011111111111111111111111111111111" \
-            "00111111110000101100000000001111111" \
-            "11111111111111111100000000111111111" \
-            "00011111100111111111111111111001111" \
-            "01001111110011111111111111000011101" \
-            "10001111111111111111111110111111001" \
-            "11101101111111111111111100111110101" \
-            "11100011111111100111011101011111010" \
-            "11100011111111110100111111110011100" \
-            "10000011110111111000111110111111101" \
-            "11100011110111111100111110111111001" \
-            "11100011110011111110111111011101100" \
-            "11101111110101111100100011111111111" \
-            "11100011110000011100000000111101110" \
-            "01000011100000011100000000000001000" \
-            "00000111110001000000000000010000010" \
-            "00001011100000000000000000001100100" \
-            "00000001001001001000000000000001000" \
-            "01000110001010100000000000000000000"
+      chunk = "                                   " \
+            "               AAAAA  BBBB         " \
+            "              CCCCCCC DDDD   1     " \
+            "            EEEE  FFF  GGG  HHH III" \
+            "            JJ KKKKK 1     1111 111" \
+            "           LL  MMMMMMMM   11111 111" \
+            "   111    NN  OOOOOOOOOO  11111   1" \
+            "   1111  PPP QQQQ  11111  11111    " \
+            "   111  11111    111111 11 111  111" \
+            "    11 11111 1 1111111 111 11   111" \
+            "      111111 1 111111  111111111111" \
+            "     111111111     111 111111111111" \
+            "    111111111111 1  111 1 111111111" \
+            "   11 111    1 1111111 1111        " \
+            "   11 111 1      11111 111        1" \
+            "   11 111   1111111111111         1" \
+            "   11111111111111111111111111111111" \
+            "  11111111    1 11          1111111" \
+            "111111111111111111        111111111" \
+            "   111111  111111111111111111  1111" \
+            " 1  111111  11111111111111    111 1" \
+            "1   111111111111111111111 111111  1" \
+            "111 11 11111111111111111  11111 1 1" \
+            "111   111111111  111 111 1 11111 1 " \
+            "111   1111111111 1  11111111  111  " \
+            "1     1111 111111   11111 1111111 1" \
+            "111   1111 1111111  11111 111111  1" \
+            "111   1111  1111111 111111 111 11  " \
+            "111 111111 1 11111  1   11111111111" \
+            "111   1111     111        1111 111 " \
+            " 1    111      111             1   " \
+            "     11111   1             1     1 " \
+            "    1 111                   11  1  " \
+            "       1  1  1  1              1   " \
+            " 1   11   1 1 1                    "
 
       dest = @bitmap_class.new(chunk, 35)
       dest.clear(" ")

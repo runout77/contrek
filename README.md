@@ -9,6 +9,45 @@ Contrek (**con**tour **trek**king) simply scans your png/raw bitmap and returns 
 In the following image all the non-white pixels have been examined and the result is the red polygon for the outer contour and the green one for the inner one
 ![alt text](contrek.png "Contour tracing")
 
+## 🚀 Why Contrek?
+
+Contrek is a high-performance vectorization engine designed for massive datasets where memory efficiency and multi-core utilization are critical. Unlike traditional sequential contour tracers, Contrek is built on a **Stripe-Merging Architecture** that allows it to process images in independent segments and reconstruct the resulting polygons with perfect topological integrity.
+
+### 1. Parallel Processing Power
+Contrek is designed to saturate all available CPU cores. By partitioning a single image into stripes, it can assign each segment to a different thread.
+* **The Result:** On multi-core systems, Contrek achieves unmatched extraction speeds by parallelizing the workload.
+* **Scalability:** Performance scales directly with your hardware, making it the ideal choice for high-throughput processing servers.
+
+### 2. Streamed Memory Management
+Standard vectorization requires loading entire high-resolution images into RAM, which often leads to memory saturation.
+* **The Solution:** Contrek enables **streamed processing** (see the C++ example in the repo). You can define a specific stripe height (buffer) and process the image incrementally, consuming only the memory allocated for that buffer.
+* **The Benefit:** Vectorize massive, gigapixel-scale images or raw datasets directly from memory buffers. This allows for high-performance processing even on systems with limited memory that would otherwise fail.
+
+### 3. Intelligent "Stitching" Technology
+The core strength of Contrek is its **Topologically Consistent Merging** algorithm, which maintains a deep understanding of polygon connectivity across stripe boundaries.
+* Whether you are optimizing for **speed** (parallel cores) or **memory** (sequential streaming), the output is always a seamless, continuous set of vector data, free from gaps or duplicates at the seams.
+
+<table>
+  <tr>
+    <td><img src="docs/images/stripes/whole_0.png" alt="Contour tracing stripe 0" width="50%"></td>
+    <td rowspan="4" align="center">
+      <img src="docs/images/stripes/whole.png" alt="Contour tracing stripe 0" width="50%">
+    </td>
+  </tr>
+  <tr>
+    <td><img src="docs/images/stripes/whole_256.png" alt="Contour tracing stripe 0" width="50%"></td>
+  </tr>
+  <tr>
+    <td><img src="docs/images/stripes/whole_512.png" alt="Contour tracing stripe 0" width="50%"></td>
+  </tr>
+  <tr>
+    <td><img src="docs/images/stripes/whole_768.png" alt="Contour tracing stripe 0" width="50%"></td>
+  </tr>
+  <tr><td colspan="2"><em><b>Left:</b> The image is split into 4 independent memory buffers (stripes).
+  <br><b>Right:</b> Contrek ensures <b>perfect topological continuity</b> during merging.</em>
+    <br><span style="color: #d32f2f;">■</span> <b>Red:</b> Outer contours |
+    <span style="color: #2e7d32;">■</span> <b>Dark Green:</b> Inner zones</td></tr>
+</table>
 
 ## Prerequisites
 
@@ -179,6 +218,26 @@ result = Contrek.contour!(
   }
 )
 ```
+
+## Tracing Modes
+
+Contrek provides two levels of precision for polygon generation to balance data density and topological accuracy.
+
+### **Standard Mode** (Default)
+Optimized for **speed** and **lightweight** output.
+* **Behavior:** Traces outer boundaries while simplifying collinear segments.
+* **Result:** Fewer vertices and smaller memory footprint.
+
+### **Strict Mode** (`strict_bounds: true`)
+Engineered for **Pixel-Perfect** precision.
+* **Behavior:** Preserves every junction and internal connectivity change.
+* **Result:** 100% topologically faithful geometry with no micro-gaps between adjacent polygons.
+
+Below are two images illustrating the difference in tracing modes. In the first case, with **strict_bounds ON**, the anti-clockwise sequence includes two additional points, **H** and **I**, which trace the shape more accurately. In the second case, the transition between **G** and **H** is approximated, omitting the indentation.
+| Strict Bounds ON | Strict Bounds OFF |
+|:---:|:---:|
+| ![Originale](./docs/images/strict_bounds_on.png) | ![Poligoni](./docs/images/strict_bounds_off.png) |
+
 
 ## Result
 

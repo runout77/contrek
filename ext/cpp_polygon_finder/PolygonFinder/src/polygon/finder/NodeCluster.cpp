@@ -18,6 +18,7 @@
 #include "NodeCluster.h"
 #include "Node.h"
 #include "RectBounds.h"
+#include "PointPool.h"
 #include "../reducers/UniqReducer.h"
 #include "../reducers/LinearReducer.h"
 #include "../reducers/VisvalingamReducer.h"
@@ -243,7 +244,7 @@ std::pair<int, int> NodeCluster::test_in_hole_o(Node* node)
 
 void NodeCluster::plot_inner_node(std::vector<Point*>& sequence_coords, Node *node, int versus, Node *stop_at, Node *start_node) {
   Node *current_node = node;
-
+  bool strict_bounds = this->options->strict_bounds;
   while (current_node != nullptr) {
     current_node->outer_index = start_node->outer_index;
     current_node->inner_index = stop_at->inner_index;
@@ -271,7 +272,12 @@ void NodeCluster::plot_inner_node(std::vector<Point*>& sequence_coords, Node *no
           sequence_coords.push_back(next_node->coords_entering_to(current_node, versus, Node::INNER));
         }
       }
-    }
+    } else if (strict_bounds) {
+        bool first_is_max = ((current_node->y > last_node->y) == (versus == Node::A));
+        sequence_coords.push_back(this->points_pool.acquire((first_is_max ? last_node->max_x : last_node->min_x), current_node->y));
+        sequence_coords.push_back(this->points_pool.acquire((first_is_max ? next_node->min_x : next_node->max_x), current_node->y));
+      }
+
     if (current_node->track_uncomplete()) {
       this->inner_new->push_back(current_node);
     } else {
@@ -284,6 +290,7 @@ void NodeCluster::plot_inner_node(std::vector<Point*>& sequence_coords, Node *no
 
 void NodeCluster::plot_node(std::vector<Point*>& sequence_coords, Node *node, Node *start_node, int versus, RectBounds& bounds) {
   Node *current_node = node;
+  bool strict_bounds = this->options->strict_bounds;
 
   while (current_node != nullptr) {
     root_nodes->remove(current_node);
@@ -315,7 +322,13 @@ void NodeCluster::plot_node(std::vector<Point*>& sequence_coords, Node *node, No
           inner_plot->contains(current_node) ? inner_plot->remove(current_node) : inner_plot->push_back(current_node);
         }
       }
-    }
+    } else if (strict_bounds) {
+        bool is_down = current_node->y > last_node->y;
+        bool is_a = (versus == Node::A);
+        sequence_coords.push_back(this->points_pool.acquire((is_down == is_a ? last_node->min_x : last_node->max_x), current_node->y));
+        sequence_coords.push_back(this->points_pool.acquire((is_down == is_a ? next_node->max_x : next_node->min_x), current_node->y));
+      }
+
     if (current_node == start_node) {
       if (current_node->track_complete()) break;
     }

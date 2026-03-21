@@ -27,6 +27,10 @@ class RawBitmap : public Bitmap {
   int get_bytes_per_pixel() const;
   uint32_t define(uint width, uint height, int bytes_per_pixel, bool clear = false);
   void draw_pixel(int x, int y, unsigned char r, unsigned char g, unsigned char b, unsigned char a = 255);
+  bool save_to_png(const std::string& filename);
+  void fill(unsigned char r, unsigned char g, unsigned char b, unsigned char a = 255);
+  void draw_line(int x0, int y0, int x1, int y1, unsigned char r, unsigned char g, unsigned char b, unsigned char a = 255);
+  void draw_filled_rectangle(int x, int y, int w, int h, unsigned char r, unsigned char g, unsigned char b, unsigned char a = 255);
 
  protected:
   std::unique_ptr<unsigned char[]> image;

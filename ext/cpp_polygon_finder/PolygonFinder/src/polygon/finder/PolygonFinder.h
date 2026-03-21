@@ -27,6 +27,7 @@ class Matcher;
 class RGBMatcher;
 class NodeCluster;
 class Node;
+class RawBitmap;
 struct Point;
 
 struct ShapeLine {
@@ -41,6 +42,7 @@ struct pf_Options {
   bool compress_visvalingam = false;
   bool named_sequences = false;
   bool bounds = false;
+  bool strict_bounds = false;
   int connectivity_offset = 0;
   float compress_visvalingam_tolerance = 10.0;
   int number_of_tiles = 1;
@@ -48,6 +50,7 @@ struct pf_Options {
     return(versus == Node::A ? "a" : "o");
   }
 };
+
 struct ProcessResult {
   int groups;
   int width, height;
@@ -55,6 +58,7 @@ struct ProcessResult {
   std::list<Polygon> polygons;
   std::string named_sequence;
   std::vector<std::pair<int, int>> treemap;
+  void draw_on_bitmap(RawBitmap& canvas) const;
 
   void print_polygons() {
     int counter = 0;
@@ -67,7 +71,7 @@ struct ProcessResult {
         first = false;
         for (const Point* p : seq) std::cout << p->toString();
       }
-      std::cout << "\n";
+      std::cout << "\n" << polygon.bounds.to_string() <<"\n";
       counter++;
     }
   }
@@ -88,6 +92,40 @@ struct ProcessResult {
       polygon.bounds.min_x += x;
       polygon.bounds.max_x += x;
     }
+  }
+
+  ProcessResult* clone() const {
+    ProcessResult* new_res = new ProcessResult();
+    new_res->groups = this->groups;
+    new_res->width = this->width;
+    new_res->height = this->height;
+    new_res->benchmarks = this->benchmarks;
+    new_res->named_sequence = this->named_sequence;
+    new_res->treemap = this->treemap;
+
+    for (const auto& poly : this->polygons) {
+      Polygon new_poly;
+      // Bounds
+      new_poly.bounds = poly.bounds;
+      // outer
+      for (const Point* p : poly.outer) {
+        if (p) {
+          new_poly.outer.push_back(new Point(p->x, p->y));
+        }
+      }
+      // inner
+      for (const auto& seq : poly.inner) {
+        std::vector<Point*> new_seq;
+        for (const Point* p : seq) {
+          if (p) {
+            new_seq.push_back(new Point(p->x, p->y));
+          }
+        }
+        new_poly.inner.push_back(new_seq);
+      }
+      new_res->polygons.push_back(new_poly);
+    }
+    return new_res;
   }
 };
 

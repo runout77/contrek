@@ -98,7 +98,7 @@ std::vector<EndPoint*> Part::remove_adjacent_pairs(const std::vector<EndPoint*>&
 }
 
 void Part::orient()
-{ if (this->size <= 1) {
+{ if (this->size <= 1 || (this->size == 2 && this->inverts)) {
     this->versus_ = 0;
   } else {
     this->versus_ = (this->tail->payload->y - this->head->payload->y) > 0 ? 1 : -1;

@@ -24,6 +24,8 @@
 #include "PolygonFinder/src/polygon/finder/List.h"
 #include "PolygonFinder/src/polygon/finder/Lists.cpp"
 #include "PolygonFinder/src/polygon/finder/Lists.h"
+#include "PolygonFinder/src/polygon/finder/PointPool.h"
+#include "PolygonFinder/src/polygon/finder/PointPool.cpp"
 #include "PolygonFinder/src/polygon/finder/Polygon.h"
 #include "PolygonFinder/src/polygon/bitmaps/Bitmap.h"
 #include "PolygonFinder/src/polygon/bitmaps/Bitmap.cpp"
@@ -219,7 +221,7 @@ class To_Ruby<ProcessResult*>
     return_me[Symbol("treemap")] = tmapout;
     rr->metadata = return_me;
 
-    // Protects objects 'out' e 'return_me' linking them to the ruby instance preventing GC
+    // Protects objects 'out' and 'return_me' linking them to the ruby instance preventing GC
     // garbage collector to free them before the instance itself.
     Rice::Object ruby_obj = rb_result;
     ruby_obj.iv_set("@polygons_storage", out);
@@ -240,7 +242,6 @@ ProcessResult ruby_result_to_process_result(Rice::Object rb_result) {
 
   Rice::Array rb_polygons = rb_result.iv_get("@polygons_storage");
   for (size_t i = 0; i < rb_polygons.size(); ++i) {
-    // Cast esplicito a Rice::Hash per evitare il Proxy
     Rice::Hash rb_poly = (Rice::Hash)rb_polygons[i];
     Polygon poly;
     // BOUNDS
@@ -371,9 +372,22 @@ void Init_cpp_polygon_finder() {
     define_class<VerticalMerger, Merger>("CPPVerticalMerger")
     .define_constructor(Constructor<VerticalMerger, int, std::vector<std::string>*>(), Arg("number_of_threads"), Arg("options") = nullptr, Arg("yield_gvl") = true);
 
-  Data_Type<RubyResult> rb_cResult =
-    define_class_under<RubyResult>(rb_cFinder, "Result")
+  Module mContrek = define_module("Contrek");
+  Module mCpp = define_module_under(mContrek, "Cpp");
+  Data_Type<RubyResult> rb_cResult = define_class_under<RubyResult>(mCpp, "CPPResult")
     .define_constructor(Constructor<RubyResult>())
     .define_method("polygons", [](RubyResult& rr) { return rr.polygons; })
-    .define_method("metadata", [](RubyResult& rr) { return rr.metadata; });
+    .define_method("metadata", [](RubyResult& rr) { return rr.metadata; })
+    .define_method("polygons=", [](RubyResult& rr, Object value) {
+      rr.polygons = value;
+      Rice::Data_Object<RubyResult> self(&rr);
+      self.iv_set("@polygons_storage", value);
+      return value;
+    })
+    .define_method("metadata=", [](RubyResult& rr, Object value) {
+      rr.metadata = (Rice::Hash)value;
+      Rice::Data_Object<RubyResult> self(&rr);
+      self.iv_set("@metadata_storage", value);
+      return value;
+    });
 }

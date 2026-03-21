@@ -1,6 +1,6 @@
 RSpec.describe CPPPolygonFinder, type: :class do
   before do
-    @matcher = CPPValueNotMatcher.new("0")
+    @matcher = CPPValueNotMatcher.new(" ")
     @polygon_finder_class = CPPPolygonFinder
     @bitmap_class = CPPBitMap
     @png_bitmap_class = CPPPngBitMap
@@ -8,17 +8,17 @@ RSpec.describe CPPPolygonFinder, type: :class do
     @png_not_matcher_color = Contrek::Bitmaps::RgbCppColor.new(r: 255, g: 255, b: 255, a: 255).raw
   end
 
-  describe "node test" do
+  describe "base tests", base: true do
     it "verify costants difference" do
-      chunk = "0000000000000000" \
-                  "0000000000000000" \
-                  "000000AAAAAA0000" \
-                  "000000BB00FF0000" \
-                  "000000CC00EE0000" \
-                  "000000DDDDDD0000" \
-                  "0000000000000000"
+      chunk = "                " \
+                  "                " \
+                  "      AAAAAA    " \
+                  "      BB  FF    " \
+                  "      CC  EE    " \
+                  "      DDDDDD    " \
+                  "                "
       bitmap = CPPBitMap.new(chunk, 16)
-      matcher = CPPValueNotMatcher.new("0")
+      matcher = CPPValueNotMatcher.new(" ")
       polygonfinder = CPPPolygonFinder.new(bitmap, matcher, nil, {versus: "o", named_sequences: true, compress: {linear: true, visvalingam: {tolerance: 1}}})
       pi = polygonfinder.process_info
       expect(pi.metadata[:groups]).to eq 1
@@ -27,9 +27,6 @@ RSpec.describe CPPPolygonFinder, type: :class do
   end
 
   describe "shared_test", simples: true do
-    before do
-      @matcher = CPPValueNotMatcher.new(" ")
-    end
     include_examples "simples"
   end
 
@@ -37,21 +34,19 @@ RSpec.describe CPPPolygonFinder, type: :class do
     include_examples "complex"
   end
 
+  describe "shared_test", treemap: true do
+    include_examples "treemap"
+  end
+
   describe "shared_test", heavy: true do
     include_examples "heavy"
   end
 
   describe "shared_test", connections: true do
-    before do
-      @matcher = CPPValueNotMatcher.new(" ")
-    end
     include_examples "connections"
   end
 
-  describe "shared_test", treemap: true do
-    before do
-      @matcher = CPPValueNotMatcher.new(" ")
-    end
-    include_examples "treemap"
+  describe "shared_test", strict_bounds: true do
+    include_examples "strict_bounds"
   end
 end

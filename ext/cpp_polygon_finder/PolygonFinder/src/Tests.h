@@ -19,4 +19,5 @@ class Tests {
   virtual void test_f();
   virtual void test_g();
   virtual void test_h();
+  virtual void test_i();
 };

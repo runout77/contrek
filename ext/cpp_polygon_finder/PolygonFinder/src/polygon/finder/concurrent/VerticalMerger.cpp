@@ -22,8 +22,8 @@ void VerticalMerger::add_tile(ProcessResult& result)
 { transpose(result);
   if (this->tiles.size() > 0) {
     translate(result, this->current_x);
-    adjust(result);
   }
+  adjust(result);
   Merger::add_tile(result);
 }
 

@@ -5,8 +5,8 @@ module Contrek
         transpose(result)
         if @tiles.size > 0
           translate(result, @current_x)
-          adjust(result)
         end
+        adjust(result)
         super
       end
 
@@ -26,7 +26,7 @@ module Contrek
       end
 
       def transpose(result)
-        result.metadata_hash[:width], result.metadata_hash[:height] = result.metadata_hash[:height], result.metadata_hash[:width]
+        result.metadata[:width], result.metadata[:height] = result.metadata[:height], result.metadata[:width]
         result.polygons.each do |polygon|
           polygon[:outer].each { |p| p[:x], p[:y] = p[:y], p[:x] }
           polygon[:inner].each do |sequence|

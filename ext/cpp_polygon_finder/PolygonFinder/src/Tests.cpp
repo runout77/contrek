@@ -14,12 +14,16 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <cstring>
+#include <algorithm>
+#include <cstdio>
 #include "polygon/finder/PolygonFinder.h"
 #include "polygon/finder/concurrent/ClippedPolygonFinder.h"
 #include "polygon/bitmaps/Bitmap.h"
 #include "polygon/bitmaps/FastPngBitmap.h"
 #include "polygon/bitmaps/RawBitmap.h"
 #include "polygon/bitmaps/RemoteFastPngBitmap.h"
+#include "polygon/bitmaps/spng.h"
 #include "polygon/matchers/Matcher.h"
 #include "polygon/matchers/RGBMatcher.h"
 #include "polygon/matchers/RGBNotMatcher.h"
@@ -27,6 +31,7 @@
 #include "polygon/finder/optionparser.h"
 #include "polygon/finder/concurrent/Finder.h"
 #include "polygon/finder/concurrent/HorizontalMerger.h"
+#include "polygon/finder/concurrent/VerticalMerger.h"
 #include "polygon/finder/concurrent/Sequence.h"
 #include "polygon/finder/concurrent/Position.h"
 #include "polygon/finder/Polygon.h"
@@ -46,6 +51,7 @@ void Tests::test_a()
   Bitmap b(chunk, 16);
   PolygonFinder pl(&b, &matcher, nullptr, &arguments);
   ProcessResult *o = pl.process_info();
+  // o->print_polygons();
   std::vector<int> outer_array{11, 1, 6, 2, 6, 3, 6, 4, 6, 5, 11, 5, 11, 4, 11, 3, 11, 2, 11, 1};
   std::vector<int> inner_array{7, 3, 10, 3, 10, 4, 7, 4};
   std::vector<int> array_compare;
@@ -252,4 +258,111 @@ void Tests::test_h()
   delete merged_result;
   delete left_result;
   delete right_result;
+}
+
+/* In this example, PNG data is read by streaming into a user-defined buffer height.
+  Contrek scans each stripe and extracts the polygons. Finally, it merges all
+  polygons from every stripe as if they had been read from a single image and saves
+  the result polygons on a png image.
+  This approach allows for processing large PNG files on systems where memory
+  would otherwise be insufficient.
+*/
+void stream_png_image(const std::string& filepath, uint32_t stripe_height) {
+    std::vector<ProcessResult*> result_clones;
+    std::vector<std::string> varguments = {};
+    VerticalMerger vmerger(0, &varguments);
+
+    // opens image to stream
+    FILE* fp = fopen(filepath.c_str(), "rb");
+    if (!fp) {
+      std::cerr << "Unable open file: " << filepath << std::endl;
+      return;
+    }
+
+    // exams image
+    spng_ctx *ctx = spng_ctx_new(0);
+    spng_set_png_file(ctx, fp);
+    struct spng_ihdr ihdr;
+    if (spng_get_ihdr(ctx, &ihdr)) {
+      fclose(fp);
+      spng_ctx_free(ctx);
+      return;
+    }
+    uint32_t total_width = ihdr.width;
+    uint32_t total_height = ihdr.height;
+
+    // allocates stripe buffer
+    RawBitmap stripe_bitmap;
+    stripe_bitmap.define(total_width, stripe_height, 4, true);
+    RGBNotMatcher not_matcher(-1);
+
+    if (spng_decode_image(ctx, NULL, 0, SPNG_FMT_RGBA8, SPNG_DECODE_PROGRESSIVE)) {
+      fclose(fp);
+      spng_ctx_free(ctx);
+      return;
+    }
+
+    size_t row_size = static_cast<size_t>(total_width) * 4;
+    // main strpes loop
+    for (uint32_t current_y_offset = 0; current_y_offset < total_height; current_y_offset += stripe_height) {
+      int uncovered_height = total_height - current_y_offset;
+
+      // copy previous last line to the next new one (each contigue stripe must share one pixel scanline)
+      if (current_y_offset > 0) {
+        unsigned char* last_row_prev = const_cast<unsigned char*>(stripe_bitmap.get_row_ptr(stripe_height - 1));
+        unsigned char* first_row_curr = const_cast<unsigned char*>(stripe_bitmap.get_row_ptr(0));
+        std::memcpy(first_row_curr, last_row_prev, row_size);
+      }
+      // clears the part of the stripe wont be overwritten by png data
+      if (uncovered_height < stripe_height)
+      { stripe_bitmap.draw_filled_rectangle(0, 1, total_width, stripe_height - 1, 255, 255, 255);
+      }
+      // decoding data directly in the stripe buffer
+      uint32_t lines_to_read = std::min(stripe_height, total_height - current_y_offset);
+      for (uint32_t y = (current_y_offset == 0 ? 0 : 1); y < lines_to_read; y++) {
+        unsigned char* row_ptr = const_cast<unsigned char*>(stripe_bitmap.get_row_ptr(y));
+        int ret = spng_decode_row(ctx, row_ptr, row_size);
+        if (ret != 0 && ret != SPNG_EOI) break;
+      }
+      // stripe contour tracing
+      std::vector<std::string> finder_arguments = {
+        "--versus=a",
+        "--strict_bounds"  // <- this option is strictly needed when working with vertical merger
+      };
+      PolygonFinder polygon_finder(&stripe_bitmap, &not_matcher, nullptr, &finder_arguments);
+      ProcessResult *result = polygon_finder.process_info();
+      if (result) {
+        std::cout << "Founds polygons: " << result->groups << std::endl;
+        ProcessResult* safe_result = result->clone();
+        result_clones.push_back(safe_result);
+        vmerger.add_tile(*safe_result);
+        delete result;
+      }
+    }
+
+    std::cout << "Merging polygons ..." << std::endl;
+    ProcessResult *merged_result = vmerger.process_info();
+    std::cout << "Founds total polygons: " << merged_result->groups << std::endl;
+
+    if (merged_result) {
+      RawBitmap full_bitmap;
+      full_bitmap.define(total_width, total_height, 4, true);
+      full_bitmap.fill(255, 255, 255);
+      merged_result->draw_on_bitmap(full_bitmap);
+      std::cout << "Saving whole png ..." << std::endl;
+      if (full_bitmap.save_to_png("whole.png")) {
+        std::cout << "Png saved!" << std::endl;
+      }
+    }
+    delete merged_result;
+    // frees memory
+    for (auto c : result_clones) {
+      delete c;
+    }
+    spng_ctx_free(ctx);
+    fclose(fp);
+}
+
+void Tests::test_i() {
+  stream_png_image("../images/graphs_1024x1024.png", 300);
 }

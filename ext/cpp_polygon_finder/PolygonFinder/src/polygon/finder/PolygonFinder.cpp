@@ -17,6 +17,8 @@
 #include <utility>
 #include "PolygonFinder.h"
 #include "../bitmaps/Bitmap.h"
+#include "../bitmaps/RawBitmap.h"
+
 #include "../matchers/Matcher.h"
 #include "../matchers/RGBMatcher.h"
 #include "../matchers/RGBNotMatcher.h"
@@ -123,4 +125,32 @@ ProcessResult* PolygonFinder::process_info() {
   }
   else pr->named_sequence = "";
   return(pr);
+}
+
+void ProcessResult::draw_on_bitmap(RawBitmap& bitmap) const {
+  for (const auto& poly : polygons) {
+    // --- OUTER ---
+    if (!poly.outer.empty()) {
+      for (size_t i = 0; i < poly.outer.size() - 1; ++i) {
+        Point* p1 = poly.outer[i];
+        Point* p2 = poly.outer[i+1];
+        bitmap.draw_line(p1->x, p1->y, p2->x, p2->y, 255, 0, 0, 255);
+      }
+      Point* last = poly.outer.back();
+      Point* first = poly.outer.front();
+      bitmap.draw_line(last->x, last->y, first->x, first->y, 255, 0, 0, 255);
+    }
+    // --- INNER ---
+    for (const auto& sequence : poly.inner) {
+      if (sequence.empty()) continue;
+      for (size_t i = 0; i < sequence.size() - 1; ++i) {
+        Point* p1 = sequence[i];
+        Point* p2 = sequence[i+1];
+        bitmap.draw_line(p1->x, p1->y, p2->x, p2->y, 0, 128, 0, 255);
+      }
+      Point* last = sequence.back();
+      Point* first = sequence.front();
+      bitmap.draw_line(last->x, last->y, first->x, first->y, 0, 128, 0, 255);
+    }
+  }
 }

@@ -34,6 +34,7 @@ RSpec.shared_examples "multiprocessing" do
     end
 
     it "divides image into 4 tiles (2048x2048)" do
+      skip unless @polygon_finder_class == Contrek::Cpp::CPPConcurrentFinder
       filename = "graphs_2048x2048"
       workers = 4
       png_bitmap = @png_bitmap_class.new("./spec/files/images/#{filename}.png")

@@ -1958,8 +1958,145 @@ RSpec.shared_examples "finder" do
       expect(result.points).to eq([{outer: [{x: 0, y: 0}, {x: 0, y: 23}, {x: 9, y: 23}, {x: 19, y: 23}, {x: 19, y: 0}, {x: 9, y: 0}], inner: [[{x: 1, y: 21}, {x: 1, y: 2}, {x: 16, y: 2}, {x: 16, y: 10}, {x: 9, y: 11}, {x: 6, y: 10}, {x: 9, y: 9}, {x: 11, y: 9}, {x: 11, y: 3}, {x: 9, y: 3}, {x: 4, y: 3}, {x: 4, y: 20}, {x: 9, y: 20}, {x: 16, y: 21}], [{x: 6, y: 7}, {x: 6, y: 5}, {x: 10, y: 5}, {x: 10, y: 7}], [{x: 16, y: 13}, {x: 16, y: 18}, {x: 6, y: 18}, {x: 6, y: 17}, {x: 9, y: 16}, {x: 10, y: 16}, {x: 10, y: 15}, {x: 9, y: 15}, {x: 6, y: 14}, {x: 6, y: 13}]]}])
     end
 
-    # this test demonstrate how trace contours on two different areas merging them later considering they share adjacent vertical
-    # stripe (one pixel)
+    it "complex shape" do
+      chunk =
+        #-----------*-------------
+        "          0E0            " \
+        "          000            " \
+        "          0E00           " \
+        "         00 F00          " \
+        "         0X  FF00        " \
+        "        00     00000     " \
+        "        0X     F00000    " \
+        "       00       0 0000   " \
+        "       0X      F0    0000" \
+        "      00      F0      000" \
+        "      0X      00     0000" \
+        "     00      F0      0000" \
+        "     00      00     00   " \
+        "     0X     F0      00   " \
+        "    00      00     00    " \
+        "    00      00     00    " \
+        "    0X     G0      00    " \
+        "    0      00      0     " \
+        "    0      00     00     " \
+        "    0      0      00     " \
+        "  000     X0      0      " \
+        "  00X     00      0      " \
+        "  00      0G     00      " \
+        "  00      0      00      " \
+        "  00      0      00      " \
+        "  00      0      00      " \
+        "  00     X0      00      " \
+        "  00     00      0       " \
+        "  00     00      0       " \
+        "  00     00      0       " \
+        "  00XXXXX00C000000       " \
+        "  00  0  00     00       " \
+        "  00     00      0       " \
+        "  00      0      00      " \
+        "  00      0      00      " \
+        "  00      00     00      " \
+        "  00      00     00      " \
+        "  00      00     00      " \
+        "  00      00      00     " \
+        "  000     00      00     " \
+        "  000      0      00     " \
+        "    0      00      00    " \
+        "    0      00       0    " \
+        "    00      0       00   " \
+        "    00      00      00   " \
+        "     0      00       00  " \
+        "     00      00       0  " \
+        "     00      00       00 " \
+        "      0       00       0 " \
+        "      00      00       00" \
+        "      00       00       0" \
+        "       00      00       0" \
+        "       00       00      0" \
+        "        00       00     0" \
+        "         0       000    0" \
+        "         00       000 000" \
+        "          00        00000" \
+        "          00        00000" \
+        "           00      000   " \
+        "            00     00    " \
+        "            000   00     " \
+        "             00  00      " \
+        "              00000      " \
+        "               000       " \
+        "                00       "
+      result = @polygon_finder_class.new(
+        bitmap: @bitmap_class.new(chunk, 25),
+        matcher: @matcher,
+        options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
+      ).process_info
+      expect(result.points).to eq([{
+        outer: [{x: 11, y: 0}, {x: 12, y: 0}, {x: 12, y: 1}, {x: 14, y: 3}, {x: 16, y: 4}, {x: 19, y: 5}, {x: 21, y: 7}, {x: 24, y: 8}, {x: 24, y: 11}, {x: 21, y: 12}, {x: 21, y: 13}, {x: 20, y: 14}, {x: 20, y: 16}, {x: 19, y: 17}, {x: 19, y: 19}, {x: 18, y: 20}, {x: 18, y: 26}, {x: 17, y: 27}, {x: 17, y: 32}, {x: 18, y: 33}, {x: 18, y: 37}, {x: 19, y: 38}, {x: 19, y: 40}, {x: 20, y: 41}, {x: 20, y: 42}, {x: 21, y: 43}, {x: 21, y: 44}, {x: 22, y: 45}, {x: 22, y: 46}, {x: 23, y: 47}, {x: 23, y: 48}, {x: 24, y: 49}, {x: 24, y: 57}, {x: 21, y: 58}, {x: 18, y: 61}, {x: 18, y: 62}, {x: 17, y: 63}, {x: 17, y: 64}, {x: 16, y: 64}, {x: 12, y: 60}, {x: 12, y: 59}, {x: 10, y: 57}, {x: 10, y: 56}, {x: 9, y: 55}, {x: 9, y: 54}, {x: 7, y: 52}, {x: 7, y: 51}, {x: 6, y: 50}, {x: 6, y: 48}, {x: 5, y: 47}, {x: 5, y: 45}, {x: 4, y: 44}, {x: 4, y: 41}, {x: 2, y: 40}, {x: 2, y: 20}, {x: 4, y: 19}, {x: 4, y: 14}, {x: 5, y: 13}, {x: 5, y: 11}, {x: 6, y: 10}, {x: 6, y: 9}, {x: 7, y: 8}, {x: 7, y: 7}, {x: 8, y: 6}, {x: 8, y: 5}, {x: 9, y: 4}, {x: 9, y: 3}, {x: 10, y: 2}, {x: 10, y: 0}], inner: [[{x: 10, y: 3}, {x: 10, y: 4}, {x: 9, y: 5}, {x: 9, y: 6}, {x: 8, y: 7}, {x: 8, y: 8}, {x: 7, y: 9}, {x: 7, y: 10}, {x: 6, y: 11}, {x: 6, y: 13}, {x: 5, y: 14}, {x: 5, y: 16}, {x: 4, y: 17}, {x: 4, y: 21}, {x: 3, y: 22}, {x: 3, y: 29}, {x: 9, y: 29}, {x: 9, y: 26}, {x: 10, y: 25}, {x: 10, y: 20}, {x: 11, y: 18}, {x: 11, y: 16}, {x: 11, y: 20}, {x: 11, y: 22}, {x: 12, y: 15}, {x: 12, y: 13}, {x: 13, y: 12}, {x: 13, y: 11}, {x: 14, y: 10}, {x: 14, y: 9}, {x: 16, y: 7}, {x: 15, y: 6}, {x: 15, y: 5}, {x: 13, y: 4}, {x: 12, y: 3}], [{x: 10, y: 23}, {x: 10, y: 29}, {x: 17, y: 29}, {x: 17, y: 22}, {x: 18, y: 21}, {x: 18, y: 18}, {x: 19, y: 17}, {x: 19, y: 14}, {x: 20, y: 13}, {x: 20, y: 12}, {x: 21, y: 11}, {x: 21, y: 10}, {x: 22, y: 9}, {x: 21, y: 8}, {x: 18, y: 7}, {x: 16, y: 7}, {x: 16, y: 8}, {x: 15, y: 9}, {x: 15, y: 10}, {x: 14, y: 11}, {x: 14, y: 12}, {x: 13, y: 13}, {x: 13, y: 15}, {x: 12, y: 16}, {x: 12, y: 18}, {x: 11, y: 20}, {x: 11, y: 22}, {x: 11, y: 18}, {x: 11, y: 16}], [{x: 10, y: 31}, {x: 10, y: 34}, {x: 11, y: 42}, {x: 11, y: 41}, {x: 11, y: 35}, {x: 11, y: 39}, {x: 12, y: 41}, {x: 12, y: 43}, {x: 13, y: 44}, {x: 13, y: 45}, {x: 14, y: 46}, {x: 14, y: 47}, {x: 15, y: 48}, {x: 15, y: 49}, {x: 16, y: 50}, {x: 16, y: 51}, {x: 20, y: 55}, {x: 22, y: 55}, {x: 24, y: 54}, {x: 24, y: 50}, {x: 23, y: 49}, {x: 23, y: 48}, {x: 22, y: 47}, {x: 22, y: 46}, {x: 20, y: 44}, {x: 20, y: 42}, {x: 18, y: 40}, {x: 18, y: 38}, {x: 17, y: 37}, {x: 17, y: 32}, {x: 16, y: 31}], [{x: 10, y: 39}, {x: 10, y: 33}, {x: 9, y: 32}, {x: 9, y: 31}, {x: 3, y: 31}, {x: 3, y: 38}, {x: 4, y: 39}, {x: 4, y: 42}, {x: 5, y: 43}, {x: 5, y: 45}, {x: 6, y: 46}, {x: 6, y: 48}, {x: 7, y: 49}, {x: 7, y: 50}, {x: 8, y: 51}, {x: 8, y: 52}, {x: 9, y: 53}, {x: 9, y: 54}, {x: 11, y: 56}, {x: 11, y: 57}, {x: 14, y: 60}, {x: 14, y: 61}, {x: 17, y: 61}, {x: 19, y: 59}, {x: 19, y: 58}, {x: 20, y: 57}, {x: 20, y: 56}, {x: 18, y: 55}, {x: 17, y: 54}, {x: 17, y: 53}, {x: 15, y: 51}, {x: 15, y: 50}, {x: 14, y: 49}, {x: 14, y: 48}, {x: 13, y: 47}, {x: 13, y: 46}, {x: 12, y: 45}, {x: 12, y: 43}, {x: 11, y: 35}, {x: 11, y: 39}, {x: 11, y: 42}, {x: 11, y: 41}]]
+      }])
+    end
+
+    it "complex shape 1" do
+      #        ---------*----------
+      chunk = "00000000000000      " \
+              "000000000000000     " \
+              "00  00        00    " \
+              "00   00        00   " \
+              "00    000000    00  " \
+              "00    000000     00 " \
+              "00        00      00" \
+              "00        00      00" \
+              "00000000010000000000" \
+              "00        00      00" \
+              "00        00     00 " \
+              "00    000000    00  " \
+              "00    0000     00   " \
+              "00    0000    00    " \
+              "00   00      00     " \
+              "00  00      00      " \
+              "00 00      00       " \
+              "0000      00        " \
+              "000      00         " \
+              "00      00          " \
+              "000000000           " \
+              "000000000           "
+
+      result = @polygon_finder_class.new(
+        bitmap: @bitmap_class.new(chunk, 20),
+        matcher: @matcher,
+        options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
+      ).process_info
+      expect(result.points).to eq([{outer: [{x: 9, y: 0}, {x: 13, y: 0}, {x: 19, y: 6}, {x: 19, y: 9}, {x: 8, y: 20}, {x: 8, y: 21}, {x: 0, y: 21}, {x: 0, y: 0}], inner: [[{x: 5, y: 2}, {x: 6, y: 3}, {x: 11, y: 4}, {x: 11, y: 7}, {x: 18, y: 7}, {x: 18, y: 6}, {x: 14, y: 2}], [{x: 6, y: 5}, {x: 6, y: 4}, {x: 4, y: 2}, {x: 1, y: 2}, {x: 1, y: 7}, {x: 10, y: 7}, {x: 10, y: 6}], [{x: 1, y: 9}, {x: 1, y: 16}, {x: 3, y: 16}, {x: 6, y: 13}, {x: 6, y: 11}, {x: 9, y: 12}, {x: 9, y: 13}, {x: 10, y: 10}, {x: 10, y: 9}], [{x: 6, y: 14}, {x: 1, y: 19}, {x: 8, y: 19}, {x: 18, y: 9}, {x: 11, y: 9}, {x: 11, y: 11}, {x: 9, y: 12}, {x: 9, y: 13}]]}])
+    end
+
+    it "complex shape 2" do
+      chunk = "00000000000000      " \
+              "000000000000000     " \
+              "00  00        00    " \
+              "00   00        00   " \
+              "00    000000    00  " \
+              "00         00    00 " \
+              "00          00    00" \
+              "00000000000000000000" \
+              "00000000010000000000" \
+              "00          00    00" \
+              "00         00    00 " \
+              "00       000    00  " \
+              "00     000     00   " \
+              "00    00      00    " \
+              "000000000000000     " \
+              "00000000000000      "
+
+      result = @polygon_finder_class.new(
+        bitmap: @bitmap_class.new(chunk, 20),
+        matcher: @matcher,
+        options: {number_of_tiles: 2, versus: :a, compress: {uniq: true, linear: true}}
+      ).process_info
+      expect(result.points).to eq([{outer: [{x: 0, y: 0}, {x: 0, y: 15}, {x: 9, y: 15}, {x: 13, y: 15}, {x: 19, y: 9}, {x: 19, y: 6}, {x: 13, y: 0}, {x: 9, y: 0}], inner: [[{x: 7, y: 13}, {x: 9, y: 11}, {x: 9, y: 12}, {x: 11, y: 11}, {x: 13, y: 9}, {x: 18, y: 9}, {x: 14, y: 13}], [{x: 7, y: 12}, {x: 6, y: 13}, {x: 1, y: 13}, {x: 1, y: 9}, {x: 12, y: 9}, {x: 11, y: 10}, {x: 9, y: 12}, {x: 9, y: 11}], [{x: 1, y: 6}, {x: 1, y: 2}, {x: 4, y: 2}, {x: 6, y: 4}, {x: 11, y: 5}, {x: 12, y: 6}], [{x: 6, y: 3}, {x: 5, y: 2}, {x: 14, y: 2}, {x: 18, y: 6}, {x: 13, y: 6}, {x: 11, y: 4}]]}])
+    end
+
+    # this test demonstrate how trace contours on two different areas merging them later considering
+    # they share adjacent vertical stripe (one pixel)
     it "merge mode" do
       left = "0000000000" \
               "0000000000" \
@@ -2070,7 +2207,7 @@ RSpec.shared_examples "finder" do
       result = step_finder.process_info
       expect(result.metadata[:width]).to eq(12)
       expect(result.metadata[:height]).to eq(9)
-      expect(result.points).to eq([{outer: [{x: 0, y: 0}, {x: 0, y: 4}, {x: 0, y: 8}, {x: 11, y: 8}, {x: 11, y: 4}, {x: 11, y: 0}], inner: [[{x: 2, y: 2}, {x: 9, y: 2}, {x: 9, y: 6}, {x: 2, y: 6}]]}])
+      expect(result.points).to eq([{outer: [{x: 0, y: 4}, {x: 0, y: 8}, {x: 11, y: 8}, {x: 11, y: 4}, {x: 11, y: 0}, {x: 0, y: 0}], inner: [[{x: 2, y: 2}, {x: 9, y: 2}, {x: 9, y: 6}, {x: 2, y: 6}]]}])
     end
 
     it "merge mode (example 4)" do
@@ -2144,7 +2281,7 @@ RSpec.shared_examples "finder" do
       result = step_finder.process_info
       expect(result.metadata[:width]).to eq(12)
       expect(result.metadata[:height]).to eq(9)
-      expect(result.points).to eq([{outer: [{x: 11, y: 0}, {x: 11, y: 4}, {x: 11, y: 8}, {x: 0, y: 8}, {x: 0, y: 4}, {x: 0, y: 0}], inner: [[{x: 9, y: 2}, {x: 2, y: 2}, {x: 2, y: 6}, {x: 9, y: 6}]]}])
+      expect(result.points).to eq([{outer: [{x: 11, y: 4}, {x: 11, y: 8}, {x: 0, y: 8}, {x: 0, y: 4}, {x: 0, y: 0}, {x: 11, y: 0}], inner: [[{x: 9, y: 2}, {x: 2, y: 2}, {x: 2, y: 6}, {x: 9, y: 6}]]}])
     end
 
     it "merge mode (example 6 vertical)" do
@@ -2184,7 +2321,257 @@ RSpec.shared_examples "finder" do
       result = step_finder.process_info
       expect(result.metadata[:width]).to eq(12)
       expect(result.metadata[:height]).to eq(12)
-      expect(result.points).to eq([{outer: [{x: 11, y: 0}, {x: 11, y: 3}, {x: 11, y: 8}, {x: 11, y: 11}, {x: 0, y: 11}, {x: 0, y: 8}, {x: 0, y: 3}, {x: 0, y: 0}], inner: [[{x: 9, y: 2}, {x: 2, y: 2}, {x: 2, y: 4}, {x: 9, y: 4}], [{x: 9, y: 7}, {x: 2, y: 7}, {x: 2, y: 9}, {x: 9, y: 9}]]}])
+      expect(result.points).to eq([{outer: [{x: 11, y: 3}, {x: 11, y: 8}, {x: 11, y: 11}, {x: 0, y: 11}, {x: 0, y: 8}, {x: 0, y: 3}, {x: 0, y: 0}, {x: 11, y: 0}], inner: [[{x: 9, y: 2}, {x: 2, y: 2}, {x: 2, y: 4}, {x: 9, y: 4}], [{x: 9, y: 7}, {x: 2, y: 7}, {x: 2, y: 9}, {x: 9, y: 9}]]}])
+    end
+
+    it "merge mode (example 7 vertical)" do
+      up =
+        "                                                                 " \
+        "                       000000000000000                           " \
+        "                    000000000000000000000                        " \
+        "              00000000        0        000000                    " \
+        "           000000             0            00000                 " \
+        "         00000                00              00000              " \
+        "       0000                   0                  0000            " \
+        "     0000                     0                    000           " \
+        "   0000                   0000000                    000         " \
+        "00000               00000000000000000000               000       " \
+        "000             0000000       0    00000000             000      "
+
+      down =
+        "000             0000000       0    00000000             000      " \
+        "0000         000000           0          00000            000    " \
+        "00000      00000              0             0000           000   " \
+        "   00    0000                 0               0000          000  " \
+        "    000 000                   0                 0000          00 " \
+        "    00000                     00                  000         000" \
+        "     00               0000000000000000              000      0000" \
+        "     000          000000000      00000000            000    000  " \
+        "     000      000000                  0000            00  000    " \
+        "      00    00000                        0000          00000     " \
+        "       00 0000                             000          000      " \
+        "        0000                                 000       000       " \
+        "        0000                                   000     000       " \
+        "        0000                                     000000000       "
+
+      result_up = @simple_polygon_finder.new(@bitmap_class.new(up, 65),
+        @matcher,
+        nil,
+        {versus: :o, bounds: true, strict_bounds: true}).process_info
+
+      result_down = @simple_polygon_finder.new(@bitmap_class.new(down, 65),
+        @matcher,
+        nil,
+        {versus: :o, bounds: true, strict_bounds: true}).process_info
+
+      step_finder = @vertical_merger.new(options: {compress: {uniq: true, linear: true}})
+      step_finder.add_tile(result_up)
+      step_finder.add_tile(result_down)
+      result = step_finder.process_info
+      expect(result.metadata[:width]).to eq(65)
+      expect(result.metadata[:height]).to eq(24)
+      expect(result.points).to eq([{outer: [{x: 40, y: 2}, {x: 44, y: 3}, {x: 50, y: 5}, {x: 52, y: 6}, {x: 53, y: 7}, {x: 57, y: 9}, {x: 58, y: 10}, {x: 60, y: 11}, {x: 64, y: 15}, {x: 64, y: 16}, {x: 60, y: 18}, {x: 57, y: 21}, {x: 57, y: 23}, {x: 49, y: 23}, {x: 41, y: 19}, {x: 38, y: 18}, {x: 33, y: 17}, {y: 16, x: 33}, {y: 16, x: 26}, {x: 26, y: 17}, {x: 19, y: 18}, {x: 13, y: 20}, {x: 11, y: 21}, {x: 11, y: 23}, {x: 8, y: 23}, {x: 8, y: 21}, {x: 5, y: 18}, {x: 5, y: 16}, {x: 4, y: 15}, {x: 4, y: 14}, {x: 3, y: 13}, {x: 0, y: 12}, {x: 0, y: 9}, {x: 3, y: 8}, {x: 11, y: 4}, {x: 14, y: 3}, {x: 20, y: 2}, {x: 23, y: 1}, {x: 37, y: 1}], inner: [[{x: 55, y: 9}, {x: 49, y: 6}, {x: 43, y: 4}, {x: 39, y: 3}, {y: 2, x: 39}, {y: 2, x: 30}, {x: 30, y: 4}, {x: 31, y: 5}, {x: 30, y: 6}, {x: 30, y: 7}, {x: 32, y: 8}, {x: 39, y: 9}, {x: 45, y: 11}, {x: 51, y: 14}, {x: 52, y: 15}, {x: 54, y: 16}, {x: 55, y: 17}, {y: 19, x: 55}, {y: 19, x: 58}, {x: 58, y: 18}, {x: 60, y: 17}, {x: 62, y: 15}, {x: 62, y: 14}, {x: 60, y: 13}, {x: 58, y: 11}], [{y: 9, x: 35}, {y: 9, x: 30}, {x: 30, y: 11}, {x: 30, y: 14}, {x: 31, y: 15}, {x: 37, y: 16}, {x: 40, y: 17}, {x: 41, y: 18}, {x: 44, y: 19}, {x: 45, y: 20}, {x: 49, y: 22}, {y: 23, x: 49}, {y: 23, x: 55}, {x: 55, y: 21}, {x: 56, y: 20}, {x: 52, y: 16}, {x: 44, y: 12}, {x: 41, y: 11}], [{y: 9, x: 30}, {y: 9, x: 22}, {x: 18, y: 11}, {x: 12, y: 13}, {x: 6, y: 16}, {x: 7, y: 17}, {x: 7, y: 19}, {x: 8, y: 20}, {y: 21, x: 8}, {y: 21, x: 10}, {x: 10, y: 20}, {x: 14, y: 18}, {x: 22, y: 16}, {x: 30, y: 15}, {x: 30, y: 11}], [{x: 20, y: 9}, {x: 26, y: 8}, {x: 30, y: 7}, {y: 2, x: 30}, {y: 2, x: 21}, {x: 21, y: 3}, {x: 16, y: 4}, {x: 10, y: 6}, {x: 4, y: 9}, {x: 3, y: 11}, {x: 4, y: 12}, {x: 4, y: 13}, {x: 6, y: 14}, {y: 15, x: 6}, {y: 15, x: 8}, {x: 8, y: 14}, {x: 9, y: 13}, {x: 13, y: 11}]]}])
+    end
+
+    it "merge mode (example 8 preview)" do
+      #        ---------*----------
+      chunk = "00000000000000000000" \
+              "00000000000000000000" \
+              "00        0       00" \
+              "00        0       00" \
+              "00000000000000000000" \
+              "00        0       00" \
+              "00        0       00" \
+              "00000000000000000000" \
+              "00000000000000000000"
+      result = @polygon_finder_class.new(
+        bitmap: @bitmap_class.new(chunk, 20),
+        matcher: @matcher,
+        options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
+      ).process_info
+      expect(result.points).to eq([{outer: [{x: 9, y: 0}, {x: 19, y: 0}, {x: 19, y: 8}, {x: 9, y: 8}, {x: 0, y: 8}, {x: 0, y: 0}], inner: [[{x: 1, y: 2}, {x: 1, y: 3}, {x: 10, y: 3}, {x: 10, y: 2}], [{x: 1, y: 5}, {x: 1, y: 6}, {x: 10, y: 6}, {x: 10, y: 5}], [{x: 18, y: 2}, {x: 10, y: 2}, {x: 10, y: 3}, {x: 18, y: 3}], [{x: 18, y: 5}, {x: 10, y: 5}, {x: 10, y: 6}, {x: 18, y: 6}]]}])
+    end
+
+    it "merge mode (example 8 vertical)" do
+      up = "00000000000000000000" \
+            "00000000000000000000" \
+            "00        0       00"
+      result_up = @simple_polygon_finder.new(@bitmap_class.new(up, 20),
+        @matcher,
+        nil,
+        {versus: :o, bounds: true, strict_bounds: true}).process_info
+
+      down = "00        0       00" \
+              "00        0       00" \
+              "00        0       00" \
+              "00000000000000000000" \
+              "00000000000000000000"
+      finder = @simple_polygon_finder.new(@bitmap_class.new(down, 20),
+        @matcher,
+        nil,
+        {versus: :o, bounds: true, strict_bounds: true})
+      result_down = finder.process_info
+
+      step_finder = @vertical_merger.new
+      step_finder.add_tile(result_up)
+      step_finder.add_tile(result_down)
+      result = step_finder.process_info
+      expect(result.metadata[:width]).to eq(20)
+      expect(result.metadata[:height]).to eq(7)
+      expect(result.points).to eq([{outer: [{x: 19, y: 1}, {x: 19, y: 2}, {x: 19, y: 3}, {x: 19, y: 4}, {x: 19, y: 5}, {x: 19, y: 6}, {x: 0, y: 6}, {x: 0, y: 5}, {x: 0, y: 4}, {x: 0, y: 3}, {x: 0, y: 2}, {x: 0, y: 1}, {x: 0, y: 0}, {x: 19, y: 0}], inner: [[{y: 1, x: 18}, {y: 1, x: 10}, {x: 10, y: 3}, {x: 10, y: 4}, {y: 5, x: 10}, {y: 5, x: 18}, {x: 18, y: 4}, {x: 18, y: 3}], [{y: 1, x: 10}, {y: 1, x: 1}, {x: 1, y: 3}, {x: 1, y: 4}, {y: 5, x: 1}, {y: 5, x: 10}, {x: 10, y: 4}, {x: 10, y: 3}]]}])
+    end
+
+    it "merge mode (example 9 vertical)" do
+      up =
+        "        00000000                                      0000       " \
+        "       000     00                                    0000        " \
+        "      000       000                                 0000       0 " \
+        "     000          000                             0000 00      0 " \
+        "    00000          0000                        00000    00     0 " \
+        "   000  00            0000                  000000      000    0 " \
+        "  000    000            00000000      000000000          000   00" \
+        "0000      000              0000000000000000               00   00"
+      mid =
+        "0000      000              0000000000000000               00   00" \
+        "000         000                  00                     00000  00" \
+        " 00          0000                 0                   000  00  00" \
+        "  000          0000               0                 0000    00 00" \
+        "   000           0000             0              00000      00000" \
+        "    000            00000          0           000000         0000" \
+        "      000            000000000    0       0000000             000"
+
+      down =
+        "      000            000000000    0       0000000             000" \
+        "       000               00000000000000000000               00000" \
+        "         000                    0000000                   0000 00" \
+        "           000                    0                     0000   00" \
+        "            0000                  0                   0000     00" \
+        "              00000              00                00000       00" \
+        "                 00000            0             000000         0 " \
+        "                    000000        0        00000000            0 " \
+        "                       000000000000000000000000                0 " \
+        "                           000000000000000                     0 " \
+        "                                                               0 " \
+        "                                                               0 "
+
+      result_up = @simple_polygon_finder.new(@bitmap_class.new(up, 65),
+        @matcher,
+        nil,
+        {versus: :a, bounds: true, strict_bounds: true}).process_info
+
+      result_mid = @simple_polygon_finder.new(@bitmap_class.new(mid, 65),
+        @matcher,
+        nil,
+        {versus: :a, bounds: true, strict_bounds: true}).process_info
+
+      result_down = @simple_polygon_finder.new(@bitmap_class.new(down, 65),
+        @matcher,
+        nil,
+        {versus: :a, bounds: true, strict_bounds: true}).process_info
+
+      step_finder = @vertical_merger.new(options: {compress: {uniq: true, linear: true}})
+      step_finder.add_tile(result_up)
+      step_finder.add_tile(result_mid)
+      step_finder.add_tile(result_down)
+
+      result = step_finder.process_info
+      expect(result.metadata[:width]).to eq(65)
+      expect(result.metadata[:height]).to eq(25)
+      expect(result.points).to eq([{outer: [{x: 7, y: 1}, {x: 2, y: 6}, {x: 0, y: 7}, {x: 0, y: 8}, {x: 4, y: 12}, {x: 6, y: 13}, {x: 7, y: 14}, {x: 11, y: 16}, {x: 12, y: 17}, {x: 14, y: 18}, {x: 23, y: 21}, {x: 27, y: 22}, {x: 41, y: 22}, {x: 46, y: 21}, {x: 50, y: 20}, {x: 53, y: 19}, {x: 61, y: 15}, {y: 14, x: 61}, {y: 14, x: 63}, {x: 63, y: 24}, {x: 63, y: 19}, {x: 64, y: 18}, {x: 64, y: 6}, {x: 63, y: 2}, {x: 63, y: 5}, {y: 11, x: 63}, {y: 11, x: 61}, {x: 61, y: 10}, {x: 60, y: 9}, {x: 60, y: 8}, {x: 59, y: 7}, {x: 59, y: 6}, {x: 55, y: 2}, {x: 57, y: 0}, {x: 54, y: 0}, {x: 52, y: 2}, {x: 50, y: 3}, {x: 44, y: 5}, {x: 38, y: 6}, {y: 7, x: 38}, {y: 7, x: 31}, {x: 31, y: 6}, {x: 25, y: 5}, {x: 22, y: 4}, {x: 16, y: 1}, {x: 15, y: 0}, {x: 8, y: 0}], inner: [[{x: 6, y: 12}, {x: 4, y: 10}, {x: 2, y: 9}, {x: 2, y: 8}, {x: 5, y: 5}, {y: 4, x: 5}, {y: 4, x: 8}, {x: 8, y: 5}, {x: 10, y: 7}, {x: 12, y: 8}, {x: 13, y: 9}, {x: 19, y: 12}, {x: 25, y: 14}, {x: 32, y: 15}, {x: 34, y: 16}, {x: 34, y: 17}, {x: 33, y: 18}, {x: 34, y: 19}, {y: 21, x: 34}, {y: 21, x: 25}, {x: 25, y: 20}, {x: 21, y: 19}, {x: 15, y: 17}, {x: 9, y: 14}], [{x: 23, y: 12}, {x: 20, y: 11}, {x: 12, y: 7}, {x: 11, y: 6}, {x: 9, y: 5}, {x: 7, y: 3}, {x: 9, y: 1}, {y: 0, x: 9}, {y: 0, x: 15}, {x: 15, y: 1}, {x: 16, y: 2}, {x: 18, y: 3}, {x: 19, y: 4}, {x: 22, y: 5}, {x: 24, y: 6}, {x: 27, y: 7}, {x: 33, y: 8}, {x: 34, y: 9}, {x: 34, y: 12}, {y: 14, x: 34}, {y: 14, x: 29}], [{x: 34, y: 12}, {x: 34, y: 8}, {x: 42, y: 7}, {x: 46, y: 6}, {x: 49, y: 5}, {x: 53, y: 3}, {y: 2, x: 53}, {y: 2, x: 55}, {x: 55, y: 3}, {x: 56, y: 4}, {x: 56, y: 5}, {x: 58, y: 7}, {x: 52, y: 10}, {x: 46, y: 12}, {y: 14, x: 42}, {y: 14, x: 34}], [{x: 51, y: 12}, {x: 55, y: 10}, {x: 56, y: 9}, {y: 8, x: 56}, {y: 8, x: 59}, {x: 59, y: 9}, {x: 60, y: 10}, {x: 60, y: 11}, {x: 61, y: 12}, {x: 60, y: 14}, {x: 54, y: 17}, {x: 48, y: 19}, {x: 43, y: 20}, {y: 21, x: 43}, {y: 21, x: 34}, {x: 34, y: 16}, {x: 38, y: 15}, {x: 44, y: 14}]]}])
+    end
+
+    # This test demonstrates how join polygons by their coordinates. Youn need to build some results from scratch by
+    # defining polygons each one composed by the outer polyline and a list of inners ones including its bounding box.
+    # Finally you need to declare the width and the height of the whole area (tile) inside the metadata hash.
+    it "merge mode from existing polygons" do
+      result_up = @result.new
+      polygons_up = [{
+        outer: [{x: 0, y: 0}, {x: 0, y: 4}, {x: 2, y: 4}, {x: 2, y: 2}, {x: 9, y: 2},
+                 {x: 9, y: 4}, {x: 11, y: 4}, {x: 11, y: 0}], inner: [],
+        bounds: {min_x: 0, max_x: 11, min_y: 0, max_y: 4}
+      }]
+      polygons_up = @result.to_numpy(polygons_up) if result_up.is_a? Contrek::Cpp::CPPResult
+      result_up.polygons = polygons_up
+      result_up.metadata = {width: 12, height: 5}
+
+      result_down = @result.new
+      polygons_down = [
+        {outer: [{x: 0, y: 0}, {x: 0, y: 4}, {x: 11, y: 4}, {x: 11, y: 0}, {x: 9, y: 0},
+        {x: 9, y: 2}, {x: 2, y: 2}, {x: 2, y: 0}], inner: [],
+         bounds: {min_x: 0, max_x: 11, min_y: 0, max_y: 4}}
+]
+      polygons_down = @result.to_numpy(polygons_down) if result_down.is_a? Contrek::Cpp::CPPResult
+      result_down.polygons = polygons_down
+      result_down.metadata = {width: 12, height: 5}
+
+      step_finder = @vertical_merger.new
+      step_finder.add_tile(result_up)
+      step_finder.add_tile(result_down)
+      result = step_finder.process_info
+      expect(result.metadata[:width]).to eq(12)
+      expect(result.metadata[:height]).to eq(9)
+      expect(result.points).to eq([{outer: [{x: 0, y: 4}, {x: 0, y: 8}, {x: 11, y: 8},
+        {x: 11, y: 4}, {x: 11, y: 0}, {x: 0, y: 0}], inner: [[{x: 2, y: 2}, {x: 9, y: 2}, {x: 9, y: 6}, {x: 2, y: 6}]]}])
+    end
+
+    it "merge horizontal" do
+      filename = "graphs_300x1024x0.png"
+      png_bitmap = @png_bitmap_class.new("./spec/files/images/#{filename}")
+      color = @color_class.new(r: 255, g: 255, b: 255, a: 255)
+      rgb_matcher = @png_not_matcher.new(color.raw)
+      polygonfinder = @simple_polygon_finder.new(png_bitmap,
+        rgb_matcher,
+        nil,
+        {versus: :a, bounds: true, compress: {uniq: true, linear: true}})
+      left = polygonfinder.process_info
+
+      filename = "graphs_300x1024x1.png"
+      png_bitmap = @png_bitmap_class.new("./spec/files/images/#{filename}")
+      color = @color_class.new(r: 255, g: 255, b: 255, a: 255)
+      rgb_matcher = @png_not_matcher.new(color.raw)
+      polygonfinder = @simple_polygon_finder.new(png_bitmap,
+        rgb_matcher,
+        nil,
+        {versus: :a, bounds: true, compress: {uniq: true, linear: true}})
+      right = polygonfinder.process_info
+
+      step_finder = @merger.new
+      step_finder.add_tile(left)
+      step_finder.add_tile(right)
+      result = step_finder.process_info
+      expect(result.metadata[:width]).to eq(599)
+      expect(result.metadata[:height]).to eq(1024)
+      expect(result.points).to match_expected_polygons("graphs_300x1024.png", number_of_tiles: 2)
+    end
+
+    it "merge vertical" do
+      filename = "graphs_1024x300x0.png"
+      png_bitmap = @png_bitmap_class.new("./spec/files/images/#{filename}")
+      color = @color_class.new(r: 255, g: 255, b: 255, a: 255)
+      rgb_matcher = @png_not_matcher.new(color.raw)
+      polygonfinder = @simple_polygon_finder.new(png_bitmap,
+        rgb_matcher,
+        nil,
+        {versus: :a, bounds: true, strict_bounds: true})
+      result_up = polygonfinder.process_info
+
+      filename = "graphs_1024x300x1.png"
+      png_bitmap = @png_bitmap_class.new("./spec/files/images/#{filename}")
+      color = @color_class.new(r: 255, g: 255, b: 255, a: 255)
+      rgb_matcher = @png_not_matcher.new(color.raw)
+      polygonfinder = @simple_polygon_finder.new(png_bitmap,
+        rgb_matcher,
+        nil,
+        {versus: :a, bounds: true, strict_bounds: true})
+      result_down = polygonfinder.process_info
+
+      step_finder = @vertical_merger.new
+      step_finder.add_tile(result_up)
+      step_finder.add_tile(result_down)
+      result = step_finder.process_info
+      expect(result.metadata[:width]).to eq(1024)
+      expect(result.metadata[:height]).to eq(599)
+      expect(result.points).to match_expected_polygons("graphs_1024x300.png", number_of_tiles: 2)
     end
   end
 end
