@@ -68,3 +68,7 @@ All notable changes to this project will be documented in this file.
 ### Changed
 - Added strict_bounds tracing mode: enables more accurate shape tracing by strictly adhering to pixel boundaries.
 - Topological Consistency Fixes: improved the Topologically Consistent Merging algorithm to support progressive polygon tracing during sequential data streaming.
+
+## [1.1.7] - 2026-03-23
+### Changed
+- Removed docs directory from gem.
