@@ -29,24 +29,24 @@ The core strength of Contrek is its **Topologically Consistent Merging** algorit
 
 <table>
   <tr>
-    <td><img src="docs/images/stripes/whole_0.png" alt="Contour tracing stripe 0" width="50%"></td>
-    <td rowspan="4" align="center">
-      <img src="docs/images/stripes/whole.png" alt="Contour tracing stripe 0" width="50%">
+    <td width="50%" style="padding: 0; background-color: white;">
+      <img src="docs/images/stripes/whole_0.png" width="100%"><br>
+      <img src="docs/images/stripes/whole_256.png" width="100%"><br>
+      <img src="docs/images/stripes/whole_512.png" width="100%"><br>
+      <img src="docs/images/stripes/whole_768.png" width="100%">
+    </td>
+    <td width="50%" align="center" style="vertical-align: middle; background-color: white;">
+      <strong>Full Topological Reconstruction</strong><br><br>
+      <img src="docs/images/stripes/whole.png" width="90%">
     </td>
   </tr>
   <tr>
-    <td><img src="docs/images/stripes/whole_256.png" alt="Contour tracing stripe 0" width="50%"></td>
+    <td colspan="2" align="center" style="background-color: white;">
+      <em><b>Left:</b> Image split into 4 independent memory buffers (stripes).</em><br>
+      <em><b>Right:</b> Contrek ensures <b>perfect topological continuity</b> during merging.</em><br>
+      🔴 <b>Red:</b> Outer contours &nbsp;&nbsp; | &nbsp;&nbsp; 🟢 <b>Green:</b> Inner zones
+    </td>
   </tr>
-  <tr>
-    <td><img src="docs/images/stripes/whole_512.png" alt="Contour tracing stripe 0" width="50%"></td>
-  </tr>
-  <tr>
-    <td><img src="docs/images/stripes/whole_768.png" alt="Contour tracing stripe 0" width="50%"></td>
-  </tr>
-  <tr><td colspan="2"><em><b>Left:</b> The image is split into 4 independent memory buffers (stripes).
-  <br><b>Right:</b> Contrek ensures <b>perfect topological continuity</b> during merging.</em>
-    <br><span style="color: #d32f2f;">■</span> <b>Red:</b> Outer contours |
-    <span style="color: #2e7d32;">■</span> <b>Dark Green:</b> Inner zones</td></tr>
 </table>
 
 ## Prerequisites
@@ -166,8 +166,6 @@ The example uses 2 threads, and the image has been divided into 2 vertical bands
 Regarding multithreading:
 
 - The algorithm splits the contour-detection workflow into multiple phases that can be executed in parallel. The initial contour extraction on each band and the subsequent merging of coordinates between adjacent bands—performed pairwise, recursively, and in a non-deterministic order—results in a final output that is not idempotent. Idempotence is guaranteed only when the exact same merging sequence is repeated.
-
-- The treemap option is currently ignored (multithreaded treemap support will be introduced in upcoming revisions).
 
 By not declaring native option CPP Multithreading optimized code is used. In the above example a [105 MP image](spec/files/images/sample_10240x10240.png) is examined by 4 threads working on 4 tiles (total compute time about 1.2 secs with image load).
 
@@ -290,7 +288,7 @@ result.metadata
 
 ## Treemap
 
-The treemap is a data structure that represents the containment hierarchy of polygons. For each polygon, it defines the parent polygon in which it is contained and its relative position among siblings. This structure allows reconstruction of the inclusion tree and determination of nesting relationships between geometries. Consider the above image
+The treemap is a data structure that represents the containment hierarchy of polygons. For each polygon, it defines the parent polygon in which it is contained and the index of the parent inner sequence in which is placed. This structure allows reconstruction of the inclusion tree and determination of nesting relationships between geometries. The treemap indexes are referred to positions inside the array of polygons returned by result.points. Consider the above image traced clockwise (o). 
 
 ```ruby
  "AAAAAAAAAAAAAAAAAAAAAA" \
@@ -311,8 +309,8 @@ result.metadata[:treemap]
 
 [[-1, -1],  # A
  [0, 0],    # B
- [1, 0],    # C
- [1, 1]]    # D
+ [1, 1],    # C
+ [1, 0]]    # D
 ```
 
 There are four polygons (`A`, `B`, `C`, and `D`).  
@@ -321,13 +319,42 @@ The order matches the one provided in `result.polygons`.
 Each entry has the structure:
 
 ```
-[parent_index, position]
+[parent_index, index_of_parent_inner_sequence]
 ```
 
 - Polygon **A** (index `0`) has no parent and is represented as `[-1, -1]`
-- Polygon **B** is contained in **A** and is its first child → `[0, 0]`
-- Polygon **C** is contained in **B** and is its first child → `[1, 0]`
-- Polygon **D** is also contained in **B** and is its second child → `[1, 1]`
+- Polygon **B** is contained in **A** in the first (0) and unique inner sequence of A → `[0, 0]`
+- Polygon **C** is contained in **B** and inside its second (1) inner sequence → `[1, 1]`
+- Polygon **D** is also contained in **B** but in the first (0) of its inner sequences → `[1, 0]`
+
+**C** is inside the **second** B inner sequence and **D** is inside the **first** B inner sequence because when the contour is traced clockwise the inner sequences are listed from right to left (left to right when anti-clockwise).
+
+Consider this sequence
+```ruby
+  "AAAAAAAAAAAAAAA       " \
+  "A             A       " \
+  "A BBBBBBBBBBB A       " \
+  "A B         B A       " \
+  "A B CC DD E B A       " \
+  "A B         B A       " \
+  "A BBBBBBBBBBB A       " \
+  "A             A       " \
+  "AAAAAAAAAAAAAAA       "
+ ``` 
+
+will get 
+
+```ruby
+result.metadata[:treemap]
+
+[[-1, -1],  # A
+ [0, 0],    # B
+ [1, 0],    # C
+ [1, 0],    # D
+ [1, 0]]    # E
+```
+C, D and E will get the same pair (**[1, 0]**) because are all placed inside the first (0) inner sequence of B.
+
 
 ## Multithreaded approach
 

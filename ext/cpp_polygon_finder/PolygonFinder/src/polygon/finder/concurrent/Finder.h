@@ -33,7 +33,7 @@ class Finder : public Poolable {
  private:
   Bitmap *bitmap;
   Matcher *matcher;
-  pf_Options options;
+  pf_Options options_;
   std::vector<std::string> input_options;
   Tile* whole_tile = nullptr;
   std::queue<ClippedPolygonFinder*> finders;
@@ -54,4 +54,5 @@ class Finder : public Poolable {
   virtual ~Finder();
   int maximum_width() const { return maximum_width_; }
   virtual ProcessResult* process_info();
+  const pf_Options& options() const { return options_; }
 };

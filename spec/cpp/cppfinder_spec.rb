@@ -90,4 +90,8 @@ RSpec.describe Contrek::Cpp::CPPConcurrentFinder, type: :class do
   describe "shared_test" do
     include_examples "multiprocessing"
   end
+
+  describe "shared_test" do
+    include_examples "concurrent_treemap"
+  end
 end

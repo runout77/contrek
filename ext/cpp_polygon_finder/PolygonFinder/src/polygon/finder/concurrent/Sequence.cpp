@@ -34,3 +34,17 @@ bool Sequence::is_not_vertical()
   }
   return false;
 }
+
+void Sequence::compute_vertical_bounds()
+{ const auto& cache = get_vector_cache();
+  if (!cache.empty()) {
+    int min_y = cache[0]->y;
+    int max_y = cache[0]->y;
+    for (const auto& pos : cache) {
+      if (pos->y < min_y) min_y = pos->y;
+      if (pos->y > max_y) max_y = pos->y;
+    }
+    vertical_bounds.min = min_y;
+    vertical_bounds.max = max_y;
+  }
+}

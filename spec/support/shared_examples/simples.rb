@@ -9,8 +9,8 @@ RSpec.shared_examples "simples" do
                  "                " \
                  "                "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
-      expect(result.metadata[:named_sequence]).to eq("A")
-      expect(result.metadata[:groups]).to eq(1)
+      expect(result.metadata[:named_sequence]).to eq("")
+      expect(result.metadata[:groups]).to eq(0)
       expect(result.metadata[:width]).to eq(16)
       expect(result.metadata[:height]).to eq(7)
       expect(result.points).to eq([])
@@ -24,8 +24,8 @@ RSpec.shared_examples "simples" do
               "                " \
               "B              C"
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
-      expect(result.metadata[:named_sequence]).to eq("A-B-C")
-      expect(result.metadata[:groups]).to eq(3)
+      expect(result.metadata[:named_sequence]).to eq("")
+      expect(result.metadata[:groups]).to eq(0)
       expect(result.points).to eq([])
     end
     it "empty" do
@@ -230,8 +230,8 @@ RSpec.shared_examples "simples" do
                  "                " \
                  "                "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
-      expect(result.metadata[:named_sequence]).to eq("AHGFEDCBA-I")
-      expect(result.metadata[:groups]).to eq(2)
+      expect(result.metadata[:named_sequence]).to eq("AHGFEDCBA")
+      expect(result.metadata[:groups]).to eq(1)
       expect(result.points).to eq([
         {outer: [{x: 2, y: 0}, {x: 2, y: 1}, {x: 2, y: 2}, {x: 2, y: 3}, {x: 2, y: 4}, {x: 13, y: 4}, {x: 13, y: 3}, {x: 13, y: 2}, {x: 13, y: 1}, {x: 13, y: 0}],
          inner: [[{x: 2, y: 1}, {x: 13, y: 1}, {x: 13, y: 2}, {x: 13, y: 3}, {x: 2, y: 3}, {x: 2, y: 2}]]}
@@ -246,8 +246,8 @@ RSpec.shared_examples "simples" do
                  "                " \
                  "                "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {versus: :a, named_sequences: true}).process_info
-      expect(result.metadata[:named_sequence]).to eq("AHGFEDCBA-I")
-      expect(result.metadata[:groups]).to eq(2)
+      expect(result.metadata[:named_sequence]).to eq("AHGFEDCBA")
+      expect(result.metadata[:groups]).to eq(1)
       expect(result.points).to eq([
         {outer: [{x: 2, y: 0}, {x: 2, y: 1}, {x: 2, y: 2}, {x: 2, y: 3}, {x: 2, y: 4}, {x: 13, y: 4}, {x: 13, y: 3}, {x: 13, y: 2}, {x: 13, y: 1}, {x: 13, y: 0}],
          inner: [[{x: 3, y: 1}, {x: 12, y: 1}, {x: 12, y: 2}, {x: 12, y: 3}, {x: 3, y: 3}, {x: 3, y: 2}]]}
@@ -278,8 +278,8 @@ RSpec.shared_examples "simples" do
                  "       EEE      " \
                  "                "
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
-      expect(result.metadata[:named_sequence]).to eq("ABA-CDC-E")
-      expect(result.metadata[:groups]).to eq(3)
+      expect(result.metadata[:named_sequence]).to eq("ABA-CDC")
+      expect(result.metadata[:groups]).to eq(2)
       expect(result.points).to eq([
         {outer: [{x: 3, y: 1}, {x: 3, y: 2}, {x: 6, y: 2}, {x: 6, y: 1}],
          inner: []},

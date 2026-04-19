@@ -24,7 +24,7 @@ void run_test() {
   // test_suite.test_f();
   // test_suite.test_g();
   // test_suite.test_h();
-  test_suite.test_i();
+  // test_suite.test_i();
   std::cout << "compute time =" << cpu_timer.stop() << std::endl;
 }
 
@@ -33,11 +33,13 @@ int main() {
   cfg.threads = 4;
   cfg.tiles = 4;
   cfg.compress_unique = true;
-  cfg.connectivity_mode = Contrek::Connectivity::OMNIDIRECTIONAL;
+  // cfg.treemap = true;
+  // cfg.connectivity_mode = Contrek::Connectivity::OMNIDIRECTIONAL;
 
   CpuTimer cpu_timer;
   cpu_timer.start();
   std::cout << "--- Start Native Benchmark ---" << std::endl;
+  // auto result = Contrek::trace("../images/graphs_1024x1024.png", cfg);
   auto result = Contrek::trace("../images/sample_10240x10240.png", cfg);
   result->print_info();
   std::cout << "Found polygons: " << result->groups << std::endl;

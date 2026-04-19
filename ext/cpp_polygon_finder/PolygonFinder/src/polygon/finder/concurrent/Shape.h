@@ -11,14 +11,22 @@
 #include <list>
 #include <iostream>
 #include <vector>
+#include "InnerPolyline.h"
 
 class Point;
 class Polyline;
 class Shape {
  public:
-  Shape(Polyline* outer_polyline, const std::list<std::vector<Point*>>& inner_polylines);
-  virtual ~Shape();
+  Shape(Polyline* outer_polyline, const std::vector<InnerPolyline*>& inner_polylines);
   Polyline* outer_polyline = nullptr;
-  std::list<std::vector<Point*>> inner_polylines;
+  std::vector<InnerPolyline*> inner_polylines;
+  Shape* merged_to_shape = nullptr;
+  InnerPolyline* parent_inner_polyline = nullptr;
+  std::vector<Shape*> children_shapes;
   void clear_inner();
+  bool reassociation_skip = false;
+  Shape* parent_shape() { return parent_shape_; }
+  void set_parent_shape(Shape*);
+ private:
+  Shape* parent_shape_ = nullptr;
 };

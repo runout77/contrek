@@ -14,12 +14,15 @@
 #include "Cluster.h"
 #include "Hub.h"
 #include "PartPool.h"
+#include "InnerPolyline.h"
 
 class Cluster {
  private:
   Finder *finder;
   std::vector<Tile*> tiles_;
   Hub *hub_ = nullptr;
+  void assign_ancestry(Shape *shape, std::vector<InnerPolyline*>& inner_polylines);
+
  public:
   Cluster(Finder *finder, int height, int start_x, int end_x);
   virtual ~Cluster();

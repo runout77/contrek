@@ -12,34 +12,28 @@
 #include <unordered_set>
 #include "Cursor.h"
 #include "Polyline.h"
+#include "InnerPolyline.h"
 
 Cursor::Cursor(Cluster& cluster, Shape* shape)
 : cluster(cluster), shape(shape) {
 }
 
-Cursor::~Cursor() {
-  for (Sequence* sequence : this->allocated_sequences) {
-    delete sequence;
-  }
-}
-
 Sequence* Cursor::join_outers()
 { Polyline* outer_polyline = shape->outer_polyline;
-  this->shapes_sequence.push_back(this->shape);
+  this->shapes_sequence_.push_back(this->shape);
   this->shapes_sequence_lookup.insert(this->shape);
-  Sequence* outer_joined_polyline = new Sequence();
-  this->allocated_sequences.push_back(outer_joined_polyline);
+  Sequence* outer_joined_polyline = outer_polyline->tile->shapes_pool->acquire_sequence();
   std::vector<Part*> all_parts;
   this->traverse_outer(outer_polyline->parts().front(),
                        all_parts,
-                       this->shapes_sequence,
+                       this->shapes_sequence_,
                        outer_joined_polyline);
 
   if (*outer_joined_polyline->head->payload == *outer_joined_polyline->tail->payload &&
       this->cluster.tiles().front()->left() &&
       this->cluster.tiles().back()->right()) outer_joined_polyline->pop();
 
-  for (Shape* shape : shapes_sequence) {
+  for (Shape* shape : shapes_sequence_) {
     shape->outer_polyline->turn_on(Polyline::TRACKED_OUTER);
     if (shape == outer_polyline->shape) {
       continue;
@@ -127,8 +121,8 @@ void Cursor::traverse_outer(Part* act_part,
   }
 }
 
-std::vector<Sequence*> Cursor::join_inners(Sequence* outer_seq) {
-  std::vector<Sequence*> retme;
+std::vector<InnerPolyline*> Cursor::join_inners(Sequence* outer_seq) {
+  std::vector<InnerPolyline*> retme;
   std::vector<Shape*> missing_shapes;
 
   for (Tile *tile : this->cluster.tiles())
@@ -136,7 +130,7 @@ std::vector<Sequence*> Cursor::join_inners(Sequence* outer_seq) {
     { if (shape->outer_polyline->is_on(Polyline::TRACKED_OUTER) ||
         shape->outer_polyline->is_on(Polyline::TRACKED_INNER) ||
         !shape->outer_polyline->boundary() ||
-        std::find(shapes_sequence.begin(), shapes_sequence.end(), shape) != shapes_sequence.end()) {
+        std::find(shapes_sequence_.begin(), shapes_sequence_.end(), shape) != shapes_sequence_.end()) {
         continue;
       }
       missing_shapes.push_back(shape);
@@ -145,17 +139,17 @@ std::vector<Sequence*> Cursor::join_inners(Sequence* outer_seq) {
 
   if (missing_shapes.size() > 0) {
     std::vector<Shape*> to_delay_shapes;
-    to_delay_shapes = connect_missings(this->shapes_sequence, missing_shapes);
+    to_delay_shapes = connect_missings(this->shapes_sequence_, missing_shapes);
     if (!to_delay_shapes.empty())
     { connect_missings(to_delay_shapes, missing_shapes);
       while (!to_delay_shapes.empty()) {
-        to_delay_shapes = connect_missings(this->shapes_sequence, to_delay_shapes);
+        to_delay_shapes = connect_missings(this->shapes_sequence_, to_delay_shapes);
       }
     }
   }
 
   retme = collect_inner_sequences(outer_seq);
-  for (Shape* shape : shapes_sequence) {
+  for (Shape* shape : shapes_sequence_) {
     shape->outer_polyline->turn_on(Polyline::TRACKED_INNER);
   }
   return(retme);
@@ -206,7 +200,7 @@ std::vector<Shape*> Cursor::connect_missings(std::vector<Shape*> shapes_sequence
             }
           }
           if (different_x) {
-            orphan_inners_.push_back(sewn_sequence);
+            orphan_inners_.push_back(outer_polyline->tile->shapes_pool->acquire_inner_polyline(sewn_sequence, shape, true));
           }
         }
         polyline->mixed_tile_origin = true;
@@ -214,9 +208,9 @@ std::vector<Shape*> Cursor::connect_missings(std::vector<Shape*> shapes_sequence
         outer_polyline->turn_on(Polyline::TRACKED_OUTER);
         outer_polyline->turn_on(Polyline::TRACKED_INNER);
         orphan_inners_.insert(
-        orphan_inners_.end(),
-        missing_shape->inner_polylines.begin(),
-        missing_shape->inner_polylines.end());
+          orphan_inners_.end(),
+          missing_shape->inner_polylines.begin(),
+          missing_shape->inner_polylines.end());
       }
     }
   }
@@ -224,10 +218,10 @@ std::vector<Shape*> Cursor::connect_missings(std::vector<Shape*> shapes_sequence
   return(delay_shapes);
 }
 
-std::vector<Sequence*> Cursor::collect_inner_sequences(Sequence* outer_seq) {
-  std::vector<Sequence*> return_sequences;
+std::vector<InnerPolyline*> Cursor::collect_inner_sequences(Sequence* outer_seq) {
+  std::vector<InnerPolyline*> return_inner_polylines;
 
-  for (Shape* shape : shapes_sequence)
+  for (Shape* shape : shapes_sequence_)
   { Polyline* polyline = shape->outer_polyline;
     for (Part* part : polyline->parts())
     { if (part->innerable())
@@ -237,7 +231,7 @@ std::vector<Sequence*> Cursor::collect_inner_sequences(Sequence* outer_seq) {
           .max = 0
         };
         traverse_inner(part, all_parts, bounds);
-        Sequence* retme_sequence = new Sequence();
+        Sequence* retme_sequence = shape->outer_polyline->tile->shapes_pool->acquire_sequence();
 
         for (Part* part : all_parts)
         { part->touch();
@@ -251,13 +245,13 @@ std::vector<Sequence*> Cursor::collect_inner_sequences(Sequence* outer_seq) {
             return(!(polyline->tile->tg_border(*position->payload) && position->end_point()->queues_include(outer_seq)));
           });
         }
-        if (retme_sequence->is_not_vertical()) return_sequences.push_back(retme_sequence);
-        else                                   delete retme_sequence;
+        if (retme_sequence->is_not_vertical()) {
+          return_inner_polylines.push_back(polyline->tile->shapes_pool->acquire_inner_polyline(retme_sequence));
+        }
       }
     }
   }
-
-  return(return_sequences);
+  return(return_inner_polylines);
 }
 
 void Cursor::traverse_inner(Part* act_part, std::vector<Part*>& all_parts, Bounds& bounds) {

@@ -16,7 +16,9 @@
 #include <unordered_map>
 #include <string>
 #include "Partitionable.h"
+#include "Sequence.h"
 #include "../RectBounds.h"
+#include "../Primitives.h"
 
 class Tile;
 class Shape;
@@ -49,6 +51,8 @@ class Polyline : public Partitionable {
   void reset_tracked_endpoints();
   bool mixed_tile_origin = false;
   std::string info();
+  bool vert_bounds_intersect(Bounds& vertical_bounds);
+  bool within(std::vector<Point*>& points);
 
  private:
   std::vector<Point*> raw_;

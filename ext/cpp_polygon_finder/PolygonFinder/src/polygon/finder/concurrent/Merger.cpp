@@ -22,7 +22,7 @@ void Merger::add_tile(ProcessResult& result)
   }
   int end_x = this->current_x + result.width;
   Tile* tile = new Tile(this, this->current_x, end_x, std::to_string(tiles.size()), Benchmarks {0, 0});
-  tile->assign_raw_polygons(result.polygons);
+  tile->assign_raw_polygons(result.polygons, result.treemap);
   tiles.queue_push(tile);
 
   this->maximum_width_ = end_x;

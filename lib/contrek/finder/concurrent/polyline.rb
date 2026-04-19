@@ -119,11 +119,57 @@ module Contrek
         !(@max_y < other.min_y || other.max_y < @min_y)
       end
 
+      def vert_bounds_intersect?(vertical_bounds)
+        !(@max_y < vertical_bounds[:min] || vertical_bounds[:max] < @min_y)
+      end
+
+      # verifies if enclosed in the given sequence (raycasting technique)
+      def within?(raw_coords)
+        is_within = false
+        self_y = raw.first[:y]
+        self_x = raw.first[:x]
+        last_node = raw_coords.last
+        return false if last_node.nil?
+        lx = last_node[:x]
+        ly = last_node[:y]
+        raw_coords.each do |pos|
+          cx = pos[:x]
+          cy = pos[:y]
+          if (cy > self_y) != (ly > self_y)
+            intersect_x = lx + (self_y - ly).to_f * (cx - lx) / (cy - ly)
+            if self_x < intersect_x
+              is_within = !is_within
+            end
+          end
+          lx, ly = cx, cy
+        end
+        is_within
+      end
+
       def get_bounds
         {min_x: @min_x,
          max_x: @max_x,
          min_y: @min_y,
          max_y: @max_y}
+      end
+
+      def self.is_within?(test_seq, container_seq)
+        target = test_seq.first
+        return false unless target
+        tx, ty = target[:x], target[:y]
+        inside = false
+        j = container_seq.length - 1
+        container_seq.each_with_index do |p_i, i|
+          p_j = container_seq[j]
+          if (p_i[:y] > ty) != (p_j[:y] > ty)
+            intersect_x = (p_j[:x] - p_i[:x]) * (ty - p_i[:y]).to_f / (p_j[:y] - p_i[:y]) + p_i[:x]
+            if tx < intersect_x
+              inside = !inside
+            end
+          end
+          j = i
+        end
+        inside
       end
 
       private

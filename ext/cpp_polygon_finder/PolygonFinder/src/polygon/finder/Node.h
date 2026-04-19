@@ -74,4 +74,6 @@ class Node : public  Listable {
   Node(int min_x, int max_x, int y, NodeCluster* cluster, char name);
   void precalc_tangs_sequences(NodeCluster& cluster);
   bool processed = false;
+  int inner_left_index = -1;
+  int inner_right_index = -1;
 };

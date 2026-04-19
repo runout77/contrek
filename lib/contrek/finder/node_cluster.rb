@@ -6,7 +6,7 @@ module Contrek
 
       def initialize(h, options)
         @options = options
-        @vert_nodes = Array.new(h) { [] }      # per y immetto i nodi
+        @vert_nodes = Array.new(h) { [] }
         @sequences = []
         @polygons = []
         @treemap = []
@@ -76,57 +76,60 @@ module Contrek
           plot_node(next_node, root_node, bounds, versus, @options[:strict_bounds]) if @nodes > 0 && !next_node.nil?
 
           draw_sequence(bitmap, "X") unless bitmap.nil?
-          @polygons << {outer: @sequence_coords, inner: [], bounds: (bounds.to_h if @options[:bounds])}.compact if @sequence_coords.size >= 2
-          @sequences << @plot_sequence
 
-          @count = 0
-          index_inner = 0
-          while @inner_plot.size > 0
-            @plot_sequence = []
-            @sequence_coords = []
-            # mia test
-            first = @inner_plot.find { |x| x.tangs_count <= 2 } || @inner_plot.first
+          if @sequence_coords.size >= 2
+            @polygons << {outer: @sequence_coords, inner: [], bounds: (bounds.to_h if @options[:bounds])}.compact
+            @sequences << @plot_sequence
 
-            @plot_sequence << first
-            @inner_plot.delete(first)
-            @root_nodes.delete(first)
+            @count = 0
+            index_inner = 0
+            while @inner_plot.size > 0
+              @plot_sequence = []
+              @sequence_coords = []
+              # mia test
+              first = @inner_plot.find { |x| x.tangs_count <= 2 } || @inner_plot.first
 
-            first.inner_index = index_inner
+              @plot_sequence << first
+              @inner_plot.delete(first)
+              @root_nodes.delete(first)
 
-            # @count += 1
-            # if @count > 10000
-            #  puts "Houston, we have a problem!"
-            #  break
-            # end
+              first.inner_index = index_inner
 
-            next_node = if (first.track & Contrek::Finder::Node::OMAX) != 0
-              if inner_v == :a
-                vert_nodes[first.y + Node::T_UP][first.upper_start]
+              # @count += 1
+              # if @count > 10000
+              #  puts "Houston, we have a problem!"
+              #  break
+              # end
+
+              next_node = if (first.track & Contrek::Finder::Node::OMAX) != 0
+                if inner_v == :a
+                  vert_nodes[first.y + Node::T_UP][first.upper_start]
+                else
+                  vert_nodes[first.y + Node::T_DOWN][first.lower_start]
+                end
+              elsif inner_v == :a
+                vert_nodes[first.y + Node::T_DOWN][first.lower_end]
               else
-                vert_nodes[first.y + Node::T_DOWN][first.lower_start]
+                vert_nodes[first.y + Node::T_UP][first.upper_end]
               end
-            elsif inner_v == :a
-              vert_nodes[first.y + Node::T_DOWN][first.lower_end]
-            else
-              vert_nodes[first.y + Node::T_UP][first.upper_end]
+
+              if !next_node.nil?
+                @sequence_coords << next_node.coords_entering_to(first, inner_v, Contrek::Finder::Node::INNER)
+              end
+
+              plot_inner_node(next_node, inner_v, first, root_node, options[:strict_bounds]) if !next_node.nil?
+
+              draw_sequence(bitmap, "+") unless bitmap.nil?
+
+              @polygons.last[:inner] << @sequence_coords
+
+              @inner_plot.grab(@inner_new)
+              index_inner += 1
             end
-
-            if !next_node.nil?
-              @sequence_coords << next_node.coords_entering_to(first, inner_v, Contrek::Finder::Node::INNER)
-            end
-
-            plot_inner_node(next_node, inner_v, first, root_node, options[:strict_bounds]) if !next_node.nil?
-
-            draw_sequence(bitmap, "+") unless bitmap.nil?
-
-            @polygons.last[:inner] << @sequence_coords
-
-            @inner_plot.grab(@inner_new)
-            index_inner += 1
+            # tree
+            @treemap << ((versus == :a) ? test_in_hole_a(root_node) : test_in_hole_o(root_node)) if @options.has_key?(:treemap)
+            index_order += 1
           end
-          # tree
-          @treemap << ((versus == :a) ? test_in_hole_a(root_node) : test_in_hole_o(root_node)) if @options.has_key?(:treemap)
-          index_order += 1
         end
       end
 
@@ -141,7 +144,7 @@ module Contrek
                 tnext = @vert_nodes[node.y][start_right]
                 if tnext.outer_index == cindex
                   if (tnext.track & Contrek::Finder::Node::IMIN) != 0
-                    return [cindex, prev.inner_index]
+                    return [cindex, (prev.inner_right_index == -1) ? prev.inner_left_index : prev.inner_right_index]
                   else
                     return [-1, -1]
                   end
@@ -165,7 +168,7 @@ module Contrek
                 tnext = @vert_nodes[node.y][start_right]
                 if tnext.outer_index == cindex
                   if (tnext.track & Contrek::Finder::Node::IMAX) != 0
-                    return [cindex, prev.inner_index]
+                    return [cindex, (prev.inner_left_index == -1) ? prev.inner_right_index : prev.inner_left_index]
                   else
                     return [-1, -1]
                   end
@@ -191,12 +194,18 @@ module Contrek
       # coordinates in @sequence_coords
       def plot_inner_node(node, versus, stop_at, start_node, strict_bounds = false)
         node.outer_index = start_node.outer_index
-        node.inner_index = stop_at.inner_index
         @root_nodes.delete(node)
         @inner_plot.delete(node)
         last_node = @plot_sequence.last
         next_node = node.my_next(last_node, versus, :inner)
         @plot_sequence << node
+
+        first_is_max = ((node.y > last_node.y) == (versus == :a))
+        if first_is_max
+          node.inner_right_index = stop_at.inner_index if node.inner_right_index == -1
+        elsif node.inner_left_index == -1
+          node.inner_left_index = stop_at.inner_index
+        end
 
         plot = true
         if next_node.y == last_node.y
@@ -211,7 +220,6 @@ module Contrek
             end
           end
         elsif strict_bounds
-          first_is_max = ((node.y > last_node.y) == (versus == :a))
           @sequence_coords << {y: node.y, x: (first_is_max ? last_node.max_x : last_node.min_x)}
           @sequence_coords << {y: node.y, x: (first_is_max ? next_node.min_x : next_node.max_x)}
         end

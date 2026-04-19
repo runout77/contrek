@@ -28,7 +28,7 @@ module Contrek
 
       def initial_process!(finder)
         result = finder.process_info
-        assign_raw_polygons!(result[:polygons])
+        assign_raw_polygons!(result[:polygons], result.metadata[:treemap])
       end
 
       def boundary_shapes
@@ -49,7 +49,9 @@ module Contrek
       end
 
       def assign_shapes!(shapes)
-        shapes.each { |s| s.outer_polyline.tile = self }
+        shapes.each do |s|
+          s.outer_polyline.tile = self
+        end
         @shapes = shapes
       end
 
@@ -57,7 +59,23 @@ module Contrek
         @shapes.filter_map do |shape|
           unless shape.outer_polyline.empty?
             {outer: shape.outer_polyline.raw,
-             inner: shape.inner_polylines}
+             inner: shape.inner_polylines.map(&:raw)}
+          end
+        end
+      end
+
+      def compute_treemap
+        @shapes_map = {}
+        shape_index = 0
+
+        @shapes.map do |shape|
+          next if shape.outer_polyline.empty?
+          @shapes_map[shape] = shape_index
+          shape_index += 1
+          if shape.parent_shape
+            [@shapes_map[shape.parent_shape], shape.parent_shape.inner_polylines.index(shape.parent_inner_polyline)]
+          else
+            [-1, -1]
           end
         end
       end
@@ -74,13 +92,24 @@ module Contrek
         "#{self.class}[#{@name}]"
       end
 
-      def assign_raw_polygons!(raw_polylines)
+      def assign_raw_polygons!(raw_polylines, treemap = nil)
         @shapes = []
-        raw_polylines.each do |raw_polyline|
+        shapes_map = {}
+        raw_polylines.each_with_index do |raw_polyline, polyline_index|
           next if raw_polyline[:bounds][:max_x] - raw_polyline[:bounds][:min_x] == 0
-          @shapes << Shape.new.tap do |shape|
+          shape = Shape.new.tap do |shape|
             shape.outer_polyline = Polyline.new(tile: self, polygon: raw_polyline[:outer], shape: shape, bounds: raw_polyline[:bounds])
-            shape.inner_polylines = raw_polyline[:inner]
+            shape.inner_polylines = raw_polyline[:inner].map { |raw| InnerPolyline.new(shape: shape, raw_coordinates: raw) }
+          end
+          @shapes << shape
+
+          if treemap && (treemap_entry = treemap[polyline_index])
+            shapes_map[polyline_index] = shape
+            if treemap_entry != [-1, -1]
+              parent = shapes_map[treemap_entry.first]
+              shape.set_parent_shape(parent)
+              shape.parent_inner_polyline = parent.inner_polylines[treemap_entry.last]
+            end
           end
         end
       end

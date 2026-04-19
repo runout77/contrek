@@ -30,19 +30,20 @@ Finder::Finder(int number_of_threads, Bitmap *bitmap, Matcher *matcher, std::vec
   maximum_width_(bitmap->w()),
   height(bitmap->h())
 { cpu_timer.start();
-  if (options != nullptr) FinderUtils::sanitize_options(this->options, options);
+  if (options != nullptr) FinderUtils::sanitize_options(this->options_, options);
 
-  double cw = static_cast<double>(this->maximum_width_) / this->options.number_of_tiles;
+  double cw = static_cast<double>(this->maximum_width_) / this->options_.number_of_tiles;
   if (cw < 1.0) {
     throw std::runtime_error("One pixel tile width minimum!");
   }
   int x = 0;
-  for (int tile_index = 0; tile_index < this->options.number_of_tiles; tile_index++)
+  for (int tile_index = 0; tile_index < this->options_.number_of_tiles; tile_index++)
   { int tile_end_x = static_cast<int>(cw * (tile_index + 1));
     TilePayload p { tile_index, x, tile_end_x };
     enqueue(p, [this](const TilePayload& payload) {
-      std::vector<std::string> base_arguments = {"--bounds", "--versus=" + this->options.get_alpha_versus()};
-      if (this->options.connectivity_offset == 1) base_arguments.push_back("--connectivity=8");
+      std::vector<std::string> base_arguments = {"--bounds", "--versus=" + this->options_.get_alpha_versus()};
+      if (this->options_.connectivity_offset == 1) base_arguments.push_back("--connectivity=8");
+      if (this->options_.treemap) base_arguments.push_back("--treemap");
       CpuTimer t;
       t.start();
       auto* finder = new ClippedPolygonFinder(
@@ -70,7 +71,7 @@ Finder::Finder(int number_of_threads, Bitmap *bitmap, Matcher *matcher, std::vec
 
 Finder::Finder(int number_of_threads, std::vector<std::string> *options)
 : Poolable(number_of_threads), bitmap(nullptr), matcher(nullptr), input_options(*options), maximum_width_(0) {
-  if (options != nullptr) FinderUtils::sanitize_options(this->options, options);
+  if (options != nullptr) FinderUtils::sanitize_options(this->options_, options);
   reports["init"] = 0;
 }
 
@@ -145,15 +146,17 @@ ProcessResult* Finder::process_info() {
   pr->groups = pr->polygons.size();
   pr->width = this->maximum_width_;
   pr->height = this->height;
-  FakeCluster fake_cluster(pr->polygons, this->options);
+  FakeCluster fake_cluster(pr->polygons, this->options_);
   cpu_timer.start();
-  fake_cluster.compress_coords(pr->polygons, this->options);
+  fake_cluster.compress_coords(pr->polygons, this->options_);
   reports["compress"] = cpu_timer.stop();
   reports["total"] = reports["compress"] + reports["init"];
   reports["outer"] = this->whole_tile->benchmarks.outer;
   reports["inner"] = this->whole_tile->benchmarks.inner;
+  if (this->options_.treemap) {
+    pr->treemap = this->whole_tile->compute_treemap();
+  }
   pr->benchmarks = this->reports;
-  // TODO(ema): pr->treemap
   // TODO(ema): pr->named_sequence
   return(pr);
 }

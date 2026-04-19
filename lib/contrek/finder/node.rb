@@ -5,7 +5,7 @@ module Contrek
 
       attr_reader :min_x, :max_x, :y, :name, :tangs_sequence, :tangs_count, :data_pointer,
         :upper_start, :upper_end, :lower_start, :lower_end, :start_point, :end_point
-      attr_accessor :track, :abs_x_index, :outer_index, :inner_index
+      attr_accessor :track, :abs_x_index, :outer_index, :inner_index, :inner_left_index, :inner_right_index
 
       T_UP = -1
       T_DOWN = 1
@@ -39,6 +39,8 @@ module Contrek
         @down_indexer = 0
         @outer_index = -1
         @inner_index = -1
+        @inner_left_index = -1
+        @inner_right_index = -1
         @upper_start = Float::INFINITY
         @upper_end = -1
         @lower_start = Float::INFINITY

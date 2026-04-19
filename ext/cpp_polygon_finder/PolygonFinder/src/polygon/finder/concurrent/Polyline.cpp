@@ -128,3 +128,24 @@ std::string Polyline::info() {
   ss << "b" << this->tile->name() << " S" << part_index;
   return ss.str();
 }
+
+bool Polyline::vert_bounds_intersect(Bounds& vertical_bounds)
+{ return !(this->max_y_ < vertical_bounds.min || vertical_bounds.max < this->min_y);
+}
+
+bool Polyline::within(std::vector<Point*>& points) {
+  size_t n = points.size();
+  if (n < 3) return false;
+  const int tx = this->raw_[0]->x;
+  const int ty = this->raw_[0]->y;
+  bool inside = false;
+  for (size_t i = 0, j = n - 1; i < n; j = i++) {
+    const Point* pi = points[i];
+    const Point* pj = points[j];
+    if (((pi->y > ty) != (pj->y > ty)) &&
+        (tx < (pj->x - pi->x) * (ty - pi->y) / (pj->y - pi->y) + pi->x)) {
+      inside = !inside;
+    }
+  }
+  return inside;
+}

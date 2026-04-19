@@ -27,6 +27,28 @@ def same_image?(path1, path2)
   a_md5 == b_md5
 end
 
+def verify_treemap(result)
+  result.metadata[:treemap].each_with_index do |treemap_entry, treemap_entry_index|
+    puts "Examing treemap entry: #{treemap_entry_index}"
+    outer_sequence = result.points[treemap_entry_index][:outer]
+    if treemap_entry == [-1, -1]
+      result.points.each_with_index do |container, container_index|
+        next if container_index == treemap_entry_index
+        container_sequence = container[:outer]
+        if Contrek::Concurrent::Polyline.is_within?(outer_sequence, container_sequence)
+          raise "No parent declared outer sequence #{treemap_entry_index} found inside other sequence!"
+        end
+      end
+    else
+      parent_seq = result.points[treemap_entry[0]]
+      parent_inner = parent_seq[:inner][treemap_entry[1]]
+      if !Contrek::Concurrent::Polyline.is_within?(outer_sequence, parent_inner)
+        raise "With parent declared outer sequence #{treemap_entry_index} not inside declared parent!"
+      end
+    end
+  end
+end
+
 #  tt = TerminalTracker.new
 #  result = @polygon_finder_class.new(...).process_info do |worker|
 #    worker.iterate do |position, ch|

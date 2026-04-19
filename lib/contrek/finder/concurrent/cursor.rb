@@ -1,7 +1,8 @@
 module Contrek
   module Concurrent
     class Cursor
-      attr_reader :orphan_inners
+      attr_reader :orphan_inners, :shapes_sequence
+
       def initialize(cluster:, shape:)
         @shapes_sequence = Set.new([shape])
         @cluster = cluster
@@ -90,7 +91,9 @@ module Contrek
               end
               combine!(inject_sequences_right, inject_sequences_left).each do |sewn_sequence|
                 sewn_sequence.uniq!
-                @orphan_inners << sewn_sequence if sewn_sequence.size > 1 && sewn_sequence.map { |c| c[:x] }.uniq.size > 1 # segmenti non sono ammessi, solo aree
+                if sewn_sequence.size > 1 && sewn_sequence.map { |c| c[:x] }.uniq.size > 1 # only areas
+                  @orphan_inners << InnerPolyline.new(shape: shape, raw_coordinates: sewn_sequence, recombined: true)
+                end
               end
               missing_outer_polyline.clear!
               polyline.mixed_tile_origin = true
@@ -147,7 +150,7 @@ module Contrek
       end
 
       def collect_inner_sequences(outer_seq)
-        return_sequences = []
+        return_inner_polylines = []
         @shapes_sequence.each do |shape|
           polyline = shape.outer_polyline
           polyline.parts.each do |part|
@@ -165,16 +168,17 @@ module Contrek
                   !(polyline.tile.tg_border?(position.payload) && position.end_point.queues.include?(outer_seq))
                 end
               end
-              return_sequences << retme_sequence if retme_sequence.is_not_vertical
+              if retme_sequence.is_not_vertical
+                return_inner_polylines << InnerPolyline.new(sequence: retme_sequence)
+              end
             end
           end
         end
-        return_sequences
+        return_inner_polylines
       end
 
       def traverse_inner(act_part, all_parts, bounds)
         return if act_part == all_parts.first
-
         if act_part.size > 0
           min_y, max_y = act_part.to_a.minmax_by { |p| p[:y] }
           bounds[:min] = [bounds[:min], min_y[:y]].min

@@ -3,7 +3,7 @@ module Contrek
     class Finder
       prepend Poolable
 
-      attr_reader :maximum_width
+      attr_reader :maximum_width, :options
 
       # Supported options
       # - number_of_threads: number of threads that can be used by the process. If set to 0, it works in
@@ -47,7 +47,12 @@ module Contrek
               finder = ClippedPolygonFinder.new(
                 bitmap: bitmap,
                 matcher: matcher,
-                options: {versus: current_versus, bounds: true, connectivity: @options[:connectivity]}.compact,
+                options: {
+                  versus: current_versus,
+                  bounds: true,
+                  treemap: @options[:treemap],
+                  connectivity: @options[:connectivity]
+                }.compact,
                 start_x: payload[:tile_start_x],
                 end_x: payload[:tile_end_x]
               )
@@ -88,6 +93,7 @@ module Contrek
           width: @maximum_width,
           height: @height
         }
+        metadata[:treemap] = @whole_tile.compute_treemap if options[:treemap]
         Contrek::Finder::Result.new(raw_polygons, metadata)
       end
 

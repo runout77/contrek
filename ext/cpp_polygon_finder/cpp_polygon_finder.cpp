@@ -63,6 +63,8 @@
 #include "PolygonFinder/src/polygon/finder/concurrent/Tile.cpp"
 #include "PolygonFinder/src/polygon/finder/concurrent/Polyline.h"
 #include "PolygonFinder/src/polygon/finder/concurrent/Polyline.cpp"
+#include "PolygonFinder/src/polygon/finder/concurrent/InnerPolyline.h"
+#include "PolygonFinder/src/polygon/finder/concurrent/InnerPolyline.cpp"
 #include "PolygonFinder/src/polygon/finder/concurrent/Partitionable.h"
 #include "PolygonFinder/src/polygon/finder/concurrent/Partitionable.cpp"
 #include "PolygonFinder/src/polygon/finder/concurrent/Shape.h"
@@ -91,6 +93,8 @@
 #include "PolygonFinder/src/polygon/finder/concurrent/HorizontalMerger.cpp"
 #include "PolygonFinder/src/polygon/finder/concurrent/VerticalMerger.h"
 #include "PolygonFinder/src/polygon/finder/concurrent/VerticalMerger.cpp"
+#include "PolygonFinder/src/polygon/finder/concurrent/ShapePool.h"
+#include "PolygonFinder/src/polygon/finder/concurrent/ShapePool.cpp"
 extern "C" {
   #include "PolygonFinder/src/polygon/bitmaps/spng.h"
 }

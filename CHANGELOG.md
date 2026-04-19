@@ -18,7 +18,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Added C++ multithreading supports
 - Optimized old just present C++ code
-- Removed Png++ dependency in place of libspn
+- Removed Png++ dependency in place of libspng
 
 ## [1.0.7] - 2026-01-10
 ### Added
@@ -72,3 +72,7 @@ All notable changes to this project will be documented in this file.
 ## [1.1.7] - 2026-03-23
 ### Changed
 - Removed docs directory from gem.
+
+## [1.1.8] - 2026-04-19
+### Changed
+- Treemap now available on multiprocessing side too.

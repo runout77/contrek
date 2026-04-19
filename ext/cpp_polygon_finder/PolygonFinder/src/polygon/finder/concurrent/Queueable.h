@@ -177,6 +177,7 @@ class Queueable {
 
   std::vector<T*> to_vector() const {
     std::vector<T*> out;
+    out.reserve(this->size);
     QNode<T>* current = head;
     while (current) {
         out.push_back(current->payload);

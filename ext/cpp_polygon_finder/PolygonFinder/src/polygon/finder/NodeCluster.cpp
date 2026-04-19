@@ -129,86 +129,89 @@ void NodeCluster::plot(int versus) {
       if ((this->nodes > 0) && (next_node != nullptr))
       { plot_node(poly.outer, next_node, root_node, versus, poly.bounds);
       }
-      this->sequences.push_back(std::move(this->plot_sequence));
-      this->plot_sequence.clear();
 
-      if (poly.outer.size() > 2)
+      if (poly.outer.size() >= 2)
       { this->polygons.push_back(poly);
-      }
+        this->sequences.push_back(std::move(this->plot_sequence));
 
-      int index_inner = 0;
-      while (inner_plot->size() > 0)
-      { this->plot_sequence.clear();
-        std::vector<Point*> inner_sequence;
-        std::list<Node*>::iterator first_i;
-        Node *first = nullptr;
+        int index_inner = 0;
+        while (inner_plot->size() > 0)
+        { this->plot_sequence.clear();
+          std::vector<Point*> inner_sequence;
+          std::list<Node*>::iterator first_i;
+          Node *first = nullptr;
 
-        Listable *act = inner_plot->first();
-        do
-        { if ((reinterpret_cast<Node*>(act))->tangs_count <= 2)
-          { first = reinterpret_cast<Node*>(act);
-            break;
-          }
-        }while((act = act->data_pointer[inner_plot->get_id()].next) != nullptr);
+          Listable *act = inner_plot->first();
+          do
+          { if ((reinterpret_cast<Node*>(act))->tangs_count <= 2)
+            { first = reinterpret_cast<Node*>(act);
+              break;
+            }
+          }while((act = act->data_pointer[inner_plot->get_id()].next) != nullptr);
 
-        if (first == nullptr) first = reinterpret_cast<Node*>(inner_plot->first());
+          if (first == nullptr) first = reinterpret_cast<Node*>(inner_plot->first());
 
-        plot_sequence.push_back(first);
-        inner_plot->remove(first);
-        root_nodes->remove(first);
+          plot_sequence.push_back(first);
+          inner_plot->remove(first);
+          root_nodes->remove(first);
 
-        first->inner_index = index_inner;
+          first->inner_index = index_inner;
 
-        Node* next_node = nullptr;
+          Node* next_node = nullptr;
 
-        if (first->get_trackmax()) {
-          if (inner_v == Node::A) {
-            if (first->upper_end >= 0) next_node = &this->vert_nodes[first->y + Node::T_UP][first->upper_start];
+          if (first->get_trackmax()) {
+            if (inner_v == Node::A) {
+              if (first->upper_end >= 0) next_node = &this->vert_nodes[first->y + Node::T_UP][first->upper_start];
+            } else {
+              if (first->lower_end >= 0) next_node = &this->vert_nodes[first->y + Node::T_DOWN][first->lower_start];
+            }
           } else {
-            if (first->lower_end >= 0) next_node = &this->vert_nodes[first->y + Node::T_DOWN][first->lower_start];
+            if (inner_v == Node::A) {
+              if (first->lower_end >= 0) next_node = &this->vert_nodes[first->y + Node::T_DOWN][first->lower_end];
+            } else {
+              if (first->upper_end >= 0) next_node = &this->vert_nodes[first->y + Node::T_UP][first->upper_end];
+            }
           }
-        } else {
-          if (inner_v == Node::A) {
-            if (first->lower_end >= 0) next_node = &this->vert_nodes[first->y + Node::T_DOWN][first->lower_end];
-          } else {
-            if (first->upper_end >= 0) next_node = &this->vert_nodes[first->y + Node::T_UP][first->upper_end];
-          }
-        }
 
-        if (next_node != nullptr)
-        { inner_sequence.push_back(next_node->coords_entering_to(first, inner_v, Node::INNER));
-          plot_inner_node(inner_sequence, next_node, inner_v, first, root_node);
+          if (next_node != nullptr)
+          { inner_sequence.push_back(next_node->coords_entering_to(first, inner_v, Node::INNER));
+            plot_inner_node(inner_sequence, next_node, inner_v, first, root_node);
+          }
+          this->polygons.back().inner.push_back(inner_sequence);
+          this->inner_plot->grab(this->inner_new);
+          index_inner++;
         }
-        this->polygons.back().inner.push_back(inner_sequence);
-        this->inner_plot->grab(this->inner_new);
-        index_inner++;
+      } else {
+        this->plot_sequence.clear();
       }
+      if (this->options->treemap)
+      { this->treemap.push_back(versus == Node::A ? this->test_in_hole_a(root_node) : this->test_in_hole_o(root_node));
+      }
+      index_order++;
     } else {
-      this->sequences.push_back(std::move(this->plot_sequence));
       this->plot_sequence.clear();
     }
-    // tree
-    if (this->options->treemap)
-    { this->treemap.push_back(versus == Node::A ? this->test_in_hole_a(root_node) : this->test_in_hole_o(root_node));
-    }
-    index_order++;
   }
 }
 
 std::pair<int, int> NodeCluster::test_in_hole_a(Node* node)
 { if (node->outer_index > 0)
   { int start_left = node->abs_x_index - 1;
+    auto& row = this->vert_nodes[node->y];
+    int row_size = static_cast<int>(row.size());
+    if (start_left < 0 && row_size > 0) {
+      start_left = row_size - 1;
+    }
     do {
       Node* prev = &this->vert_nodes[node->y][start_left];
       int cindex = prev->outer_index;
-
       if ((cindex < node->outer_index) && (prev->track & Node::IMAX))
       { unsigned int start_right = node->abs_x_index;
         unsigned int line_size = this->vert_nodes[node->y].size();
         while (++start_right != line_size)
         { Node* tnext = &this->vert_nodes[node->y][start_right];
           if (tnext->outer_index == cindex) {
-            if (tnext->track & Node::IMIN) return {cindex, prev->inner_index};
+            if (tnext->track & Node::IMIN) return {cindex, prev->inner_right_index == -1 ? prev->inner_left_index : prev->inner_right_index};
             else                           return {-1, -1};
           }
         }
@@ -222,18 +225,16 @@ std::pair<int, int> NodeCluster::test_in_hole_o(Node* node)
 { auto& line = this->vert_nodes[node->y];
   const unsigned int line_size = line.size();
   if (node->outer_index == 0 || &line.back() == node) return {-1, -1};
-
   unsigned int start_left = node->abs_x_index + 1;
   do {
     Node* prev = &line[start_left];
     int cindex = prev->outer_index;
-
     if (cindex < node->outer_index && (prev->track & Node::IMIN))
     { int start_right = node->abs_x_index;
       while (--start_right >= 0) {
         Node* tnext = &line[start_right];
         if (tnext->outer_index == cindex) {
-          if (tnext->track & Node::IMAX) return {cindex, prev->inner_index};
+          if (tnext->track & Node::IMAX) return {cindex, prev->inner_left_index == -1 ? prev->inner_right_index : prev->inner_left_index};
           else                           return {-1, -1};
         }
       }
@@ -247,14 +248,19 @@ void NodeCluster::plot_inner_node(std::vector<Point*>& sequence_coords, Node *no
   bool strict_bounds = this->options->strict_bounds;
   while (current_node != nullptr) {
     current_node->outer_index = start_node->outer_index;
-    current_node->inner_index = stop_at->inner_index;
     root_nodes->remove(current_node);
     inner_plot->remove(current_node);
 
     Node *last_node = plot_sequence.back();
     Node *next_node = current_node->my_next_inner(last_node, versus);
-
     plot_sequence.push_back(current_node);
+
+    bool first_is_max = ((current_node->y > last_node->y) == (versus == Node::A));
+    if (first_is_max) {
+      if (current_node->inner_right_index == -1) current_node->inner_right_index = stop_at->inner_index;
+    } else {
+      if (current_node->inner_left_index == -1) current_node->inner_left_index = stop_at->inner_index;
+    }
 
     bool plot = true;
     if (next_node->y == last_node->y) {
@@ -273,7 +279,6 @@ void NodeCluster::plot_inner_node(std::vector<Point*>& sequence_coords, Node *no
         }
       }
     } else if (strict_bounds) {
-        bool first_is_max = ((current_node->y > last_node->y) == (versus == Node::A));
         sequence_coords.push_back(this->points_pool.acquire((first_is_max ? last_node->max_x : last_node->min_x), current_node->y));
         sequence_coords.push_back(this->points_pool.acquire((first_is_max ? next_node->min_x : next_node->max_x), current_node->y));
       }

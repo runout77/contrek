@@ -155,7 +155,7 @@ void Tests::test_d()
   std::cout << "color =" << color << std::endl;
   RGBNotMatcher not_matcher(color);
 
-  std::vector<std::string> arguments = {"--versus=a", "--compress_uniq"};
+  std::vector<std::string> arguments = {"--versus=a", "--compress_uniq", "--treemap"};
   PolygonFinder pl(&png_bitmap, &not_matcher, nullptr, &arguments);
   ProcessResult *o = pl.process_info();
   o->print_info();

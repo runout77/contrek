@@ -6,11 +6,14 @@
  * Licensed under the GNU Affero General Public License v3 (AGPLv3).
  * See the LICENSE file in this directory for the full license text.
  */
+
 #pragma once
 #include <string>
 #include <list>
+#include <vector>
 #include "Finder.h"
 #include "ClippedPolygonFinder.h"
+#include "ShapePool.h"
 
 class Finder;
 class Cluster;
@@ -51,7 +54,12 @@ class Tile {
   void info();
   bool tg_border(const Point& coord);
   void assign_shapes(std::list<Shape*>& shapes);
-  void assign_raw_polygons(const std::list<Polygon>& raw_polylines);
+  void assign_raw_polygons(const std::list<Polygon>& raw_polylines, const std::vector<std::pair<int, int>>& treemap);
   std::list<Polygon> to_raw_polygons();
+  std::vector<std::pair<int, int>> compute_treemap();
+  std::string toString();
   Benchmarks benchmarks;
+  std::vector<ShapePool*> shapes_pools;
+  ShapePool* shapes_pool;
+  void adopt(Tile* other);
 };
