@@ -74,29 +74,6 @@ bool Part::intersect_part(Part* other_part)
   return(intersect);
 }
 
-std::vector<EndPoint*> Part::to_endpoints() {
-  std::vector<EndPoint*> out;
-  QNode<Point>* current = head;
-  while (current) {
-    out.push_back((static_cast<Position*>(current))->end_point());
-    current = current->next;
-  }
-  return out;
-}
-
-std::vector<EndPoint*> Part::remove_adjacent_pairs(const std::vector<EndPoint*>& input = {}) {
-  std::vector<EndPoint*> result;
-  result.reserve(input.size());
-  for (EndPoint* current : input) {
-    if (!result.empty() && result.back() == current) {
-      result.pop_back();
-    } else {
-      result.push_back(current);
-    }
-  }
-  return result;
-}
-
 void Part::orient()
 { if (this->size <= 1 || (this->size == 2 && this->inverts)) {
     this->versus_ = 0;
@@ -126,4 +103,42 @@ std::string Part::inspect() {
   });
   ss << ")";
   return ss.str();
+}
+
+std::vector<EndPoint*> Part::continuum_to(const Part& other_part) const {
+  if (this->size <= 2 && this->inverts && other_part.size <= 2 && other_part.inverts) return {};
+
+  Point* target = other_part.head->payload;
+  QNode<Point>* cursor = this->tail;
+
+  while (cursor != nullptr) {
+    if (*cursor->payload == *target) {
+      QNode<Point>* s = cursor;
+      QNode<Point>* o = other_part.head;
+      bool match = true;
+      int count = 0;
+
+      while (s != nullptr && o != nullptr) {
+        if (!(*s->payload == *o->payload)) {
+          match = false;
+          break;
+        }
+        s = s->next;
+        o = o->next;
+        count++;
+      }
+      if (match && s == nullptr) {
+        std::vector<EndPoint*> res;
+        res.reserve(count);
+        s = cursor;
+        for (int i = 0; i < count; ++i) {
+          res.push_back(static_cast<Position*>(s)->end_point());
+          s = s->next;
+        }
+        return res;
+      }
+    }
+    cursor = cursor->prev;
+  }
+  return {};
 }

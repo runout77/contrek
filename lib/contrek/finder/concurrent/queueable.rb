@@ -152,23 +152,6 @@ module Contrek
       def pop!
         rem(@tail)
       end
-
-      def remove_adjacent_pairs!
-        unless @tail.nil?
-          pointer = @tail
-          loop do
-            break if pointer == @head
-            if pointer.payload == pointer.prev&.payload
-              later = pointer.next
-              rem pointer.prev
-              rem pointer
-              pointer = later.nil? ? @tail : later
-              redo
-            end
-            break unless (pointer = pointer.prev)
-          end
-        end
-      end
     end
   end
 end

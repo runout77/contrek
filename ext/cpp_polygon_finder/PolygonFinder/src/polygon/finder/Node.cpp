@@ -32,8 +32,6 @@ Node::Node(int min_x, int max_x, int y, NodeCluster* cluster, char name)
   this->track = 0;
   this->outer_index = -1;
   this->inner_index = -1;
-  this->inner_left_index = -1;
-  this->inner_right_index = -1;
 }
 
 bool Node::get_trackmax() {

@@ -76,3 +76,7 @@ All notable changes to this project will be documented in this file.
 ## [1.1.8] - 2026-04-19
 ### Changed
 - Treemap now available on multiprocessing side too.
+
+## [1.1.9] - 2026-04-24
+### Changed
+- Improved the internal parts joining algorithm, which was imprecise in some circumstances.

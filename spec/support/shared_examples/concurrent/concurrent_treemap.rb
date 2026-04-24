@@ -269,9 +269,8 @@ RSpec.shared_examples "concurrent_treemap" do
         {outer: [{x: 11, y: 8}, {x: 13, y: 8}, {x: 13, y: 9}, {x: 11, y: 9},
           {x: 10, y: 9}, {x: 10, y: 8}], inner: []}, # 5
         {outer: [{x: 20, y: 3}, {x: 20, y: 4}, {x: 16, y: 4}, {x: 16, y: 3}], inner: []}, # 3
-        {outer: [{x: 20, y: 7}, {x: 20, y: 8}, {x: 18, y: 8}, {x: 18, y: 7}], inner: []}
-      ] # 6
-                                   )
+        {outer: [{x: 20, y: 7}, {x: 20, y: 8}, {x: 18, y: 8}, {x: 18, y: 7}], inner: []} # 6
+      ])
       expect(c_result.metadata[:treemap]).to eq([[-1, -1], [0, 0], [0, 0], [0, 0], [-1, -1], [0, 0], [0, 0]])
 
       c_result = @polygon_finder_class.new(
@@ -283,7 +282,7 @@ RSpec.shared_examples "concurrent_treemap" do
         {outer: [{x: 0, y: 0}, {x: 0, y: 10}, {x: 7, y: 10}, {x: 8, y: 10}, {x: 8, y: 7},
           {x: 15, y: 7}, {x: 15, y: 10}, {x: 23, y: 10}, {x: 23, y: 0}, {x: 7, y: 0}],
          inner: [[{x: 7, y: 6}, {x: 7, y: 9}, {x: 1, y: 9}, {x: 1, y: 2},
-           {x: 7, y: 1}, {x: 22, y: 2}, {x: 22, y: 9}, {x: 16, y: 9}, {x: 16, y: 6}]]},
+           {x: 7, y: 1}, {x: 15, y: 1}, {x: 22, y: 2}, {x: 22, y: 9}, {x: 16, y: 9}, {x: 16, y: 6}, {x: 15, y: 6}]]},
         {outer: [{x: 3, y: 3}, {x: 3, y: 4}, {x: 7, y: 4}, {x: 7, y: 3}], inner: []},
         {outer: [{x: 3, y: 7}, {x: 3, y: 8}, {x: 5, y: 8}, {x: 5, y: 7}], inner: []},
         {outer: [{x: 9, y: 3}, {x: 9, y: 4}, {x: 14, y: 4}, {x: 14, y: 3}], inner: []},
@@ -321,7 +320,7 @@ RSpec.shared_examples "concurrent_treemap" do
       ).process_info
       expect(c_result.points).to eq([
         {outer: [{x: 7, y: 0}, {x: 23, y: 0}, {x: 23, y: 10}, {x: 7, y: 10}, {x: 0, y: 10}, {x: 0, y: 0}],
-         inner: [[{x: 7, y: 1}, {x: 1, y: 2}, {x: 1, y: 8}, {x: 7, y: 9}, {x: 22, y: 8}, {x: 22, y: 2}]]}, # 0
+         inner: [[{x: 7, y: 1}, {x: 1, y: 2}, {x: 1, y: 8}, {x: 7, y: 9}, {x: 15, y: 9}, {x: 22, y: 8}, {x: 22, y: 2}, {x: 15, y: 1}]]}, # 0]]}, # 0
         {outer: [{x: 7, y: 3}, {x: 12, y: 3}, {x: 12, y: 4},
           {x: 7, y: 4}, {x: 3, y: 4}, {x: 3, y: 3}], inner: []}, # 1
         {outer: [{x: 15, y: 6}, {x: 15, y: 7}, {x: 13, y: 7}, {x: 13, y: 6}], inner: []}, # 3
@@ -419,7 +418,7 @@ RSpec.shared_examples "concurrent_treemap" do
         options: {number_of_tiles: 4, versus: :a, treemap: true, compress: {uniq: true, linear: true}}
       ).process_info
       # 0-2-1-3-4-7-5-6
-      expect(c_result.points).to eq([{outer: [{x: 0, y: 0}, {x: 0, y: 14}, {x: 11, y: 14}, {x: 47, y: 14}, {x: 47, y: 0}, {x: 11, y: 0}], inner: [[{x: 1, y: 11}, {x: 1, y: 2}, {x: 22, y: 2}, {x: 22, y: 13}, {x: 16, y: 13}, {x: 16, y: 12}], [{x: 25, y: 11}, {x: 25, y: 2}, {x: 46, y: 2}, {x: 46, y: 11}]]}, {outer: [{x: 3, y: 3}, {x: 3, y: 10}, {x: 11, y: 10}, {x: 16, y: 10}, {x: 16, y: 9}, {x: 19, y: 8}, {x: 19, y: 3}, {x: 11, y: 3}], inner: [[{x: 4, y: 8}, {x: 4, y: 5}, {x: 18, y: 5}, {x: 18, y: 7}, {x: 16, y: 8}]]}, {outer: [{x: 6, y: 6}, {x: 6, y: 7}, {x: 7, y: 7}, {x: 7, y: 6}], inner: []}, {outer: [{x: 9, y: 6}, {x: 9, y: 7}, {x: 13, y: 7}, {x: 16, y: 6}, {x: 11, y: 6}], inner: []}, {outer: [{x: 18, y: 10}, {x: 18, y: 12}, {x: 20, y: 12}, {x: 20, y: 10}], inner: []}, {outer: [{x: 27, y: 3}, {x: 27, y: 10}, {x: 35, y: 10}, {x: 42, y: 10}, {x: 42, y: 3}, {x: 35, y: 3}], inner: [[{x: 28, y: 8}, {x: 28, y: 5}, {x: 41, y: 5}, {x: 41, y: 8}]]}, {outer: [{x: 30, y: 6}, {x: 30, y: 7}, {x: 31, y: 7}, {x: 31, y: 6}], inner: []}, {outer: [{x: 33, y: 6}, {x: 33, y: 7}, {x: 35, y: 7}, {x: 38, y: 7}, {x: 38, y: 6}, {x: 35, y: 6}], inner: []}])
+      expect(c_result.points).to eq([{outer: [{x: 0, y: 0}, {x: 0, y: 14}, {x: 11, y: 14}, {x: 47, y: 14}, {x: 47, y: 0}, {x: 11, y: 0}], inner: [[{x: 1, y: 11}, {x: 1, y: 2}, {x: 22, y: 2}, {x: 22, y: 13}, {x: 16, y: 13}, {x: 16, y: 12}, {x: 11, y: 12}], [{x: 25, y: 11}, {x: 25, y: 2}, {x: 46, y: 2}, {x: 46, y: 11}]]}, {outer: [{x: 3, y: 3}, {x: 3, y: 10}, {x: 11, y: 10}, {x: 16, y: 10}, {x: 16, y: 9}, {x: 19, y: 8}, {x: 19, y: 3}, {x: 11, y: 3}], inner: [[{x: 4, y: 8}, {x: 4, y: 5}, {x: 18, y: 5}, {x: 18, y: 7}, {x: 16, y: 8}]]}, {outer: [{x: 6, y: 6}, {x: 6, y: 7}, {x: 7, y: 7}, {x: 7, y: 6}], inner: []}, {outer: [{x: 9, y: 6}, {x: 9, y: 7}, {x: 13, y: 7}, {x: 16, y: 6}, {x: 11, y: 6}], inner: []}, {outer: [{x: 18, y: 10}, {x: 18, y: 12}, {x: 20, y: 12}, {x: 20, y: 10}], inner: []}, {outer: [{x: 27, y: 3}, {x: 27, y: 10}, {x: 35, y: 10}, {x: 42, y: 10}, {x: 42, y: 3}, {x: 35, y: 3}], inner: [[{x: 28, y: 8}, {x: 28, y: 5}, {x: 41, y: 5}, {x: 41, y: 8}]]}, {outer: [{x: 30, y: 6}, {x: 30, y: 7}, {x: 31, y: 7}, {x: 31, y: 6}], inner: []}, {outer: [{x: 33, y: 6}, {x: 33, y: 7}, {x: 35, y: 7}, {x: 38, y: 7}, {x: 38, y: 6}, {x: 35, y: 6}], inner: []}])
       expect(c_result.metadata[:treemap]).to eq([[-1, -1], [0, 0], [1, 0], [1, 0], [0, 0], [0, 1], [5, 0], [5, 0]])
     end
 

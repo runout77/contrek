@@ -280,7 +280,7 @@ void Cursor::traverse_inner(Part* act_part, std::vector<Part*>& all_parts, Bound
               int dest_part_versus = dest_part->versus();
               if (dest_part_versus != 0 && dest_part_versus == act_part->versus()) continue;
               if (dest_part->intersect_part(act_part)) {
-                std::vector<EndPoint*> link_seq = duplicates_intersection(*dest_part, *act_part);
+                std::vector<EndPoint*> link_seq = dest_part->continuum_to(*act_part);
                 if (!link_seq.empty()) {
                   Part* ins_part = pool.acquire(Part::ADDED, act_part->polyline());
                   for (EndPoint* pos : link_seq) {
@@ -312,33 +312,6 @@ void Cursor::traverse_inner(Part* act_part, std::vector<Part*>& all_parts, Bound
     }
     else break;
   }
-}
-
-template <typename T>
-std::vector<T*> difference_ptr(std::vector<T*>& a, std::vector<T*>& b)
-{ std::vector<T*> result;
-  for (T* item : a) {
-    auto it = std::find_if(
-      b.begin(), b.end(),
-      [&](T* other) {
-        return other == item;
-      });
-    if (it == b.end()) {
-      result.push_back(item);
-    }
-  }
-  return result;
-}
-
-std::vector<EndPoint*> Cursor::duplicates_intersection(Part& part_a, Part& part_b) {
-  auto a1 = part_a.to_endpoints();
-  auto b1 = part_b.to_endpoints();
-  if (part_a.inverts) a1 = Part::remove_adjacent_pairs(a1);
-  if (part_b.inverts) b1 = Part::remove_adjacent_pairs(b1);
-  std::vector<EndPoint*> result = difference_ptr(a1, b1);
-  std::vector<EndPoint*> temp = difference_ptr(b1, a1);
-  result.insert(result.end(), temp.begin(), temp.end());
-  return result;
 }
 
 std::vector<std::vector<Point*>> Cursor::combine(std::vector<std::vector<Point*>>& seqa, std::vector<std::vector<Point*>>& seqb)

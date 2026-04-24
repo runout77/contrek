@@ -81,10 +81,6 @@ module Contrek
         intersect
       end
 
-      def to_endpoints
-        map(&:end_point)
-      end
-
       def orient!
         @versus = if size <= 1 || (size == 2 && @inverts)
           0
@@ -93,16 +89,34 @@ module Contrek
         end
       end
 
-      def self.remove_adjacent_pairs(array = nil)
-        n = array.size
-        (0...(n - 1)).each do |i|
-          if array[i] == array[i + 1]
-            # Remove the pair and call recursively
-            new_array = array[0...i] + array[(i + 2)..]
-            return remove_adjacent_pairs(new_array)
+      def continuum_to?(other)
+        return [] if size <= 2 && inverts && other.size <= 2 && other.inverts
+        return [] if other.head.nil?
+
+        target = other.head.payload
+        cursor = tail
+        while cursor
+          if cursor.payload == target
+            s = cursor
+            o = other.head
+            match = true
+            nodes = []
+            while s && o
+              if s.payload != o.payload
+                match = false
+                break
+              end
+              nodes << s.end_point
+              s = s.next
+              o = o.next
+            end
+            if match && s.nil?
+              return nodes
+            end
           end
+          cursor = cursor.prev
         end
-        array
+        []
       end
     end
   end

@@ -391,9 +391,8 @@ RSpec.shared_examples "treemap" do
            {x: 0, y: 5}, {x: 0, y: 2}]]},
         {outer: [{x: 5, y: 1}, {x: 5, y: 2}, {x: 6, y: 2}, {x: 6, y: 1}], inner: []}, # 1
         {outer: [{x: 15, y: 1}, {x: 15, y: 2}, {x: 16, y: 2}, {x: 16, y: 1}], inner: []}, # 3
-        {outer: [{x: 10, y: 3}, {x: 10, y: 4}, {x: 11, y: 4}, {x: 11, y: 3}], inner: []}
-      ] # 2
-                                 )
+        {outer: [{x: 10, y: 3}, {x: 10, y: 4}, {x: 11, y: 4}, {x: 11, y: 3}], inner: []} # 2
+      ])
       expect(result.metadata[:treemap]).to eq([
         [-1, -1], [-1, -1],
         [-1, -1], [0, 0]

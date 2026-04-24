@@ -29,9 +29,6 @@ RSpec.describe Contrek::Concurrent::Listable, type: :class do
       [e, a, b, b1, a1, f, g].each { |entry| list.add(entry) }
       expect(list.to_a).to eq ["e", "a", "b", "b", "a", "f", "g"]
       expect(a.next).to be b
-      expect(Contrek::Concurrent::Part.remove_adjacent_pairs(list.to_a)).to eq ["e", "f", "g"]
-      list.remove_adjacent_pairs!
-      expect(list.to_a).to eq ["e", "f", "g"]
     end
 
     it "removes ancients 2" do
@@ -41,8 +38,6 @@ RSpec.describe Contrek::Concurrent::Listable, type: :class do
       list = TestList.new
       [a, b, b1].each { |entry| list.add(entry) }
       expect(list.to_a).to eq ["a", "b", "b"]
-      list.remove_adjacent_pairs!
-      expect(list.to_a).to eq ["a"]
     end
 
     it "no removes ancients" do
@@ -51,8 +46,6 @@ RSpec.describe Contrek::Concurrent::Listable, type: :class do
       c = TestNode.new("c")
       list = TestList.new
       [a, b, c].each { |entry| list.add(entry) }
-      expect(list.to_a).to eq ["a", "b", "c"]
-      list.remove_adjacent_pairs!
       expect(list.to_a).to eq ["a", "b", "c"]
     end
 
@@ -63,8 +56,6 @@ RSpec.describe Contrek::Concurrent::Listable, type: :class do
       list = TestList.new
       [b, b1, a].each { |entry| list.add(entry) }
       expect(list.to_a).to eq ["b", "b", "a"]
-      list.remove_adjacent_pairs!
-      expect(list.to_a).to eq ["a"]
     end
 
     it "multiple append" do

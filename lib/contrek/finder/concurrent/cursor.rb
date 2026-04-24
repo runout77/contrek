@@ -195,9 +195,8 @@ module Contrek
                   next if dest_part.trasmuted || dest_part.is?(Part::EXCLUSIVE)
                   dest_part_versus = dest_part.versus
                   next if dest_part_versus != 0 && dest_part_versus == act_part.versus
-
                   if dest_part.intersect_part?(act_part)
-                    link_seq = duplicates_intersection(dest_part, act_part)
+                    link_seq = dest_part.continuum_to?(act_part)
                     if link_seq.any?
                       ins_part = Part.new(Part::ADDED, act_part.polyline)
                       link_seq.each do |pos|
@@ -220,17 +219,6 @@ module Contrek
         end
       end
       # rubocop:enable Lint/NonLocalExitFromIterator
-
-      # The sequences should contain inverted parts, e.g., 4,5,6,6,5,4. These parts must be
-      # removed from the sequences, and the remaining elements are compared. Only the
-      # elements that appear once between the two sequences are kept. This represents
-      # a connection between parts inserted afterwards.
-      # TODO evaluate the adoption of remove_adjacent_pairs!
-      def duplicates_intersection(part_a, part_b)
-        a1 = part_a.inverts ? Part.remove_adjacent_pairs(part_a.to_endpoints) : part_a.to_endpoints
-        b1 = part_b.inverts ? Part.remove_adjacent_pairs(part_b.to_endpoints) : part_b.to_endpoints
-        (a1 - b1) + (b1 - a1)
-      end
 
       # example
       # a = [[A],[B,C]]

@@ -47,10 +47,9 @@ class Part : public Queueable<Point> {
   void touch();
   bool intersect_part(Part* other_part);
   void set_polyline(Polyline* polyline) { this->polyline_ = polyline; }
-  std::vector<EndPoint*> to_endpoints();
-  static std::vector<EndPoint*> remove_adjacent_pairs(const std::vector<EndPoint*>& input);
   void orient();
   std::string inspect();
+  std::vector<EndPoint*> continuum_to(const Part& other_part) const;
 
  private:
   int versus_ = 0;

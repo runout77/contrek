@@ -37,7 +37,6 @@ class Cursor {
                       Sequence* outer_joined_polyline);
   std::vector<InnerPolyline*> collect_inner_sequences(Sequence* outer_seq);
   void traverse_inner(Part* act_part, std::vector<Part*> &all_parts, Bounds& bounds);
-  std::vector<EndPoint*> duplicates_intersection(Part& part_a, Part& part_b);
   std::vector<std::vector<Point*>> combine(std::vector<std::vector<Point*>>& seqa, std::vector<std::vector<Point*>>& seqb);
   std::vector<Shape*> connect_missings(std::vector<Shape*> shapes_sequence, std::vector<Shape*> missing_shapes);
 };
