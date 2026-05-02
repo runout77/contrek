@@ -31,10 +31,6 @@ module Contrek
         assign_raw_polygons!(result[:polygons], result.metadata[:treemap])
       end
 
-      def boundary_shapes
-        @bbs ||= shapes.select { |s| s.outer_polyline.boundary? }
-      end
-
       def iterate
         @shapes.each do |shape|
           shape.outer_polyline.raw.each do |position|

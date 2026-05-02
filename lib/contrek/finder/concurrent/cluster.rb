@@ -34,7 +34,6 @@ module Contrek
               next if shape.outer_polyline.on?(Polyline::TRACKED_OUTER) || shape.outer_polyline.width == 0
               if shape.outer_polyline.boundary?
                 shape.outer_polyline.partition!
-                shape.outer_polyline.precalc!
               end
             end
           end
@@ -44,7 +43,7 @@ module Contrek
           tile.shapes.each do |shape|
             next if shape.outer_polyline.on?(Polyline::TRACKED_OUTER) || shape.outer_polyline.width == 0
 
-            if shape.outer_polyline.boundary? && shape.outer_polyline.next_tile_eligible_shapes.any?
+            if shape.outer_polyline.any_ancients
               cursor = Cursor.new(cluster: self, shape: shape)
 
               new_outer = nil

@@ -56,7 +56,6 @@ void Cursor::traverse_outer(Part* act_part,
     if (all_parts.empty() || last_part != act_part) {
       all_parts.push_back(act_part);
     }
-
     bool jumped_to_new_part = false;
     if (act_part->is(Part::EXCLUSIVE)) {
       if (act_part->size == 0) return;
@@ -82,36 +81,45 @@ void Cursor::traverse_outer(Part* act_part,
         }
         this->cluster.positions_pool.emplace_back(this->cluster.hub(), new_position->payload);
         outer_joined_polyline->add(&this->cluster.positions_pool.back());
+        new_position->end_point()->tracked_outer = true;
+        int versus = act_part->versus();
+        auto& q_set = new_position->end_point()->queues();
+        auto it = std::find_if(q_set.begin(), q_set.end(), [&](Queueable<Point>* q) {
+          Part* p = static_cast<Part*>(q);
+          return p->versus() == -versus && p->polyline()->tile != act_part->polyline()->tile;
+        });
 
-        for (Shape *shape : act_part->polyline()->next_tile_eligible_shapes()) {
-          if (Part *part = shape->outer_polyline->find_first_part_by_position(new_position, act_part->versus())) {
-            const auto n = all_parts.size();
-            Part *last_last_part = n >= 2 ? all_parts[n - 2] : nullptr;
-
-            if (last_last_part != part) {
-              if (n >= 2) {
-                bool all_seam = true;
-                for (std::size_t i = all_parts.size() - 2; i < all_parts.size(); ++i) {
-                  if (all_parts[i]->type != Part::SEAM) {
-                    all_seam = false;
-                    break;
-                  }
+        Part* part = nullptr;
+        if (it != q_set.end()) {
+          part = static_cast<Part*>(*it);
+        }
+        if (part) {
+          const auto n = all_parts.size();
+          Part *last_last_part = n >= 2 ? all_parts[n - 2] : nullptr;
+          if (last_last_part != part) {
+            if (n >= 2) {
+              bool all_seam = true;
+              for (std::size_t i = all_parts.size() - 2; i < all_parts.size(); ++i) {
+                if (all_parts[i]->type != Part::SEAM) {
+                  all_seam = false;
+                  break;
                 }
-                if (all_seam) break;
               }
-              if (shapes_sequence_lookup.insert(part->polyline()->shape).second) {
-                shapes_sequence.push_back(part->polyline()->shape);
-              }
-              part->next_position(new_position);
-              part->dead_end = true;
-              act_part = part;
-              jumped_to_new_part = true;
-              break;
+              if (all_seam) break;
             }
+            if (shapes_sequence_lookup.insert(part->polyline()->shape).second) {
+              shapes_sequence.push_back(part->polyline()->shape);
+            }
+            part->next_position(new_position);
+            part->dead_end = true;
+            act_part = part;
+            jumped_to_new_part = true;
+            break;
           }
         }
-        if (jumped_to_new_part) break;
-        act_part->next_position(nullptr);
+        if (!jumped_to_new_part) {
+          act_part->next_position(nullptr);
+        }
       }
     }
     if (jumped_to_new_part) continue;
@@ -122,107 +130,11 @@ void Cursor::traverse_outer(Part* act_part,
 }
 
 std::vector<InnerPolyline*> Cursor::join_inners(Sequence* outer_seq) {
-  std::vector<InnerPolyline*> retme;
-  std::vector<Shape*> missing_shapes;
-
-  for (Tile *tile : this->cluster.tiles())
-  { for (Shape *shape : tile->shapes())
-    { if (shape->outer_polyline->is_on(Polyline::TRACKED_OUTER) ||
-        shape->outer_polyline->is_on(Polyline::TRACKED_INNER) ||
-        !shape->outer_polyline->boundary() ||
-        std::find(shapes_sequence_.begin(), shapes_sequence_.end(), shape) != shapes_sequence_.end()) {
-        continue;
-      }
-      missing_shapes.push_back(shape);
-    }
-  }
-
-  if (missing_shapes.size() > 0) {
-    std::vector<Shape*> to_delay_shapes;
-    to_delay_shapes = connect_missings(this->shapes_sequence_, missing_shapes);
-    if (!to_delay_shapes.empty())
-    { connect_missings(to_delay_shapes, missing_shapes);
-      while (!to_delay_shapes.empty()) {
-        to_delay_shapes = connect_missings(this->shapes_sequence_, to_delay_shapes);
-      }
-    }
-  }
-
-  retme = collect_inner_sequences(outer_seq);
-  for (Shape* shape : shapes_sequence_) {
-    shape->outer_polyline->turn_on(Polyline::TRACKED_INNER);
-  }
-  return(retme);
-}
-
-std::vector<Shape*> Cursor::connect_missings(std::vector<Shape*> shapes_sequence, std::vector<Shape*> missing_shapes) {
-  std::vector<Shape*> delay_shapes;
-
-  for (Shape* shape : shapes_sequence)
-  { Polyline* polyline = shape->outer_polyline;
-    for (Shape* missing_shape : missing_shapes)
-    { Polyline* outer_polyline = missing_shape->outer_polyline;
-      if ( (polyline->mixed_tile_origin == false && outer_polyline->tile == polyline->tile) ||
-           outer_polyline->is_on(Polyline::TRACKED_OUTER)  ||
-           !polyline->vert_intersect(*outer_polyline)) continue;
-      std::vector<std::pair<int, int>> intersection = polyline->intersection(outer_polyline);
-      if (intersection.size() > 0)
-      { auto result = polyline->sew(intersection, outer_polyline);
-        if (!result) {
-          delay_shapes.push_back(missing_shape);
-          continue;
-        }
-        auto& inject_sequences_left = result->first;
-        auto& inject_sequences_right = result->second;
-        auto combined = combine(inject_sequences_right, inject_sequences_left);
-        for (auto& sewn_sequence : combined) {
-          std::vector<Point*> unique;
-          unique.reserve(sewn_sequence.size());
-          for (Point* p : sewn_sequence) {
-            if (!p) continue;
-            auto it = std::find_if(
-              unique.begin(), unique.end(),
-              [&](Point* up) {
-                  return up && *up == *p;
-              });
-            if (it == unique.end()) unique.push_back(p);
-          }
-          sewn_sequence.swap(unique);
-
-          if (sewn_sequence.size() <= 1) continue;
-
-          int first_x = sewn_sequence.front()->x;
-          bool different_x = false;
-          for (Point* p : sewn_sequence) {
-            if (p->x != first_x) {
-              different_x = true;
-              break;
-            }
-          }
-          if (different_x) {
-            orphan_inners_.push_back(outer_polyline->tile->shapes_pool->acquire_inner_polyline(sewn_sequence, shape, true));
-          }
-        }
-        polyline->mixed_tile_origin = true;
-        outer_polyline->clear();
-        outer_polyline->turn_on(Polyline::TRACKED_OUTER);
-        outer_polyline->turn_on(Polyline::TRACKED_INNER);
-        orphan_inners_.insert(
-          orphan_inners_.end(),
-          missing_shape->inner_polylines.begin(),
-          missing_shape->inner_polylines.end());
-      }
-    }
-  }
-
-  return(delay_shapes);
-}
-
-std::vector<InnerPolyline*> Cursor::collect_inner_sequences(Sequence* outer_seq) {
   std::vector<InnerPolyline*> return_inner_polylines;
-
-  for (Shape* shape : shapes_sequence_)
-  { Polyline* polyline = shape->outer_polyline;
+  std::vector<Shape*> processing_queue = shapes_sequence_;
+  for (size_t i = 0; i < shapes_sequence_.size(); ++i)
+  { Shape* shape = shapes_sequence_[i];
+    Polyline* polyline = shape->outer_polyline;
     for (Part* part : polyline->parts())
     { if (part->innerable())
       { std::vector<Part*> all_parts;
@@ -232,7 +144,6 @@ std::vector<InnerPolyline*> Cursor::collect_inner_sequences(Sequence* outer_seq)
         };
         traverse_inner(part, all_parts, bounds);
         Sequence* retme_sequence = shape->outer_polyline->tile->shapes_pool->acquire_sequence();
-
         for (Part* part : all_parts)
         { part->touch();
           retme_sequence->move_from(*part, [&](QNode<Point>* pos) -> bool {
@@ -242,7 +153,7 @@ std::vector<InnerPolyline*> Cursor::collect_inner_sequences(Sequence* outer_seq)
               position->payload->y <= bounds.max)) {
             return(false);
           }
-            return(!(polyline->tile->tg_border(*position->payload) && position->end_point()->queues_include(outer_seq)));
+            return(!(polyline->tile->tg_border(*position->payload) && position->end_point()->tracked_outer));
           });
         }
         if (retme_sequence->is_not_vertical()) {
@@ -270,27 +181,39 @@ void Cursor::traverse_inner(Part* act_part, std::vector<Part*>& all_parts, Bound
     if (act_part->innerable()) {
       all_parts.push_back(act_part);
       bool jumped = false;
-      while (act_part = act_part->next) {
+      while (act_part = act_part->circular_next) {
         if (act_part->innerable()) {
             all_parts.push_back(act_part);
         } else {
-          for (Shape *shape : act_part->polyline()->next_tile_eligible_shapes()) {
-            for (Part* dest_part : shape->outer_polyline->parts()) {
-              if (dest_part->trasmuted || dest_part->is(Part::EXCLUSIVE)) continue;
+          if (act_part->head)
+          { for (auto dest_part_p : static_cast<Position*>(act_part->head)->end_point()->queues()) {
+              Part* dest_part = static_cast<Part*>(dest_part_p);
+              if (dest_part->polyline()->tile == act_part->polyline()->tile) {
+                continue;
+              }
               int dest_part_versus = dest_part->versus();
               if (dest_part_versus != 0 && dest_part_versus == act_part->versus()) continue;
-              if (dest_part->intersect_part(act_part)) {
-                std::vector<EndPoint*> link_seq = dest_part->continuum_to(*act_part);
-                if (!link_seq.empty()) {
-                  Part* ins_part = pool.acquire(Part::ADDED, act_part->polyline());
-                  for (EndPoint* pos : link_seq) {
-                    this->cluster.positions_pool.emplace_back(pos);
-                    ins_part->add(&this->cluster.positions_pool.back());
-                  }
-                  all_parts.push_back(ins_part);
+              std::vector<EndPoint*> link_seq = dest_part->continuum_to(*act_part);
+              if (!link_seq.empty()) {
+                Part* ins_part = pool.acquire(Part::ADDED, act_part->polyline());
+                for (EndPoint* pos : link_seq) {
+                  this->cluster.positions_pool.emplace_back(pos);
+                  ins_part->add(&this->cluster.positions_pool.back());
                 }
-                shape->outer_polyline->turn_on(Polyline::TRACKED_OUTER);
-                shape->outer_polyline->turn_on(Polyline::TRACKED_INNER);
+                all_parts.push_back(ins_part);
+              }
+              Shape* shape = dest_part->polyline()->shape;
+              if (!dest_part->polyline()->is_on(Polyline::TRACKED_OUTER))
+              { shapes_sequence_.push_back(shape);
+                orphan_inners_.insert(
+                  orphan_inners_.end(),
+                  shape->inner_polylines.begin(),
+                  shape->inner_polylines.end());
+              }
+              dest_part->polyline()->turn_on(Polyline::TRACKED_OUTER);
+              if (!dest_part->touched()) {
+                dest_part->touch();
+
                 act_part = dest_part->circular_next;
                 jumped = true;
                 break;
@@ -298,7 +221,6 @@ void Cursor::traverse_inner(Part* act_part, std::vector<Part*>& all_parts, Bound
             }
             if (jumped) break;
           }
-          if (jumped) break;
           if (act_part->is(Part::SEAM)) {
             all_parts.push_back(act_part);
           }
@@ -312,18 +234,4 @@ void Cursor::traverse_inner(Part* act_part, std::vector<Part*>& all_parts, Bound
     }
     else break;
   }
-}
-
-std::vector<std::vector<Point*>> Cursor::combine(std::vector<std::vector<Point*>>& seqa, std::vector<std::vector<Point*>>& seqb)
-{ std::vector<std::vector<Point*>> rets;
-  size_t n = std::min(seqa.size(), seqb.size());
-  for (size_t i = 0; i < n; ++i) {
-    std::vector<Point*> last = std::move(seqa.back());
-    seqa.pop_back();
-    std::vector<Point*> first = std::move(seqb.front());
-    seqb.erase(seqb.begin());
-    first.insert(first.end(), last.begin(), last.end());
-    rets.push_back(std::move(first));
-  }
-  return rets;
 }

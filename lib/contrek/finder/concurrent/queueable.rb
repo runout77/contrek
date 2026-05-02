@@ -10,16 +10,6 @@ module Contrek
         @size = 0
       end
 
-      def singleton!
-        if @head&.next
-          @head.next.prev = nil
-          @head.next = nil
-        end
-        @tail = nil
-        @size = 1
-        @iterator = 0
-      end
-
       def rem(node)
         Raise "Not my node" if node.owner != self
 
@@ -55,43 +45,12 @@ module Contrek
         node.after_add(self)
       end
 
-      def replace!(queueable)
-        reset!
-        append(queueable)
-      end
-
-      def append(queueable)
-        return if queueable.size.zero?
-        queueable.each do |node|
-          node.before_rem(queueable)
-          node.owner = self
-        end
-        if @tail
-          @tail.next = queueable.head
-          queueable.head.prev = @tail
-        else
-          @head = queueable.head
-        end
-        @tail = queueable.tail
-        @size += queueable.size
-        queueable.reset!
-
-        each { |node| node.after_add(self) }
-      end
-
       def move_from(queueable, &block)
         queueable.rewind!
         while (node = queueable.iterator)
           queueable.forward!
           add(node) if yield(node)
         end
-      end
-
-      def reset!
-        @head = nil
-        @tail = nil
-        @size = 0
-        @iterator = 0
       end
 
       # from yield: false => stop, true => continue

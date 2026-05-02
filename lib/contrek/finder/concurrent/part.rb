@@ -7,8 +7,8 @@ module Contrek
       EXCLUSIVE = 0
       ADDED = 2
 
-      attr_reader :polyline, :index, :touched
-      attr_accessor :next, :circular_next, :prev, :type, :dead_end, :inverts, :trasmuted, :delayed, :versus
+      attr_reader :polyline, :touched
+      attr_accessor :next, :circular_next, :prev, :type, :dead_end, :inverts, :trasmuted, :versus
       def initialize(type, polyline)
         @type = type
         @polyline = polyline
@@ -19,16 +19,11 @@ module Contrek
         @touched = false
         @inverts = false
         @trasmuted = false
-        @delayed = false
         @versus = 0
       end
 
       def is?(type)
         @type == type
-      end
-
-      def set_polyline(polyline)
-        @polyline = polyline
       end
 
       def add_position(position)
@@ -66,19 +61,6 @@ module Contrek
 
       def innerable?
         (@touched == false) && is?(EXCLUSIVE)
-      end
-
-      def intersect_part?(other_part)
-        intersect = false
-        other_part.each do |position|
-          if position.end_point.queues.include?(self)
-            intersect = true
-            false
-          else
-            true
-          end
-        end
-        intersect
       end
 
       def orient!

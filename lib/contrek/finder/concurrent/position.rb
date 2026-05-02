@@ -20,11 +20,17 @@ module Contrek
       end
 
       def after_add(new_queue)
-        @end_point.queues << new_queue if @end_point
+        if @end_point && new_queue.instance_of?(Contrek::Concurrent::Part)
+          @end_point.queues << new_queue if !@end_point.queues.include?(new_queue)
+          if @end_point.queues.size > 1
+            new_queue.polyline.any_ancients = true
+            @end_point.queues.first.polyline.any_ancients = true
+          end
+        end
       end
 
       def before_rem(old_queue)
-        @end_point&.queues&.delete(old_queue)
+        # @end_point&.queues&.delete(old_queue) if old_queue.class == Contrek::Concurrent::Part
       end
 
       def inspect

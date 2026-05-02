@@ -167,7 +167,7 @@ Regarding multithreading:
 
 - The algorithm splits the contour-detection workflow into multiple phases that can be executed in parallel. The initial contour extraction on each band and the subsequent merging of coordinates between adjacent bands—performed pairwise, recursively, and in a non-deterministic order—results in a final output that is not idempotent. Idempotence is guaranteed only when the exact same merging sequence is repeated.
 
-By not declaring native option CPP Multithreading optimized code is used. In the above example a [105 MP image](spec/files/images/sample_10240x10240.png) is examined by 4 threads working on 4 tiles (total compute time about 1.2 secs with image load).
+By not declaring native option CPP Multithreading optimized code is used. In the above example a [105 MP image](spec/files/images/sample_10240x10240.png) is examined by 4 threads working on 4 tiles (total compute time about 1.1 secs with image load).
 
 ```ruby
 result = Contrek.contour!(
@@ -181,11 +181,11 @@ result = Contrek.contour!(
 )
 puts result.metadata[:benchmarks].inspect
 
-{ compress: 26.37,
-  init: 354.339,
-  inner: 17.9427,
-  outer: 93.6252,
-  total: 380.709
+{ compress: 23.83,
+  init: 313.179,
+  inner: 6.16,
+  outer: 78.791,
+  total: 337.013
 }
 
 ```
@@ -483,9 +483,12 @@ int main() {
 
 ## License
 
-This project is licensed under the terms of a dual-license.
+Contrek uses a dual-license model:
 
-See [LICENSE.md](LICENSE.md).
+- **Ruby gem and wrappers** — [MIT](lib/LICENSE-MIT.md). Free to use in any project, including commercial ones.
+- **C++17 core engine** (`ext/cpp_polygon_finder/PolygonFinder`) — [AGPLv3](ext/cpp_polygon_finder/PolygonFinder/LICENSE_AGPL.txt). If you use the core in a SaaS or closed-source product, you must either open your source or [contact the author](https://github.com/runout77) for a commercial license.
+
+See [LICENSE.md](LICENSE.md) for full details.
 
 ## Changelog
 

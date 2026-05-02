@@ -656,7 +656,7 @@ RSpec.shared_examples "concurrent_treemap" do
     end
 
     it "case 21" do
-      chunk = "        000000000000           " \
+      chunk = "                  00           " \
               "                 0000          " \
               "                00  00         " \
               "               00    00        " \
@@ -688,12 +688,13 @@ RSpec.shared_examples "concurrent_treemap" do
       ).process_info
       expect(result.metadata[:treemap]).to eq([[-1, -1], [0, 2], [1, 0]])
 
-      c_result = @polygon_finder_class.new(
+      result = @polygon_finder_class.new(
         bitmap: @bitmap_class.new(chunk, 31),
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :a, treemap: true, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(c_result.metadata[:treemap]).to eq([[-1, -1], [0, 2], [1, 0]])
+      # 0=>0 1=>1 2=>2
+      expect(result.metadata[:treemap]).to eq([[-1, -1], [0, 1], [1, 0]])
     end
   end
 end

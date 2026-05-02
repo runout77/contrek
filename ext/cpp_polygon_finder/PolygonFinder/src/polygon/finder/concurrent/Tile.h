@@ -31,8 +31,6 @@ class Tile {
   int end_x_;
   std::string name_;
   std::list<Shape*> shapes_;
-  std::list<Shape*> boundary_shapes_;
-  bool boundary_shapes_initialized_ = false;
 
  public:
   Tile(Finder *finder, int start_x, int end_x, std::string name, const Benchmarks& b);
@@ -46,7 +44,6 @@ class Tile {
   std::string name() const { return name_; }
   const std::list<Shape*>& shapes() const { return shapes_; }
   std::list<Shape*>& shapes() { return shapes_; }
-  const std::list<Shape*>& boundary_shapes();
   bool whole();
   bool left();
   bool right();

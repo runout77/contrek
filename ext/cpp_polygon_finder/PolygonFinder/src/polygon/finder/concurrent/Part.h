@@ -28,10 +28,10 @@ class Part : public Queueable<Point> {
     ADDED = 2
   };
   explicit Part(Types type, Polyline* polyline);
+  bool listable() const override { return true; }
   bool is(Types type);
   bool inverts = false;
   bool trasmuted = false;
-  bool delayed = false;
   bool dead_end = false;
   Part* next = nullptr;
   Part* prev = nullptr;
@@ -45,8 +45,6 @@ class Part : public Queueable<Point> {
   const bool touched() const { return touched_; }
   const int versus() const { return versus_; }
   void touch();
-  bool intersect_part(Part* other_part);
-  void set_polyline(Polyline* polyline) { this->polyline_ = polyline; }
   void orient();
   std::string inspect();
   std::vector<EndPoint*> continuum_to(const Part& other_part) const;

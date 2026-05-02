@@ -104,18 +104,6 @@ std::string Tile::toString() {
   return s;
 }
 
-const std::list<Shape*>& Tile::boundary_shapes()
-{ if (!boundary_shapes_initialized_)
-  { for (Shape* s : shapes_)
-    { if (s->outer_polyline->boundary())
-      { boundary_shapes_.push_back(s);
-      }
-    }
-    boundary_shapes_initialized_ = true;
-  }
-  return boundary_shapes_;
-}
-
 std::list<Polygon> Tile::to_raw_polygons()
 { std::list<Polygon> retme;
   for (Shape* s : shapes_)

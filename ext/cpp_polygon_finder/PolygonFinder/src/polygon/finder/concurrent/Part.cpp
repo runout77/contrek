@@ -61,19 +61,6 @@ void Part::touch()
 {  this->touched_ = true;
 }
 
-bool Part::intersect_part(Part* other_part)
-{ bool intersect = false;
-  other_part->each([&](QNode<Point>* pos) -> bool {
-    Position *position = static_cast<Position*>(pos);
-    if (position->end_point()->queues_include(this))
-    { intersect = true;
-      return(false);
-    }
-    return(true);
-  });
-  return(intersect);
-}
-
 void Part::orient()
 { if (this->size <= 1 || (this->size == 2 && this->inverts)) {
     this->versus_ = 0;

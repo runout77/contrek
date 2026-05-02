@@ -58,39 +58,6 @@ RSpec.describe Contrek::Concurrent::Listable, type: :class do
       expect(list.to_a).to eq ["b", "b", "a"]
     end
 
-    it "multiple append" do
-      a1 = TestNode.new("a1")
-      a2 = TestNode.new("a2")
-      list_a = TestList.new
-      list_a.add(a1)
-      list_a.add(a2)
-      expect(list_a.to_a).to eq ["a1", "a2"]
-
-      b1 = TestNode.new("b1")
-      b2 = TestNode.new("b2")
-      list_b = TestList.new
-      list_b.add(b1)
-      list_b.add(b2)
-      expect(list_b.to_a).to eq ["b1", "b2"]
-
-      list_c = TestList.new
-      list_c.append(list_a)
-      list_c.append(list_b)
-
-      expect(list_c.to_a).to eq ["a1", "a2", "b1", "b2"]
-      expect(list_c.head).to eq a1
-      expect(list_c.tail).to eq b2
-      expect(list_c.size).to eq 4
-      expect(list_a.to_a).to eq []
-      expect(list_b.to_a).to eq []
-      expect(list_a.head).to be nil
-      expect(list_a.tail).to be nil
-      expect(list_b.head).to be nil
-      expect(list_b.tail).to be nil
-      expect(list_b.size).to eq 0
-      expect(list_a.size).to eq 0
-    end
-
     it "iterate and remove" do
       a = TestNode.new("a")
       b = TestNode.new("b")
@@ -220,7 +187,7 @@ RSpec.describe Contrek::Concurrent::Listable, type: :class do
       expect(a.next).to be nil
       expect(a.prev).to be nil
 
-      list.append(list2)
+      list.add(a)
       expect(list2.to_a).to eq []
       expect(list2.head).to be nil
       expect(list2.tail).to be nil

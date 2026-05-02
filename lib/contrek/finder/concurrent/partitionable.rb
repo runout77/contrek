@@ -18,23 +18,6 @@ module Contrek
         new_part.orient! if new_part.is?(Part::SEAM)
       end
 
-      def insert_after(part, new_part)
-        part_index = @parts.index(part)
-        @parts.insert(part_index + 1, new_part)
-        new_part.prev = part
-        new_part.next = new_part.circular_next = part.next
-        part.next.prev = new_part if part.next
-        part.next = part.circular_next = new_part
-      end
-
-      def find_first_part_by_position(position, versus)
-        @parts.find do |part|
-          part.is?(Part::SEAM) &&
-            part.versus == -versus &&
-            position.end_point.queues.include?(part)
-        end
-      end
-
       def inspect_parts
         [" "] + ["#{self.class} parts=#{@parts.size}"] + @parts.map { |p| p.inspect } + [" "]
       end
@@ -65,70 +48,6 @@ module Contrek
         add_part(current_part)
 
         trasmute_parts!
-      end
-
-      def sew!(intersection, other)
-        matching_part_indexes, other_matching_part_indexes = intersection.transpose.map(&:sort)
-        # other_matching_part_indexes and matching_part_indexes always must contain at least one element
-        before_parts = other.parts[other_matching_part_indexes.last + 1..]
-        after_parts = other_matching_part_indexes.first.zero? ? [] : other.parts[0..other_matching_part_indexes.first - 1]
-        part_start = parts[matching_part_indexes.first]
-        part_end = parts[matching_part_indexes.last]
-
-        # left and right side reduces will be combined and later converted into orphan inners sequences
-        returning_data = [[matching_part_indexes, parts], [other_matching_part_indexes, other.parts]].map do |matching_part_indexes, parts|
-          lastn = 0
-          result = []
-          (matching_part_indexes.first + 1).upto(matching_part_indexes.last - 1) do |n|
-            if matching_part_indexes.index(n).nil?
-              part = parts[n]
-              if part.is?(Part::SEAM) && part.size > 0 && !part.delayed # fallback, delays the shape
-                part.delayed = true
-                return nil
-              end
-              if (lastn == (n - 1)) && result.any?
-                result.last.concat part.to_a
-              else
-                result << part.to_a
-              end
-              lastn = n
-            end
-          end
-          result
-        end
-
-        if part_start != part_end
-          (matching_part_indexes.last - 1).downto(matching_part_indexes.first + 1) do |n|
-            delete_part = parts[n]
-            delete_part.prev.next = delete_part.next if delete_part.prev
-            delete_part.next.prev = delete_part.prev if delete_part.next
-            parts.delete_at(n)
-          end
-        end
-
-        all_parts = before_parts + after_parts
-        will_be_last = all_parts.last
-        all_parts.reverse_each do |part|
-          insert_after(part_start, part)
-          other.parts.delete(part)
-          part.set_polyline(self)
-        end
-
-        part_start.type = Part::EXCLUSIVE
-        new_end_part = Part.new(Part::EXCLUSIVE, self)
-        new_end_part.add(part_end.tail)
-        part_start.singleton! # reduce part to its head only
-
-        if part_start != part_end
-          part_end.prev.next = part_end.next if part_end.prev
-          part_end.next.prev = part_end.prev if part_end.next
-          parts.delete(part_end)
-        end
-        insert_after(will_be_last, new_end_part)
-
-        reset_tracked_endpoints!
-
-        returning_data
       end
 
       private

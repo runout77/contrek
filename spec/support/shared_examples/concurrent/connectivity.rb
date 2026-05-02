@@ -31,7 +31,6 @@ RSpec.shared_examples "connectivity" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :o, connectivity: 8, compress: {uniq: true, linear: true}}
       ).process_info
-
       expect(result.points).to eq([{outer: [{x: 9, y: 0}, {x: 9, y: 2}, {x: 19, y: 3}, {x: 19, y: 5}, {x: 10, y: 5}, {x: 10, y: 3}, {x: 9, y: 2}, {x: 0, y: 2}, {x: 0, y: 0}], inner: []}])
     end
 
@@ -101,6 +100,12 @@ RSpec.shared_examples "connectivity" do
         options: {number_of_tiles: 2, versus: :a, connectivity: 8, compress: {uniq: true, linear: true}}
       ).process_info
       expect(result.points).to eq([{outer: [{x: 7, y: 2}, {x: 7, y: 3}, {x: 9, y: 3}, {x: 10, y: 4}, {x: 10, y: 5}, {x: 12, y: 5}, {x: 12, y: 4}, {x: 9, y: 3}, {x: 9, y: 2}, {x: 12, y: 1}, {x: 12, y: 0}, {x: 10, y: 0}, {x: 10, y: 1}, {x: 9, y: 2}], inner: []}])
+      result = @polygon_finder_class.new(
+        bitmap: @bitmap_class.new(chunk, 20),
+        matcher: @matcher,
+        options: {number_of_tiles: 2, versus: :o, connectivity: 8, compress: {uniq: true, linear: true}}
+      ).process_info
+      expect(result.points).to eq([{outer: [{x: 9, y: 2}, {x: 10, y: 1}, {x: 10, y: 0}, {x: 12, y: 0}, {x: 12, y: 1}, {x: 9, y: 2}, {x: 9, y: 3}, {x: 12, y: 4}, {x: 12, y: 5}, {x: 10, y: 5}, {x: 10, y: 4}, {x: 9, y: 3}, {x: 7, y: 3}, {x: 7, y: 2}], inner: []}])
     end
 
     it "connections 8 case 6" do

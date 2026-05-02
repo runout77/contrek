@@ -28,13 +28,17 @@ module Contrek
       def transpose(result)
         result.metadata[:width], result.metadata[:height] = result.metadata[:height], result.metadata[:width]
         result.polygons.each do |polygon|
-          polygon[:outer].each { |p| p[:x], p[:y] = p[:y], p[:x] }
-          polygon[:inner].each do |sequence|
-            sequence.each { |p| p[:x], p[:y] = p[:y], p[:x] }
+          invert_point = ->(p) { {x: p[:y], y: p[:x]} }
+          polygon[:outer] = polygon[:outer].map(&invert_point)
+          polygon[:inner] = polygon[:inner].map do |sequence|
+            sequence.map(&invert_point)
           end
           if polygon.key?(:bounds)
-            polygon[:bounds][:min_x], polygon[:bounds][:min_y] = polygon[:bounds][:min_y], polygon[:bounds][:min_x]
-            polygon[:bounds][:max_x], polygon[:bounds][:max_y] = polygon[:bounds][:max_y], polygon[:bounds][:max_x]
+            b = polygon[:bounds]
+            polygon[:bounds] = {
+              min_x: b[:min_y], min_y: b[:min_x],
+              max_x: b[:max_y], max_y: b[:max_x]
+            }
           end
         end
         result

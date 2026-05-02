@@ -63,7 +63,6 @@ Tile* Cluster::merge_tiles() {
       if (shape->outer_polyline->is_on(Polyline::TRACKED_OUTER) || shape->outer_polyline->width() == 0) continue;
       if (shape->outer_polyline->boundary()) {
         shape->outer_polyline->partition();
-        shape->outer_polyline->precalc();
       }
     }
   }
@@ -77,7 +76,7 @@ Tile* Cluster::merge_tiles() {
         continue;
       }
 
-      if (shape->outer_polyline->boundary() && !shape->outer_polyline->next_tile_eligible_shapes().empty()) {
+      if (shape->outer_polyline->any_ancients) {
         Cursor cursor(*this, shape);
         Sequence* new_outer = nullptr;
 

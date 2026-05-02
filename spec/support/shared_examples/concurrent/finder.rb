@@ -1070,7 +1070,6 @@ RSpec.shared_examples "finder" do
       expect(result.points).to eq([{outer:
         [{x: 7, y: 0}, {x: 7, y: 3}, {x: 5, y: 4}, {x: 2, y: 5}, {x: 1, y: 6}, {x: 1, y: 9}, {x: 2, y: 10},
           {x: 7, y: 11}, {x: 12, y: 11}, {x: 14, y: 9}, {x: 14, y: 6}, {x: 13, y: 5}, {x: 13, y: 0}], inner: []}])
-
       result = @polygon_finder_class.new(
         bitmap: @bitmap_class.new(chunk, 16),
         matcher: @matcher,
@@ -1299,23 +1298,23 @@ RSpec.shared_examples "finder" do
 
     it "syllable el (sew technic)" do
       #        --------*--------*---------
-      chunk = "XXXXXXXXXXXXXXXXXXX        " \
-              " XXXXXXXXXX  XXXXX         " \
-              "  XXX    XX   XXX          " \
-              "  XXX     X   XXX          " \
-              "  XXX         XXX          " \
-              "  XXX     X   XXX          " \
-              "  XXX    XX   XXX          " \
-              "  XXXXXXXXX   XXX          " \
-              "  XXXXXXXXX   XXX          " \
-              "  XXXXXXXXX   XXX          " \
-              "  XXX    XX   XXX          " \
-              "  XXX     X   XXX          " \
-              "  XXX         XXX          " \
-              "  XXX     X   XXX         X" \
-              "  XXX    XX   XXX        XX" \
-              " XXXXXXXXXX  XXXXXXXXXXXXXX" \
-              "XXXXXXXXXXXXXXXXXXXXXXXXXXX"
+      chunk = "0000000000000000000        " \
+              " 0000000000  00000         " \
+              "  000    00   000          " \
+              "  000     0   000          " \
+              "  000         000          " \
+              "  000     0   000          " \
+              "  000    00   000          " \
+              "  000000000   000          " \
+              "  000000000   000          " \
+              "  000000000   000          " \
+              "  000    00   000          " \
+              "  000     0   000          " \
+              "  000         000          " \
+              "  000     0   000         0" \
+              "  000    00   000        00" \
+              " 0000000000  00000000000000" \
+              "000000000000000000000000000"
       result = @polygon_finder_class.new(
         bitmap: @bitmap_class.new(chunk, 27),
         matcher: @matcher,
@@ -1563,6 +1562,38 @@ RSpec.shared_examples "finder" do
               "00  0000000000000000" \
               "00  0000000000000000" \
               "00  000         0000" \
+              "00  00000000    0000" \
+              "00  00000000    0000" \
+              "00  000         0000" \
+              "00  0000000000000000" \
+              "00  0000000000000000" \
+              "00              0000" \
+              "00000000000000000000" \
+              "00000000000000000000"
+      result = Contrek::Finder::PolygonFinder.new(
+        @ruby_bitmap_class.new(chunk, 20),
+        @ruby_matcher,
+        nil,
+        {versus: :o, compress: {uniq: true, linear: true}}
+      ).process_info
+      expect(result.points).to eq([{outer: [{x: 19, y: 0}, {x: 19, y: 13}, {x: 0, y: 13}, {x: 0, y: 0}], inner: [[{x: 16, y: 2}, {x: 1, y: 2}, {x: 1, y: 11}, {x: 16, y: 11}, {x: 4, y: 10}, {x: 4, y: 3}], [{x: 16, y: 5}, {x: 6, y: 5}, {x: 11, y: 6}, {x: 11, y: 7}, {x: 6, y: 8}, {x: 16, y: 8}, {x: 16, y: 6}]]}])
+
+      result = @polygon_finder_class.new(
+        bitmap: @bitmap_class.new(chunk, 20),
+        matcher: @matcher,
+        options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
+      ).process_info
+      expect(result.points).to eq([{outer: [{x: 9, y: 0}, {x: 19, y: 0}, {x: 19, y: 13}, {x: 9, y: 13}, {x: 0, y: 13}, {x: 0, y: 0}], inner: [[{x: 1, y: 2}, {x: 1, y: 11}, {x: 16, y: 11}, {x: 9, y: 10}, {x: 4, y: 10}, {x: 4, y: 3}, {x: 9, y: 3}, {x: 16, y: 2}], [{x: 16, y: 8}, {x: 16, y: 5}, {x: 6, y: 5}, {x: 9, y: 6}, {x: 11, y: 6}, {x: 11, y: 7}, {x: 9, y: 7}, {x: 6, y: 8}]]}])
+    end
+
+    it "half moon problem 2 bis" do
+      #        ---------*----------
+      chunk = "00000000000000000000" \
+              "00000000000000000000" \
+              "00              0000" \
+              "00  0000000000000000" \
+              "00  0000000000000000" \
+              "00  000         0000" \
               "00  000 000000000000" \
               "00  000 000000000000" \
               "00  000         0000" \
@@ -1635,10 +1666,10 @@ RSpec.shared_examples "finder" do
         inner: [
           [{x: 1, y: 2}, {x: 1, y: 19}, {x: 16, y: 19}, {x: 11, y: 18},
             {x: 4, y: 18}, {x: 4, y: 3}, {x: 11, y: 3}, {x: 16, y: 2}],
-          [{x: 16, y: 13}, {x: 16, y: 12}, {x: 12, y: 11}, {x: 12, y: 10},
-            {x: 16, y: 9}, {x: 16, y: 8}, {x: 9, y: 8}, {x: 9, y: 13}],
             [{x: 16, y: 16}, {x: 11, y: 15}, {x: 8, y: 15}, {x: 8, y: 6},
-              {x: 11, y: 6}, {x: 16, y: 5}, {x: 5, y: 5}, {x: 5, y: 16}]
+              {x: 11, y: 6}, {x: 16, y: 5}, {x: 5, y: 5}, {x: 5, y: 16}],
+          [{x: 16, y: 13}, {x: 16, y: 12}, {x: 12, y: 11}, {x: 12, y: 10},
+            {x: 16, y: 9}, {x: 16, y: 8}, {x: 9, y: 8}, {x: 9, y: 13}]
 ]
       }])
     end
@@ -1813,7 +1844,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result.points).to eq([{outer: [{x: 9, y: 0}, {x: 19, y: 0}, {x: 19, y: 19}, {x: 9, y: 19}, {x: 0, y: 19}, {x: 0, y: 0}], inner: [[{x: 1, y: 2}, {x: 1, y: 17}, {x: 16, y: 17}, {x: 9, y: 16}, {x: 4, y: 16}, {x: 4, y: 3}, {x: 9, y: 3}, {x: 11, y: 3}, {x: 11, y: 4}, {x: 16, y: 4}, {x: 16, y: 2}], [{x: 16, y: 14}, {x: 6, y: 14}], [{x: 16, y: 11}, {x: 16, y: 7}, {x: 11, y: 7}, {x: 11, y: 10}, {x: 6, y: 11}], [{x: 10, y: 8}, {x: 10, y: 5}, {x: 6, y: 5}, {x: 6, y: 8}]]}])
+      expect(result.points).to eq([{outer: [{x: 9, y: 0}, {x: 19, y: 0}, {x: 19, y: 19}, {x: 9, y: 19}, {x: 0, y: 19}, {x: 0, y: 0}], inner: [[{x: 1, y: 2}, {x: 1, y: 17}, {x: 16, y: 17}, {x: 9, y: 16}, {x: 4, y: 16}, {x: 4, y: 3}, {x: 9, y: 3}, {x: 11, y: 3}, {x: 11, y: 4}, {x: 16, y: 4}, {x: 16, y: 2}], [{x: 16, y: 14}, {x: 6, y: 14}], [{x: 16, y: 11}, {x: 16, y: 7}, {x: 11, y: 7}, {x: 11, y: 10}, {x: 9, y: 10}, {x: 6, y: 11}], [{x: 10, y: 8}, {x: 10, y: 5}, {x: 6, y: 5}, {x: 6, y: 8}]]}])
     end
 
     it "multiconnections case 4" do
@@ -1843,7 +1874,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result.points).to eq([{outer: [{x: 9, y: 0}, {x: 19, y: 0}, {x: 19, y: 19}, {x: 9, y: 19}, {x: 0, y: 19}, {x: 0, y: 1}, {x: 7, y: 0}], inner: [[{x: 6, y: 2}, {x: 6, y: 3}, {x: 1, y: 4}, {x: 1, y: 17}, {x: 16, y: 17}, {x: 9, y: 16}, {x: 4, y: 16}, {x: 4, y: 5}, {x: 6, y: 5}, {x: 6, y: 8}, {x: 9, y: 9}, {x: 10, y: 8}, {x: 10, y: 5}, {x: 16, y: 4}, {x: 16, y: 2}, {x: 12, y: 2}, {x: 12, y: 3}, {x: 9, y: 3}, {x: 9, y: 2}], [{x: 16, y: 14}, {x: 6, y: 14}], [{x: 16, y: 11}, {x: 16, y: 7}, {x: 11, y: 7}, {x: 11, y: 10}, {x: 6, y: 11}]]}])
+      expect(result.points).to eq([{outer: [{x: 9, y: 0}, {x: 19, y: 0}, {x: 19, y: 19}, {x: 9, y: 19}, {x: 0, y: 19}, {x: 0, y: 1}, {x: 7, y: 0}], inner: [[{x: 6, y: 2}, {x: 6, y: 3}, {x: 1, y: 4}, {x: 1, y: 17}, {x: 16, y: 17}, {x: 9, y: 16}, {x: 4, y: 16}, {x: 4, y: 5}, {x: 6, y: 5}, {x: 6, y: 8}, {x: 9, y: 9}, {x: 10, y: 8}, {x: 10, y: 5}, {x: 16, y: 4}, {x: 16, y: 2}, {x: 12, y: 2}, {x: 12, y: 3}, {x: 9, y: 3}, {x: 9, y: 2}], [{x: 16, y: 14}, {x: 6, y: 14}], [{x: 16, y: 11}, {x: 16, y: 7}, {x: 11, y: 7}, {x: 11, y: 10}, {x: 9, y: 10}, {x: 6, y: 11}]]}])
     end
 
     it "multiconnections case 5" do
@@ -1881,7 +1912,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result.points).to eq([{outer: [{x: 9, y: 0}, {x: 19, y: 0}, {x: 19, y: 27}, {x: 9, y: 27}, {x: 0, y: 27}, {x: 0, y: 0}], inner: [[{x: 1, y: 2}, {x: 1, y: 25}, {x: 12, y: 25}, {x: 12, y: 24}, {x: 9, y: 23}, {x: 4, y: 23}, {x: 4, y: 3}, {x: 9, y: 3}, {x: 9, y: 4}, {x: 6, y: 5}, {x: 9, y: 6}, {x: 11, y: 5}, {x: 12, y: 4}, {x: 18, y: 3}, {x: 18, y: 2}], [{x: 18, y: 6}, {x: 13, y: 6}, {x: 13, y: 21}, {x: 18, y: 21}, {x: 18, y: 7}], [{x: 17, y: 24}, {x: 13, y: 24}, {x: 13, y: 25}, {x: 17, y: 25}], [{x: 12, y: 21}, {x: 12, y: 20}, {x: 6, y: 20}, {x: 6, y: 21}], [{x: 12, y: 17}, {x: 12, y: 16}, {x: 6, y: 16}, {x: 6, y: 17}], [{x: 12, y: 13}, {x: 12, y: 12}, {x: 6, y: 12}, {x: 6, y: 13}], [{x: 12, y: 9}, {x: 12, y: 8}, {x: 6, y: 8}, {x: 6, y: 9}]]}])
+      expect(result.points).to eq([{outer: [{x: 9, y: 0}, {x: 19, y: 0}, {x: 19, y: 27}, {x: 9, y: 27}, {x: 0, y: 27}, {x: 0, y: 0}], inner: [[{x: 1, y: 2}, {x: 1, y: 25}, {x: 12, y: 25}, {x: 12, y: 24}, {x: 9, y: 23}, {x: 4, y: 23}, {x: 4, y: 3}, {x: 9, y: 3}, {x: 9, y: 4}, {x: 6, y: 5}, {x: 9, y: 6}, {x: 11, y: 5}, {x: 12, y: 4}, {x: 18, y: 3}, {x: 18, y: 2}], [{x: 12, y: 21}, {x: 12, y: 20}, {x: 6, y: 20}, {x: 6, y: 21}], [{x: 12, y: 17}, {x: 12, y: 16}, {x: 6, y: 16}, {x: 6, y: 17}], [{x: 12, y: 13}, {x: 12, y: 12}, {x: 6, y: 12}, {x: 6, y: 13}], [{x: 12, y: 9}, {x: 12, y: 8}, {x: 6, y: 8}, {x: 6, y: 9}], [{x: 18, y: 6}, {x: 13, y: 6}, {x: 13, y: 21}, {x: 18, y: 21}, {x: 18, y: 7}], [{x: 17, y: 24}, {x: 13, y: 24}, {x: 13, y: 25}, {x: 17, y: 25}]]}])
     end
 
     it "multiconnections case 6" do
@@ -1921,7 +1952,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result.points).to eq([{outer: [{x: 9, y: 0}, {x: 19, y: 0}, {x: 19, y: 29}, {x: 9, y: 29}, {x: 0, y: 29}, {x: 0, y: 1}, {x: 7, y: 0}], inner: [[{x: 6, y: 2}, {x: 6, y: 3}, {x: 1, y: 4}, {x: 1, y: 27}, {x: 12, y: 27}, {x: 12, y: 26}, {x: 9, y: 25}, {x: 4, y: 25}, {x: 4, y: 5}, {x: 9, y: 5}, {x: 9, y: 6}, {x: 6, y: 7}, {x: 9, y: 8}, {x: 11, y: 7}, {x: 12, y: 6}, {x: 18, y: 5}, {x: 18, y: 4}, {x: 16, y: 3}, {x: 16, y: 2}, {x: 12, y: 2}, {x: 12, y: 3}, {x: 9, y: 3}, {x: 9, y: 2}], [{x: 18, y: 8}, {x: 13, y: 8}, {x: 13, y: 23}, {x: 18, y: 23}, {x: 18, y: 9}], [{x: 17, y: 26}, {x: 13, y: 26}, {x: 13, y: 27}, {x: 17, y: 27}], [{x: 12, y: 23}, {x: 12, y: 22}, {x: 6, y: 22}, {x: 6, y: 23}], [{x: 12, y: 19}, {x: 12, y: 18}, {x: 6, y: 18}, {x: 6, y: 19}], [{x: 12, y: 15}, {x: 12, y: 14}, {x: 6, y: 14}, {x: 6, y: 15}], [{x: 12, y: 11}, {x: 12, y: 10}, {x: 6, y: 10}, {x: 6, y: 11}]]}])
+      expect(result.points).to eq([{outer: [{x: 9, y: 0}, {x: 19, y: 0}, {x: 19, y: 29}, {x: 9, y: 29}, {x: 0, y: 29}, {x: 0, y: 1}, {x: 7, y: 0}], inner: [[{x: 6, y: 2}, {x: 6, y: 3}, {x: 1, y: 4}, {x: 1, y: 27}, {x: 12, y: 27}, {x: 12, y: 26}, {x: 9, y: 25}, {x: 4, y: 25}, {x: 4, y: 5}, {x: 9, y: 5}, {x: 9, y: 6}, {x: 6, y: 7}, {x: 9, y: 8}, {x: 11, y: 7}, {x: 12, y: 6}, {x: 18, y: 5}, {x: 18, y: 4}, {x: 16, y: 3}, {x: 16, y: 2}, {x: 12, y: 2}, {x: 12, y: 3}, {x: 9, y: 3}, {x: 9, y: 2}], [{x: 12, y: 23}, {x: 12, y: 22}, {x: 6, y: 22}, {x: 6, y: 23}], [{x: 12, y: 19}, {x: 12, y: 18}, {x: 6, y: 18}, {x: 6, y: 19}], [{x: 12, y: 15}, {x: 12, y: 14}, {x: 6, y: 14}, {x: 6, y: 15}], [{x: 12, y: 11}, {x: 12, y: 10}, {x: 6, y: 10}, {x: 6, y: 11}], [{x: 18, y: 8}, {x: 13, y: 8}, {x: 13, y: 23}, {x: 18, y: 23}, {x: 18, y: 9}], [{x: 17, y: 26}, {x: 13, y: 26}, {x: 13, y: 27}, {x: 17, y: 27}]]}])
     end
 
     it "multiconnections case 7" do
@@ -1955,7 +1986,7 @@ RSpec.shared_examples "finder" do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :a, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result.points).to eq([{outer: [{x: 0, y: 0}, {x: 0, y: 23}, {x: 9, y: 23}, {x: 19, y: 23}, {x: 19, y: 0}, {x: 9, y: 0}], inner: [[{x: 1, y: 21}, {x: 1, y: 2}, {x: 16, y: 2}, {x: 16, y: 10}, {x: 9, y: 11}, {x: 6, y: 10}, {x: 9, y: 9}, {x: 11, y: 9}, {x: 11, y: 3}, {x: 9, y: 3}, {x: 4, y: 3}, {x: 4, y: 20}, {x: 9, y: 20}, {x: 16, y: 21}], [{x: 6, y: 7}, {x: 6, y: 5}, {x: 10, y: 5}, {x: 10, y: 7}], [{x: 16, y: 13}, {x: 16, y: 18}, {x: 6, y: 18}, {x: 6, y: 17}, {x: 9, y: 16}, {x: 10, y: 16}, {x: 10, y: 15}, {x: 9, y: 15}, {x: 6, y: 14}, {x: 6, y: 13}]]}])
+      expect(result.points).to eq([{outer: [{x: 0, y: 0}, {x: 0, y: 23}, {x: 9, y: 23}, {x: 19, y: 23}, {x: 19, y: 0}, {x: 9, y: 0}], inner: [[{x: 1, y: 21}, {x: 1, y: 2}, {x: 16, y: 2}, {x: 16, y: 10}, {x: 9, y: 11}, {x: 6, y: 10}, {x: 9, y: 9}, {x: 11, y: 9}, {x: 11, y: 3}, {x: 9, y: 3}, {x: 4, y: 3}, {x: 4, y: 20}, {x: 9, y: 20}, {x: 16, y: 21}], [{x: 16, y: 13}, {x: 16, y: 18}, {x: 6, y: 18}, {x: 6, y: 17}, {x: 9, y: 16}, {x: 10, y: 16}, {x: 10, y: 15}, {x: 9, y: 15}, {x: 6, y: 14}, {x: 6, y: 13}], [{x: 6, y: 7}, {x: 6, y: 5}, {x: 10, y: 5}, {x: 10, y: 7}]]}])
     end
 
     it "complex shape" do

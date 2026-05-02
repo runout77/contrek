@@ -4,10 +4,9 @@ module Contrek
       prepend Partitionable
 
       TRACKED_OUTER = 1 << 0
-      TRACKED_INNER = 1 << 1
 
-      attr_reader :raw, :name, :min_y, :max_y, :next_tile_eligible_shapes
-      attr_accessor :shape, :tile, :mixed_tile_origin
+      attr_reader :raw, :name, :min_y, :max_y
+      attr_accessor :shape, :tile, :any_ancients
 
       def initialize(tile:, polygon:, shape: nil, bounds: nil)
         @tile = tile
@@ -15,7 +14,7 @@ module Contrek
         @raw = polygon
         @shape = shape
         @flags = 0
-        @mixed_tile_origin = false # becomes true when is sewn with polyline coming from other side tile
+        @any_ancients = false
 
         if bounds.nil?
           find_boundary
@@ -55,38 +54,6 @@ module Contrek
         (@flags & flag) != 0
       end
 
-      def reset_tracked_endpoints!
-        @tracked_endpoints = nil
-      end
-
-      # returns for every position of intersection an array composed by the indexes of parts (self,other) involved
-      # es [[1,3],[2,6],...]. The first time the sequence for self is computed is stored.
-      def intersection(other)
-        if @tracked_endpoints.nil?
-          @tracked_endpoints = {} # memoize found sequence
-          parts.each_with_index do |part, part_index|
-            next if !part.is?(Part::SEAM) && part.trasmuted
-            part.each do |pos|
-              next if pos.end_point.nil?
-              @tracked_endpoints[pos.end_point.object_id] = part_index
-            end
-          end
-        end
-        matching_parts = []
-        other.parts.each_with_index do |part, part_index|
-          next if !part.is?(Part::SEAM) && part.trasmuted
-          part.each do |pos|
-            if (self_index = @tracked_endpoints[pos.end_point.object_id])
-              matching_parts << [self_index, part_index]
-              false
-            else
-              true
-            end
-          end
-        end
-        matching_parts
-      end
-
       def empty?
         @raw.empty?
       end
@@ -102,17 +69,6 @@ module Contrek
       def width
         return 0 if empty?
         @max_x - @min_x
-      end
-
-      # Pre-detects, for the current polyline, adjacent ones in the neighboring tile
-      # that vertically intersect.
-      def precalc!
-        @next_tile_eligible_shapes = @tile
-          .circular_next.boundary_shapes
-          .select { |s|
-          !s.outer_polyline.on?(Polyline::TRACKED_OUTER) &&
-            vert_intersect?(s.outer_polyline)
-        }
       end
 
       def vert_intersect?(other)

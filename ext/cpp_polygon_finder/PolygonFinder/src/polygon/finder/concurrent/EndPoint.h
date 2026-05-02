@@ -20,9 +20,11 @@ class EndPoint {
 
   void set_point(Point* p) { point_ = p; }
   Point* get_point() const { return point_; }
-  std::unordered_set<Queueable<Point>*>& queues() { return queues_; }
+  std::vector<Queueable<Point>*>& queues() { return queues_; }
   bool queues_include(Queueable<Point>* q) const;
+  bool tracked_outer = false;
+
  private:
   Point* point_;
-  std::unordered_set<Queueable<Point>*> queues_;
+  std::vector<Queueable<Point>*> queues_;
 };

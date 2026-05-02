@@ -39,6 +39,7 @@ class Queueable {
   QNode<T>* _iterator {nullptr};
   bool _started = false;
   size_t size {0};
+  virtual bool listable() const { return false; }
   Queueable() = default;
   virtual ~Queueable() = default;
 
@@ -73,53 +74,6 @@ class Queueable {
     node->owner = this;
     size++;
     node->after_add(this);
-  }
-
-  void reset() {
-    head = nullptr;
-    tail = nullptr;
-    _iterator = nullptr;
-    _started = false;
-    size = 0;
-  }
-
-  void singleton()
-  { if (head && head->next) {
-      head->next->prev = nullptr;
-      head->next = nullptr;
-    }
-    tail = nullptr;
-    size = 1;
-    _iterator = nullptr;
-    _started = false;
-  }
-
-  void replace(Queueable<T>& q) {
-    reset();
-    append(q);
-  }
-
-  void append(Queueable<T>& q) {
-    if (q.size == 0) return;
-    QNode<T>* current = q.head;
-    while (current) {
-      current->before_rem(&q);
-      current->owner = this;
-      current = current->next;
-    }
-    if (tail) {
-      tail->next = q.head;
-      q.head->prev = tail;
-    } else {
-      head = q.head;
-    }
-    tail = q.tail;
-    size += q.size;
-    q.reset();
-    each([&](QNode<T>* n) -> bool {
-      n->after_add(this);
-      return(true);
-    });
   }
 
   void rewind() {
@@ -197,15 +151,5 @@ class Queueable {
   QNode<T>* pop() {
     if (!tail) return nullptr;
     return rem(tail);
-  }
-
-  bool contains(const T& value) const {
-    QNode<T>* current = head;
-    while (current) {
-      if (current->payload == value)
-          return true;
-      current = current->next;
-    }
-    return false;
   }
 };
