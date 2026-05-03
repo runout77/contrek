@@ -6,7 +6,7 @@ task :compile do |t|
     Dir.glob("**/*.o").each { |f| File.delete(f) }
     File.delete("Makefile") if File.exist?("Makefile")
     system "ruby", "extconf.rb"
-    system "make", "-B"
+    system "make", "-j#{`nproc`.strip}", "-B"
     Dir.glob("**/*.o").each { |f| File.delete(f) }
     system "cp cpp_polygon_finder.so ./../../lib"
   end

@@ -98,7 +98,7 @@ void Tests::test_c()
   Point* p2 = new Point({2, 2});
   Point* p3 = new Point({3, 3});
 
-  Hub* hub = new Hub(4, 0, 3);
+  Hub* hub = new Hub(4);
 
   Position* pos1 = new Position(hub, p1);
   Position* pos2 = new Position(hub, p2);

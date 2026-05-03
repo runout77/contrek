@@ -10,8 +10,8 @@
 #include "Hub.h"
 #include <cstring>
 
-Hub::Hub(int height, int start_x, int end_x)
-    : width_(end_x - start_x), height_(height), start_x_(start_x)
+Hub::Hub(int height)
+    : height_(height)
 { size_t total_pixels = static_cast<size_t>(height);
   payloads_.resize(total_pixels);
   bitset_.resize((total_pixels + 63) / 64, 0);

@@ -15,10 +15,8 @@
 class EndPoint;
 class Hub {
  public:
-  explicit Hub(int height, int start_x, int end_x);
+  explicit Hub(int height);
   int spawn_end_point();
-  const int width() const { return width_; }
-  const int start_x() const { return start_x_; }
   inline EndPoint* get(int key) {
     if (!is_set(key)) return nullptr;
     int index = payloads_[key];
@@ -34,9 +32,7 @@ class Hub {
   }
 
  private:
-  int width_;
   int height_;
-  int start_x_;
   std::vector<int> payloads_;
   std::vector<EndPoint> endpoint_pool_;
   Hub(const Hub&) = delete;
