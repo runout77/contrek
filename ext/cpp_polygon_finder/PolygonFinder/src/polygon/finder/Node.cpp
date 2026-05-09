@@ -17,6 +17,8 @@
 #include "Node.h"
 #include "NodeCluster.h"
 
+static const int TURNER[2][2] = {{Node::OMAX, Node::OMIN}, {Node::TURN_MAX, Node::TURN_MIN}};
+
 Node::Node(int min_x, int max_x, int y, NodeCluster* cluster, char name)
 : start_point(min_x, y),
   end_point(max_x, y),

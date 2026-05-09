@@ -909,5 +909,36 @@ RSpec.shared_examples "finder_extension" do
       ).process_info
       expect(result.points).to eq([{outer: [{x: 0, y: 0}, {x: 0, y: 8}, {x: 10, y: 8}, {x: 21, y: 8}, {x: 21, y: 0}, {x: 10, y: 0}], inner: [[{x: 0, y: 7}, {x: 0, y: 4}, {x: 10, y: 3}, {x: 13, y: 4}, {x: 10, y: 5}, {x: 8, y: 5}, {x: 8, y: 6}, {x: 10, y: 6}, {x: 14, y: 6}, {x: 14, y: 2}, {x: 10, y: 2}, {x: 0, y: 1}, {x: 21, y: 1}, {x: 21, y: 7}]]}])
     end
+
+    it "foliage problem to solve 10" do
+      #        ----------*-----------
+      #        0123456789012345678901
+      chunk = "      000000000       " \
+              "      0   0   0       " \
+              "      0   0   0       " \
+              "      000000000       " \
+              "         0            " \
+              "      000000000       " \
+              "      0  0    0       " \
+              "      0  0    0       " \
+              "      000000000       " \
+              "          0           " \
+              "      000000000       " \
+              "      0  0    0       " \
+              "      0  0    0       " \
+              "      0  000000       " \
+              "      0   0           " \
+              "      0  000000       " \
+              "      0  0    0       " \
+              "      0  0    0       " \
+              "      000000000       "
+
+      result = @polygon_finder_class.new(
+        bitmap: @bitmap_class.new(chunk, 22),
+        matcher: @matcher,
+        options: {number_of_tiles: 2, versus: :a, compress: {uniq: true, linear: true}}
+      ).process_info
+      expect(result.points).to eq([{outer: [{x: 6, y: 0}, {x: 6, y: 3}, {x: 9, y: 4}, {x: 6, y: 5}, {x: 6, y: 8}, {x: 10, y: 9}, {x: 6, y: 10}, {x: 6, y: 18}, {x: 14, y: 18}, {x: 14, y: 15}, {x: 10, y: 14}, {x: 14, y: 13}, {x: 14, y: 10}, {x: 10, y: 9}, {x: 14, y: 8}, {x: 14, y: 5}, {x: 10, y: 5}, {x: 9, y: 4}, {x: 10, y: 3}, {x: 14, y: 3}, {x: 14, y: 0}, {x: 10, y: 0}], inner: [[{x: 6, y: 1}, {x: 10, y: 1}, {x: 10, y: 2}, {x: 6, y: 2}], [{x: 6, y: 6}, {x: 9, y: 6}, {x: 9, y: 7}, {x: 6, y: 7}], [{x: 6, y: 11}, {x: 9, y: 11}, {x: 9, y: 13}, {x: 10, y: 14}, {x: 9, y: 15}, {x: 9, y: 17}, {x: 6, y: 17}, {x: 6, y: 12}], [{x: 9, y: 17}, {x: 9, y: 16}, {x: 14, y: 16}, {x: 14, y: 17}], [{x: 9, y: 12}, {x: 9, y: 11}, {x: 14, y: 11}, {x: 14, y: 12}], [{x: 9, y: 7}, {x: 9, y: 6}, {x: 14, y: 6}, {x: 14, y: 7}], [{x: 10, y: 1}, {x: 14, y: 1}, {x: 14, y: 2}, {x: 10, y: 2}]]}])
+    end
   end
 end

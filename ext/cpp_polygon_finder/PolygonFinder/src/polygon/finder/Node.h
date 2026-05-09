@@ -14,7 +14,42 @@
 #include <limits>
 #include <algorithm>
 #include <map>
+#include <cstring>
+#include <cstddef>
 #include "List.h"
+
+struct SmallVec {
+  static constexpr int INLINE_CAP = 6;
+  int  buf[INLINE_CAP];
+  int* ptr = buf;
+  int  sz = 0, cap = INLINE_CAP;
+  int  front() const { return ptr[0]; }
+  int  back()  const { return ptr[sz - 1]; }
+  void push_back(int v) {
+      if (sz == cap) {
+          cap *= 2;
+          int* np = new int[cap];
+          std::memcpy(np, ptr, sz * sizeof(int));
+          if (ptr != buf) delete[] ptr;
+          ptr = np;
+      }
+      ptr[sz++] = v;
+  }
+  void reserve(int n) {
+      if (n <= cap) return;
+      int* np = new int[n];
+      std::memcpy(np, ptr, sz * sizeof(int));
+      if (ptr != buf) delete[] ptr;
+      ptr = np; cap = n;
+  }
+  void clear() { sz = 0; ptr = buf; cap = INLINE_CAP; }
+  int  size()  const { return sz; }
+  int& operator[](int i) { return ptr[i]; }
+  int  operator[](int i) const { return ptr[i]; }
+  int* begin() { return ptr; }
+  int* end()   { return ptr + sz; }
+  ~SmallVec() { if (ptr != buf) delete[] ptr; }
+};
 
 class NodeCluster;
 struct Point {
@@ -42,7 +77,6 @@ class Node : public  Listable {
   static const int OCOMPLETE = OMIN | OMAX;
   static const int TURN_MAX = IMAX | OMAX;
   static const int TURN_MIN = IMIN | OMIN;
-  const int TURNER[2][2] = {{OMAX, OMIN}, {TURN_MAX, TURN_MIN}};
   static const int OUTER = 0;
   static const int INNER = 1;
 
@@ -60,7 +94,7 @@ class Node : public  Listable {
   Point start_point, end_point;
   NodeCluster* cluster;
   void add_intersection(Node& other_node, int other_node_index);
-  std::vector<int> tangs_sequence;
+  SmallVec tangs_sequence;
   Point* coords_entering_to(Node *enter_to, int mode, int tracking);
   Node* my_next_outer(Node *last, int versus);
   Node* my_next_inner(Node *last, int versus);

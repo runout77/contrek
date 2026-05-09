@@ -84,3 +84,7 @@ All notable changes to this project will be documented in this file.
 ## [1.2.0] - 2026-05-02
 ### Changed
 - Further improvements have been applied to the internal parts joining algorithm using a new structural approach. This update is faster and resolves edge cases where inner parts were mistakenly classified as outer perimeters, ensuring precise contour hierarchy. The simplified logic has led to a significant reduction in codebase complexity and the removal of substantial redundant code.
+
+## [1.2.1] - 2026-05-09
+### Changed
+- Some c++ optimizations. 

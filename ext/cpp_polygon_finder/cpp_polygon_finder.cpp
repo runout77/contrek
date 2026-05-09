@@ -6,6 +6,9 @@
  *      Copyright 2025 Emanuele Cesaroni
  */
 
+#ifdef HAVE_TCMALLOC
+#include <gperftools/malloc_extension.h>
+#endif
 #include <iostream>
 #include <list>
 #include <vector>
@@ -286,6 +289,12 @@ ProcessResult ruby_result_to_process_result(Rice::Object rb_result) {
 
 extern "C"
 void Init_cpp_polygon_finder() {
+  #ifdef HAVE_TCMALLOC
+  MallocExtension::instance()->SetNumericProperty(
+    "tcmalloc.max_total_thread_cache_bytes",
+    1024 * 1024 * 1024);
+  #endif
+
   Data_Type<Bitmap> rb_cBitmap =
     define_class<Bitmap>("CPPBitMap")
     .define_constructor(Constructor<Bitmap, std::string, int>())

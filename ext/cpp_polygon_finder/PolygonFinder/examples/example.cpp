@@ -7,6 +7,7 @@
  * See the LICENSE file in this directory for the full license text.
  */
 
+#include <gperftools/malloc_extension.h>
 #include <iostream>
 #include "ContrekApi.h"
 #include "Tests.h"
@@ -29,6 +30,10 @@ void run_test() {
 }
 
 int main() {
+  MallocExtension::instance()->SetNumericProperty(
+    "tcmalloc.max_total_thread_cache_bytes",
+    1024 * 1024 * 1024);
+
   Contrek::Config cfg;
   cfg.threads = 4;
   cfg.tiles = 4;
@@ -41,6 +46,7 @@ int main() {
   std::cout << "--- Start Native Benchmark ---" << std::endl;
   // auto result = Contrek::trace("../images/graphs_1024x1024.png", cfg);
   auto result = Contrek::trace("../images/sample_10240x10240.png", cfg);
+  // auto result = Contrek::trace("../images/test_20480x20480.png", cfg);
   result->print_info();
   std::cout << "Found polygons: " << result->groups << std::endl;
   std::cout << "Time: " << cpu_timer.stop() << " ms" << std::endl;

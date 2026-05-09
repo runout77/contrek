@@ -49,6 +49,17 @@ The core strength of Contrek is its **Topologically Consistent Merging** algorit
   </tr>
 </table>
 
+## 📊 Benchmarking & Performance
+The **Stripe-Merging** algorithm has been validated through a dedicated testing suite comparing **Contrek** against **OpenCV** (industry-standard contour extraction).
+
+### Key Metrics:
+* **Execution Latency:** Single-threaded OpenCV vs. Contrek's parallel thread management.
+* **Memory Footprint:** RAM consumption during ultra-high-resolution processing.
+* **Extraction Fidelity:** Verifying polygon precision across both engines.
+
+The complete testing suite, source code, and raw benchmarks are available here:
+👉 **[test_opencv_contrek](https://github.com/runout77/test_opencv_contrek)**
+
 ## Prerequisites
 
 For optimal performance and efficient memory management with large images (20k+), it is highly recommended to install **tcmalloc**.
@@ -57,7 +68,11 @@ For optimal performance and efficient memory management with large images (20k+)
 ```bash
 sudo apt-get install libgoogle-perftools-dev
 ```
+> For advanced performance tuning (zlib-ng, tcmalloc, thread configuration) see [PERFORMANCE.md](PERFORMANCE.md).
 
+> ⚠️ **Platform support:** Contrek native extensions are supported on **Linux** and **macOS** only. 
+> Windows is not supported due to the use of POSIX threading primitives and platform-specific 
+> memory management. On Windows, consider using WSL2 (Windows Subsystem for Linux).
 
 ## Install
 
@@ -167,7 +182,7 @@ Regarding multithreading:
 
 - The algorithm splits the contour-detection workflow into multiple phases that can be executed in parallel. The initial contour extraction on each band and the subsequent merging of coordinates between adjacent bands—performed pairwise, recursively, and in a non-deterministic order—results in a final output that is not idempotent. Idempotence is guaranteed only when the exact same merging sequence is repeated.
 
-By not declaring native option CPP Multithreading optimized code is used. In the above example a [105 MP image](spec/files/images/sample_10240x10240.png) is examined by 4 threads working on 4 tiles (total compute time about 1.1 secs with image load).
+By not declaring native option CPP Multithreading optimized code is used. In the above example a [105 MP image](spec/files/images/sample_10240x10240.png) is examined by 4 threads working on 4 tiles (total compute time about 0.816 secs with image load (0.37 secs)).
 
 ```ruby
 result = Contrek.contour!(
@@ -232,9 +247,10 @@ Engineered for **Pixel-Perfect** precision.
 * **Result:** 100% topologically faithful geometry with no micro-gaps between adjacent polygons.
 
 Below are two images illustrating the difference in tracing modes. In the first case, with **strict_bounds ON**, the anti-clockwise sequence includes two additional points, **H** and **I**, which trace the shape more accurately. In the second case, the transition between **G** and **H** is approximated, omitting the indentation.
+
 | Strict Bounds ON | Strict Bounds OFF |
 |:---:|:---:|
-| ![Originale](./docs/images/strict_bounds_on.png) | ![Poligoni](./docs/images/strict_bounds_off.png) |
+| <img src="./docs/images/strict_bounds_on.png" alt="Originale" width="60%"/> | <img src="./docs/images/strict_bounds_off.png" alt="Poligoni" width="60%"/> |
 
 
 ## Result
@@ -410,6 +426,8 @@ This the one for the native C++
 ```
 
 About 130x faster. Times are in microseconds; system: AMD Ryzen 7 3700X 8-Core Processor (BogoMIPS: 7199,99) on Ubuntu distro.
+
+**Note:** Benchmarks were measured inside a VMware virtual machine.
 
 ## 🛠 C++ Standalone Library Usage
 

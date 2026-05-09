@@ -35,6 +35,7 @@ NodeCluster::NodeCluster(int h, int w, pf_Options *options) {
   this->root_nodes = this->lists.add_list();
   this->inner_plot = this->lists.add_list();
   this->inner_new = this->lists.add_list();
+  this->plot_sequence.reserve(1024);
 }
 
 NodeCluster::~NodeCluster() {
@@ -68,8 +69,8 @@ void NodeCluster::compress_coords(std::list<Polygon>& polygons, pf_Options optio
 }
 
 void NodeCluster::build_tangs_sequence() {
-  for (auto& line : vert_nodes) {
-    for (Node& node : line) {
+  for (int y = 0; y < (int)vert_nodes.size(); y++) {
+    for (Node& node : vert_nodes[y]) {
       node.precalc_tangs_sequences(*this);
     }
   }
@@ -94,8 +95,7 @@ Node* NodeCluster::add_node(int min_x, int max_x, int y, char name, int offset) 
 
       while (it != up_nodes.end()) {
         if ((it->min_x - offset) > node.max_x) break;
-        int current_index = std::distance(up_nodes.begin(), it);
-        node.add_intersection(*it, current_index);
+        node.add_intersection(*it, it->abs_x_index);
         it->add_intersection(node, node.abs_x_index);
         ++it;
       }
