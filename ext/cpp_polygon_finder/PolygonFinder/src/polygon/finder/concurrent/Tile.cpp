@@ -61,7 +61,7 @@ void Tile::assign_raw_polygons(const std::list<Polygon>& raw_polylines, const st
     { Polyline* polyline = this->shapes_pool->acquire_polyline(this, raw_polyline.outer, raw_polyline.bounds);
       std::vector<InnerPolyline*> inner_polylines_list;
       for (auto& raw_points : raw_polyline.inner) {
-        inner_polylines_list.push_back(this->shapes_pool->acquire_inner_polyline(raw_points, nullptr, false));
+        inner_polylines_list.push_back(this->shapes_pool->acquire_inner_polyline(raw_points, nullptr));
       }
       Shape* shape = this->shapes_pool->acquire_shape(polyline, inner_polylines_list);
       polyline->shape = shape;
@@ -75,6 +75,7 @@ void Tile::assign_raw_polygons(const std::list<Polygon>& raw_polylines, const st
           if (it != shapes_map.end()) {
             Shape* parent = it->second;
             shape->set_parent_shape(parent);
+            shape->fixed = true;
             shape->parent_inner_polyline = parent->inner_polylines[treemap_entry.second];
           }
         }
@@ -84,7 +85,7 @@ void Tile::assign_raw_polygons(const std::list<Polygon>& raw_polylines, const st
   }
 }
 
-void Tile::assign_shapes(std::list<Shape*>& shapes) {
+void Tile::assign_shapes(std::vector<Shape*>& shapes) {
   for (Shape *shape : shapes) {
     shape->outer_polyline->tile = this;
   }
@@ -135,7 +136,8 @@ std::vector<std::pair<int, int>> Tile::compute_treemap()
   for (auto* shape : this->shapes_) {
     if (shape->outer_polyline->is_empty()) continue;
     if (shape->parent_shape() != nullptr) {
-      int p_idx = shapes_map[shape->parent_shape()];
+      auto p_it = shapes_map.find(shape->parent_shape());
+      int p_idx = (p_it != shapes_map.end()) ? p_it->second : -1;
       const auto& inners = shape->parent_shape()->inner_polylines;
       auto it = std::find(inners.begin(), inners.end(), shape->parent_inner_polyline);
       int inner_idx = static_cast<int>(std::distance(inners.begin(), it));

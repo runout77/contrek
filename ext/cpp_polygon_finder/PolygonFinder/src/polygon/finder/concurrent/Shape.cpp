@@ -9,6 +9,7 @@
 
 #include <list>
 #include <vector>
+#include <string>
 #include "Shape.h"
 #include "Polyline.h"
 
@@ -33,4 +34,8 @@ void Shape::set_parent_shape(Shape* shape) {
   if (shape != nullptr)
   { shape->children_shapes.push_back(this);
   }
+}
+
+std::string Shape::name() {
+  return(this->outer_polyline->named());
 }

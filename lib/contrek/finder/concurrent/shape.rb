@@ -1,8 +1,8 @@
 module Contrek
   module Concurrent
     class Shape
-      attr_accessor :outer_polyline, :inner_polylines, :merged_to_shape, :parent_inner_polyline,
-        :reassociation_skip
+      attr_accessor :outer_polyline, :inner_polylines, :merged_to_shape,
+        :parent_inner_polyline, :fixed
       attr_reader :parent_shape, :children_shapes
 
       def initialize
@@ -10,7 +10,7 @@ module Contrek
         @merged_to_shape = nil
         @parent_inner_polyline = nil
         @children_shapes = []
-        @reassociation_skip = false
+        @fixed = false
       end
 
       def self.init_by(set_outer_polyline, set_inner_polylines)
@@ -22,6 +22,10 @@ module Contrek
 
       def clear_inner!
         @inner_polylines.clear
+      end
+
+      def name
+        outer_polyline.named
       end
 
       def set_parent_shape(shape)

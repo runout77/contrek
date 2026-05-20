@@ -17,8 +17,8 @@ Shape* ShapePool::acquire_shape(Polyline* outer_polyline, const std::vector<Inne
   return shape;
 }
 
-InnerPolyline* ShapePool::acquire_inner_polyline(std::vector<Point*> coords, Shape* shape, bool rec) {
-  inner_polylines_storage.emplace_back(coords, shape, rec);
+InnerPolyline* ShapePool::acquire_inner_polyline(std::vector<Point*> coords, Shape* shape) {
+  inner_polylines_storage.emplace_back(coords, shape);
   InnerPolyline* ip = &inner_polylines_storage.back();
   return ip;
 }

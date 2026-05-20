@@ -61,15 +61,15 @@ module Contrek
       end
 
       def compute_treemap
-        @shapes_map = {}
+        shapes_map = {}
         shape_index = 0
 
-        @shapes.map do |shape|
+        shapes.map do |shape|
           next if shape.outer_polyline.empty?
-          @shapes_map[shape] = shape_index
+          shapes_map[shape] = shape_index
           shape_index += 1
           if shape.parent_shape
-            [@shapes_map[shape.parent_shape], shape.parent_shape.inner_polylines.index(shape.parent_inner_polyline)]
+            [shapes_map[shape.parent_shape], shape.parent_shape.inner_polylines.index(shape.parent_inner_polyline)]
           else
             [-1, -1]
           end
@@ -104,6 +104,7 @@ module Contrek
             if treemap_entry != [-1, -1]
               parent = shapes_map[treemap_entry.first]
               shape.set_parent_shape(parent)
+              shape.fixed = true
               shape.parent_inner_polyline = parent.inner_polylines[treemap_entry.last]
             end
           end

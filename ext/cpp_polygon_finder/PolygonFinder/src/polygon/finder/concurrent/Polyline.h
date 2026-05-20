@@ -23,6 +23,7 @@
 class Tile;
 class Shape;
 class Point;
+class InnerPolyline;
 
 class Polyline : public Partitionable {
  public:
@@ -42,17 +43,21 @@ class Polyline : public Partitionable {
   std::vector<Point*> raw() const { return raw_; }
   const std::vector<Part*>& parts() const { return parts_; }
   const int max_y() const { return max_y_; }
+  const int min_y() const { return min_y_; }
   void clear();
   bool is_empty();
-  bool vert_intersect(Polyline& other);
   bool any_ancients = false;
-  std::string info();
   bool vert_bounds_intersect(Bounds& vertical_bounds);
   bool within(std::vector<Point*>& points);
+  InnerPolyline* inside_inner_polyline = nullptr;
+  std::string named();
+  void set_named(std::string force_named) { this->named_ = force_named; }
 
  private:
   std::vector<Point*> raw_;
-  int min_x, max_x, min_y, max_y_;
+  int min_x, max_x, min_y_, max_y_;
   void find_boundary();
   uint32_t flags_ = 0;
+  std::string named_;
+  int name;
 };

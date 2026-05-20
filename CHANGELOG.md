@@ -87,4 +87,8 @@ All notable changes to this project will be documented in this file.
 
 ## [1.2.1] - 2026-05-09
 ### Changed
-- Some c++ optimizations. 
+- Some c++ optimizations.
+
+## [1.2.2] - 2026-05-20
+### Changed
+- The treemap determination algorithm has been heavily optimized. Calls to the geometric routine that checks whether a newly generated inner polyline encloses other already-existing ones have been reduced to the minimum. Polylines adjacent to the shared overlap stripe are now excluded from these checks, as they are already identified during the initial polygon detection phase. The geometric approach remains unavoidable in this context and is still a performance bottleneck. It will certainly be the subject of future optimizations.

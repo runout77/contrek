@@ -158,7 +158,8 @@ You can process from a raw stream
   [{:outer=>[{:x=>5, :y=>4}, {:x=>5, :y=>5}, {:x=>8, :y=>5}, {:x=>8, :y=>4}], :inner=>[]}]
 ```
 
-Multithreaded contour processing is supported. However, on Ruby MRI (the standard Ruby implementation, at least up to 3.x), the Global Interpreter Lock (GIL) prevents more than one thread from executing Ruby code simultaneously. As a consequence, execution remains effectively serialized even on multicore systems, unless the gem is used under JRuby or TruffleRuby (not tested).
+Multithreaded contour processing is supported by both the native C++ and pure Ruby implementations. When using the C++ engine (default), multithreading works as expected and fully utilizes all available cores.
+When running the pure Ruby implementation, however, the Global Interpreter Lock (GIL) in Ruby MRI (the standard Ruby interpreter, up to at least version 3.x) prevents true parallel execution — threads are serialized even on multicore systems. Switching to JRuby or TruffleRuby would bypass this limitation, though these runtimes have not been tested with Contrek.
 
 ```ruby
 result = Contrek.contour!(

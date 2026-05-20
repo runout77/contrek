@@ -11,6 +11,7 @@
 #include <list>
 #include <iostream>
 #include <vector>
+#include <string>
 #include "InnerPolyline.h"
 
 class Point;
@@ -24,9 +25,10 @@ class Shape {
   InnerPolyline* parent_inner_polyline = nullptr;
   std::vector<Shape*> children_shapes;
   void clear_inner();
-  bool reassociation_skip = false;
+  bool fixed = false;
   Shape* parent_shape() { return parent_shape_; }
   void set_parent_shape(Shape*);
+  std::string name();
  private:
   Shape* parent_shape_ = nullptr;
 };

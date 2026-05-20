@@ -35,8 +35,8 @@ int main() {
     1024 * 1024 * 1024);
 
   Contrek::Config cfg;
-  cfg.threads = 4;
-  cfg.tiles = 4;
+  cfg.threads = 8;
+  cfg.tiles = 8;
   cfg.compress_unique = true;
   // cfg.treemap = true;
   // cfg.connectivity_mode = Contrek::Connectivity::OMNIDIRECTIONAL;

@@ -4,7 +4,7 @@ module Contrek
       attr_reader :orphan_inners, :shapes_sequence
 
       def initialize(cluster:, shape:)
-        @shapes_sequence = Set.new([shape])
+        @shapes_sequence = [shape]
         @cluster = cluster
         @outer_polyline = shape.outer_polyline
         @orphan_inners = []
@@ -38,18 +38,19 @@ module Contrek
         outer_joined_polyline
       end
 
-      def join_inners!(outer_seq)
+      def join_inners!(outer_seq, treemap)
         return_inner_polylines = []
+        shape_index = 0
 
-        @processing_shapes = @shapes_sequence.to_a
-
-        @processing_shapes.each do |shape|
+        while shape_index < @shapes_sequence.size
+          shape = @shapes_sequence[shape_index]
           polyline = shape.outer_polyline
           polyline.parts.each do |part|
             if part.innerable?
               all_parts = []
+              tracked_end_points = []
               bounds = {min: polyline.max_y, max: 0}
-              traverse_inner(part, all_parts, bounds)
+              traverse_inner(part, all_parts, bounds, tracked_end_points)
               range_of_bounds = (bounds[:min]..bounds[:max])
 
               retme_sequence = Sequence.new
@@ -62,15 +63,35 @@ module Contrek
                 end
               end
               if retme_sequence.is_not_vertical
-                return_inner_polylines << InnerPolyline.new(sequence: retme_sequence)
+                inner_polyline = InnerPolyline.new(sequence: retme_sequence)
+                return_inner_polylines << inner_polyline
+                mark_children(tracked_end_points, polyline, inner_polyline) if treemap
               end
             end
           end
+          shape_index += 1
         end
         return_inner_polylines
       end
 
       private
+
+      # finds each part (and relative polyline) inscribed between two end_points and sets the
+      # founded inner_polyline which be later used to define in which parent hole is placed.
+      def mark_children(end_points, outer_polyline, inner_polyline)
+        end_points.each_slice(2) do |a, b|
+          range = [a.position[:y], b.position[:y]].sort
+          (range[0] + 1).upto(range[1] - 1) do |y|
+            if (end_point = @cluster.hub.payloads[y])
+              end_point.queues.each do |part|
+                if part.polyline != outer_polyline
+                  part.polyline.inside_inner_polyline = inner_polyline
+                end
+              end
+            end
+          end
+        end
+      end
 
       # rubocop:disable Lint/NonLocalExitFromIterator
       def traverse_outer(act_part, all_parts, shapes_sequence, outer_joined_polyline)
@@ -104,7 +125,7 @@ module Contrek
                   cont = false if map.size == 1 && map.first == Part::SEAM
                 end
                 if cont
-                  shapes_sequence.add(part.polyline.shape)
+                  shapes_sequence << part.polyline.shape if !shapes_sequence.include?(part.polyline.shape)
                   part.next_position(new_position)
                   part.dead_end = true
                   traverse_outer(part, all_parts, shapes_sequence, outer_joined_polyline)
@@ -120,7 +141,7 @@ module Contrek
         traverse_outer(act_part.circular_next, all_parts, shapes_sequence, outer_joined_polyline)
       end
 
-      def traverse_inner(act_part, all_parts, bounds)
+      def traverse_inner(act_part, all_parts, bounds, tracked_end_points)
         return if act_part == all_parts.first
 
         if act_part.size > 0
@@ -140,6 +161,8 @@ module Contrek
                   dest_part_versus = dest_part.versus
                   next if dest_part_versus != 0 && dest_part_versus == act_part.versus
 
+                  tracked_end_points << act_part.head.end_point
+
                   link_seq = dest_part.continuum_to?(act_part)
                   if link_seq.any?
                     ins_part = Part.new(Part::ADDED, act_part.polyline)
@@ -150,13 +173,13 @@ module Contrek
                   end
                   shape = dest_part.polyline.shape
                   if !dest_part.polyline.on?(Polyline::TRACKED_OUTER)
-                    @processing_shapes << shape
+                    @shapes_sequence << shape
                     @orphan_inners += shape.inner_polylines
                   end
                   dest_part.polyline.turn_on(Polyline::TRACKED_OUTER)
                   if !dest_part.touched
                     dest_part.touch!
-                    traverse_inner(dest_part.circular_next, all_parts, bounds)
+                    traverse_inner(dest_part.circular_next, all_parts, bounds, tracked_end_points)
                     return
                   end
                 end
@@ -165,7 +188,7 @@ module Contrek
             end
           end
         elsif act_part.next
-          traverse_inner(act_part.next, all_parts, bounds)
+          traverse_inner(act_part.next, all_parts, bounds, tracked_end_points)
         end
       end
       # rubocop:enable Lint/NonLocalExitFromIterator

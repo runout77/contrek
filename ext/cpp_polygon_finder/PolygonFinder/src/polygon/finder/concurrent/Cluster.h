@@ -21,7 +21,8 @@ class Cluster {
   Finder *finder;
   std::vector<Tile*> tiles_;
   Hub *hub_ = nullptr;
-  void assign_ancestry(Shape *shape, std::vector<InnerPolyline*>& inner_polylines);
+  void assign_ancestry(Shape *shape, InnerPolyline* inner_polyline);
+  void is_children(Shape* shape, std::vector<InnerPolyline*> inner_polylines);
 
  public:
   Cluster(Finder *finder, int height, int start_x, int end_x);

@@ -129,7 +129,7 @@ void Cursor::traverse_outer(Part* act_part,
   }
 }
 
-std::vector<InnerPolyline*> Cursor::join_inners(Sequence* outer_seq) {
+std::vector<InnerPolyline*> Cursor::join_inners(Sequence* outer_seq, bool treemap) {
   std::vector<InnerPolyline*> return_inner_polylines;
   std::vector<Shape*> processing_queue = shapes_sequence_;
   for (size_t i = 0; i < shapes_sequence_.size(); ++i)
@@ -138,11 +138,12 @@ std::vector<InnerPolyline*> Cursor::join_inners(Sequence* outer_seq) {
     for (Part* part : polyline->parts())
     { if (part->innerable())
       { std::vector<Part*> all_parts;
+        std::vector<EndPoint*> tracked_end_points;
         Bounds bounds{
           .min = polyline->max_y(),
           .max = 0
         };
-        traverse_inner(part, all_parts, bounds);
+        traverse_inner(part, all_parts, bounds, tracked_end_points);
         Sequence* retme_sequence = shape->outer_polyline->tile->shapes_pool->acquire_sequence();
         for (Part* part : all_parts)
         { part->touch();
@@ -157,7 +158,11 @@ std::vector<InnerPolyline*> Cursor::join_inners(Sequence* outer_seq) {
           });
         }
         if (retme_sequence->is_not_vertical()) {
-          return_inner_polylines.push_back(polyline->tile->shapes_pool->acquire_inner_polyline(retme_sequence));
+          InnerPolyline* inner_polyline = polyline->tile->shapes_pool->acquire_inner_polyline(retme_sequence);
+          return_inner_polylines.push_back(inner_polyline);
+          if (treemap) {
+            mark_children(tracked_end_points, polyline, inner_polyline);
+          }
         }
       }
     }
@@ -165,7 +170,26 @@ std::vector<InnerPolyline*> Cursor::join_inners(Sequence* outer_seq) {
   return(return_inner_polylines);
 }
 
-void Cursor::traverse_inner(Part* act_part, std::vector<Part*>& all_parts, Bounds& bounds) {
+void Cursor::mark_children(std::vector<EndPoint*>& end_points, const Polyline* outer_polyline, InnerPolyline* inner_polyline) {
+  for (size_t i = 0; i + 1 < end_points.size(); i += 2) {
+    const auto& a = end_points[i];
+    const auto& b = end_points[i + 1];
+    auto [y_min, y_max] = std::minmax(a->get_point()->y, b->get_point()->y);
+    for (int y = y_min + 1; y < y_max; ++y) {
+      EndPoint* end_point = this->cluster.hub()->get(y);
+      if (end_point) {
+        for (auto part_p : end_point->queues())
+        { Part* part = static_cast<Part*>(part_p);
+          if (part->polyline() != outer_polyline) {
+            part->polyline()->inside_inner_polyline = inner_polyline;
+          }
+        }
+      }
+    }
+  }
+}
+
+void Cursor::traverse_inner(Part* act_part, std::vector<Part*>& all_parts, Bounds& bounds, std::vector<EndPoint*>& tracked_end_points) {
   PartPool& pool = act_part->polyline()->tile->cluster->parts_pool;
   while (act_part != nullptr) {
     if (!all_parts.empty() && act_part == all_parts.front()) return;
@@ -186,13 +210,17 @@ void Cursor::traverse_inner(Part* act_part, std::vector<Part*>& all_parts, Bound
             all_parts.push_back(act_part);
         } else {
           if (act_part->head)
-          { for (auto dest_part_p : static_cast<Position*>(act_part->head)->end_point()->queues()) {
+          { EndPoint* current_end_point = static_cast<Position*>(act_part->head)->end_point();
+            for (auto dest_part_p : current_end_point->queues()) {
               Part* dest_part = static_cast<Part*>(dest_part_p);
               if (dest_part->polyline()->tile == act_part->polyline()->tile) {
                 continue;
               }
               int dest_part_versus = dest_part->versus();
               if (dest_part_versus != 0 && dest_part_versus == act_part->versus()) continue;
+
+              tracked_end_points.push_back(current_end_point);
+
               std::vector<EndPoint*> link_seq = dest_part->continuum_to(*act_part);
               if (!link_seq.empty()) {
                 Part* ins_part = pool.acquire(Part::ADDED, act_part->polyline());

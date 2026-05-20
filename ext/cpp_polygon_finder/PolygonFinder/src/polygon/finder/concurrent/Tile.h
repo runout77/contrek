@@ -30,7 +30,7 @@ class Tile {
   int start_x_;
   int end_x_;
   std::string name_;
-  std::list<Shape*> shapes_;
+  std::vector<Shape*> shapes_;
 
  public:
   Tile(Finder *finder, int start_x, int end_x, std::string name, const Benchmarks& b);
@@ -42,15 +42,15 @@ class Tile {
   int start_x() const { return start_x_; }
   int end_x() const { return end_x_; }
   std::string name() const { return name_; }
-  const std::list<Shape*>& shapes() const { return shapes_; }
-  std::list<Shape*>& shapes() { return shapes_; }
+  const std::vector<Shape*>& shapes() const { return shapes_; }
+  std::vector<Shape*>& shapes() { return shapes_; }
   bool whole();
   bool left();
   bool right();
   void initial_process(ClippedPolygonFinder *finder);
   void info();
   bool tg_border(const Point& coord);
-  void assign_shapes(std::list<Shape*>& shapes);
+  void assign_shapes(std::vector<Shape*>& shapes);
   void assign_raw_polygons(const std::list<Polygon>& raw_polylines, const std::vector<std::pair<int, int>>& treemap);
   std::list<Polygon> to_raw_polygons();
   std::vector<std::pair<int, int>> compute_treemap();

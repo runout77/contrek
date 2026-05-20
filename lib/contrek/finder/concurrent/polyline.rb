@@ -6,15 +6,17 @@ module Contrek
       TRACKED_OUTER = 1 << 0
 
       attr_reader :raw, :name, :min_y, :max_y
-      attr_accessor :shape, :tile, :any_ancients
+      attr_accessor :shape, :tile, :any_ancients, :inside_inner_polyline
 
-      def initialize(tile:, polygon:, shape: nil, bounds: nil)
+      def initialize(tile:, polygon:, shape: nil, bounds: nil, force_named: nil)
         @tile = tile
         @name = tile.shapes.count
+        @named = force_named
         @raw = polygon
         @shape = shape
         @flags = 0
         @any_ancients = false
+        @inside_inner_polyline = nil
 
         if bounds.nil?
           find_boundary
@@ -31,15 +33,11 @@ module Contrek
       end
 
       def named
-        "[b#{@tile.name} S#{@name} #{"B" if boundary?}]"
+        @named || "t#{@tile.name}s#{@name}#{"B" if boundary?}"
       end
 
       def numpy_raw
         raw.flat_map { |p| [p[:x], p[:y]] }
-      end
-
-      def info
-        "w#{@tile.name} S#{@name}"
       end
 
       def turn_on(flag)

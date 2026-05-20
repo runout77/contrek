@@ -498,12 +498,12 @@ RSpec.shared_examples "concurrent_treemap" do
         {named_sequences: true, versus: :a, treemap: true}
       ).process_info
       expect(result.metadata[:treemap]).to eq([[-1, -1], [0, 0], [1, 0]])
-      c_result = @polygon_finder_class.new(
+      result = @polygon_finder_class.new(
         bitmap: @bitmap_class.new(chunk, 30),
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :a, treemap: true, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(c_result.metadata[:treemap]).to eq([[-1, -1], [0, 0], [1, 0]])
+      expect(result.metadata[:treemap]).to eq([[-1, -1], [0, 0], [1, 0]])
     end
 
     it "case 17" do
@@ -695,6 +695,229 @@ RSpec.shared_examples "concurrent_treemap" do
       ).process_info
       # 0=>0 1=>1 2=>2
       expect(result.metadata[:treemap]).to eq([[-1, -1], [0, 1], [1, 0]])
+    end
+
+    it "case 22" do
+      chunk = "0000000000000000" \
+              "00            00" \
+              "0000000000000000" \
+              "00              " \
+              "00 0000000000000" \
+              "00 00         00" \
+              "00 00 0000 00 00" \
+              "00 00 0000 00 00" \
+              "00         00 00" \
+              "0000000000000 00" \
+              "              00" \
+              "0000000000000000" \
+              "00            00" \
+              "0000000000000000"
+      result = @simple_polygon_finder.new(
+        @bitmap_class.new(chunk, 16),
+        @matcher,
+        nil,
+        {versus: :o, treemap: true}
+      ).process_info
+      expect(result.metadata[:treemap]).to eq([[-1, -1], [-1, -1], [-1, -1]])
+      result = @polygon_finder_class.new(
+        bitmap: @bitmap_class.new(chunk, 16),
+        matcher: @matcher,
+        options: {number_of_tiles: 2, versus: :o, treemap: true, compress: {uniq: true, linear: true}}
+      ).process_info
+      expect(result.points).to eq([{outer: [{x: 7, y: 0}, {x: 15, y: 0}, {x: 15, y: 2}, {x: 7, y: 2}, {x: 1, y: 3}, {x: 1, y: 8}, {x: 7, y: 9}, {x: 11, y: 8}, {x: 11, y: 6}, {x: 12, y: 6}, {x: 12, y: 9}, {x: 7, y: 9}, {x: 0, y: 9}, {x: 0, y: 0}], inner: [[{x: 1, y: 1}, {x: 14, y: 1}]]}, {outer: [{x: 7, y: 4}, {x: 15, y: 4}, {x: 15, y: 13}, {x: 7, y: 13}, {x: 0, y: 13}, {x: 0, y: 11}, {x: 7, y: 11}, {x: 14, y: 10}, {x: 14, y: 5}, {x: 7, y: 4}, {x: 4, y: 5}, {x: 4, y: 7}, {x: 3, y: 7}, {x: 3, y: 4}], inner: [[{x: 14, y: 12}, {x: 1, y: 12}]]}, {outer: [{x: 7, y: 6}, {x: 9, y: 6}, {x: 9, y: 7}, {x: 7, y: 7}, {x: 6, y: 7}, {x: 6, y: 6}], inner: []}])
+      expect(result.metadata[:treemap]).to eq([[-1, -1], [-1, -1], [-1, -1]])
+    end
+
+    it "case 23" do
+      chunk = "0000000000000000" \
+              "00            00" \
+              "0000000000000000" \
+              "00              " \
+              "0000000000000000" \
+              "00  00        00" \
+              "00  00 000 00000" \
+              "00  00 000 00   " \
+              "00  00     00   " \
+              "0000000000000   "
+
+      result = @simple_polygon_finder.new(
+        @bitmap_class.new(chunk, 16),
+        @matcher,
+        nil,
+        {versus: :o, treemap: true, compress: {uniq: true, linear: true}}
+      ).process_info
+      expect(result.metadata[:treemap]).to eq([[-1, -1], [0, 1]])
+      result = @polygon_finder_class.new(
+        bitmap: @bitmap_class.new(chunk, 16),
+        matcher: @matcher,
+        options: {number_of_tiles: 2, versus: :o, treemap: true, compress: {uniq: true, linear: true}}
+      ).process_info
+      expect(result.points).to eq([{outer: [{x: 7, y: 0}, {x: 15, y: 0}, {x: 15, y: 2}, {x: 7, y: 2}, {x: 1, y: 3}, {x: 7, y: 4}, {x: 15, y: 4}, {x: 15, y: 6}, {x: 12, y: 7}, {x: 12, y: 9}, {x: 7, y: 9}, {x: 0, y: 9}, {x: 0, y: 0}], inner: [[{x: 4, y: 5}, {x: 1, y: 5}, {x: 1, y: 8}, {x: 4, y: 8}, {x: 4, y: 6}], [{x: 1, y: 1}, {x: 14, y: 1}], [{x: 5, y: 5}, {x: 5, y: 8}, {x: 11, y: 8}, {x: 11, y: 6}, {x: 14, y: 5}]]}, {outer: [{x: 9, y: 6}, {x: 9, y: 7}, {x: 7, y: 7}, {x: 7, y: 6}], inner: []}])
+      expect(result.metadata[:treemap]).to eq([[-1, -1], [0, 2]])
+    end
+
+    it "case 24" do
+      chunk = "000000000000000000" \
+              "00              00" \
+              "00  00000000000000" \
+              "00  00          00" \
+              "00  00 00000    00" \
+              "00  00 00000      " \
+              "00  00          00" \
+              "000000000000000000"
+
+      result = @simple_polygon_finder.new(
+        @bitmap_class.new(chunk, 18),
+        @matcher,
+        nil,
+        {versus: :o, treemap: true, compress: {uniq: true, linear: true}}
+      ).process_info
+      expect(result.metadata[:treemap]).to eq([[-1, -1], [-1, -1]])
+      result = @polygon_finder_class.new(
+        bitmap: @bitmap_class.new(chunk, 18),
+        matcher: @matcher,
+        options: {number_of_tiles: 2, versus: :o, treemap: true, compress: {uniq: true, linear: true}}
+      ).process_info
+      expect(result.points).to eq([{outer: [{x: 8, y: 0}, {x: 17, y: 0}, {x: 17, y: 4}, {x: 16, y: 4}, {x: 16, y: 3}, {x: 8, y: 2}, {x: 5, y: 3}, {x: 5, y: 6}, {x: 8, y: 7}, {x: 16, y: 6}, {x: 17, y: 6}, {x: 17, y: 7}, {x: 8, y: 7}, {x: 0, y: 7}, {x: 0, y: 0}], inner: [[{x: 1, y: 1}, {x: 1, y: 6}, {x: 4, y: 6}, {x: 4, y: 2}, {x: 16, y: 1}]]}, {outer: [{x: 8, y: 4}, {x: 11, y: 4}, {x: 11, y: 5}, {x: 8, y: 5}, {x: 7, y: 5}, {x: 7, y: 4}], inner: []}])
+      expect(result.metadata[:treemap]).to eq([[-1, -1], [-1, -1]])
+    end
+
+    it "case 25" do
+      chunk = "000000000000000000" \
+              "00              00" \
+              "00  00000000000000" \
+              "00  00          00" \
+              "00  00 00000    00" \
+              "00  00 00000    00" \
+              "00  00          00" \
+              "000000000000000000"
+
+      result = @simple_polygon_finder.new(
+        @bitmap_class.new(chunk, 18),
+        @matcher,
+        nil,
+        {versus: :o, treemap: true, compress: {uniq: true, linear: true}}
+      ).process_info
+      expect(result.metadata[:treemap]).to eq([[-1, -1], [0, 1]])
+      result = @polygon_finder_class.new(
+        bitmap: @bitmap_class.new(chunk, 18),
+        matcher: @matcher,
+        options: {number_of_tiles: 2, versus: :o, treemap: true, compress: {uniq: true, linear: true}}
+      ).process_info
+      expect(result.points).to eq([{outer: [{x: 8, y: 0}, {x: 17, y: 0}, {x: 17, y: 7}, {x: 8, y: 7}, {x: 0, y: 7}, {x: 0, y: 0}], inner: [[{x: 1, y: 1}, {x: 1, y: 6}, {x: 4, y: 6}, {x: 4, y: 2}, {x: 8, y: 2}, {x: 16, y: 1}], [{x: 5, y: 3}, {x: 5, y: 6}, {x: 16, y: 6}, {x: 16, y: 3}]]}, {outer: [{x: 8, y: 4}, {x: 11, y: 4}, {x: 11, y: 5}, {x: 8, y: 5}, {x: 7, y: 5}, {x: 7, y: 4}], inner: []}])
+      expect(result.metadata[:treemap]).to eq([[-1, -1], [0, 1]])
+    end
+
+    it "case 26" do
+      chunk = "000000000000000000" \
+              "00  00          00" \
+              "00  00 00000    00" \
+              "00  00 00000    00" \
+              "00  00          00" \
+              "00  00000000000000" \
+              "00              00" \
+              "000000000000000000"
+
+      result = @simple_polygon_finder.new(
+        @bitmap_class.new(chunk, 18),
+        @matcher,
+        nil,
+        {versus: :o, treemap: true, compress: {uniq: true, linear: true}}
+      ).process_info
+      expect(result.metadata[:treemap]).to eq([[-1, -1], [0, 0]])
+      result = @polygon_finder_class.new(
+        bitmap: @bitmap_class.new(chunk, 18),
+        matcher: @matcher,
+        options: {number_of_tiles: 2, versus: :o, treemap: true, compress: {uniq: true, linear: true}}
+      ).process_info
+      expect(result.metadata[:treemap]).to eq([[-1, -1], [0, 0]])
+    end
+
+    it "case 27" do
+      chunk = "          000   " \
+              "          000   " \
+              "                " \
+              "0000000000000000" \
+              "00            00" \
+              "00 000    000 00" \
+              "00 000    000 00" \
+              "00            00" \
+              "0000000000000000" \
+              "                " \
+              "   000    000   " \
+              "   000    000   "
+      result = @simple_polygon_finder.new(
+        @bitmap_class.new(chunk, 16),
+        @matcher,
+        nil,
+        {versus: :o, treemap: true}
+      ).process_info
+      expect(result.metadata[:treemap]).to eq([[-1, -1], [-1, -1], [1, 0], [1, 0], [-1, -1], [-1, -1]])
+
+      result = @polygon_finder_class.new(
+        bitmap: @bitmap_class.new(chunk, 16),
+        matcher: @matcher,
+        options: {number_of_tiles: 2, versus: :o, treemap: true, compress: {uniq: true, linear: true}}
+      ).process_info
+      expect(result.metadata[:treemap]).to eq([[-1, -1], [0, 0], [-1, -1], [-1, -1], [0, 0], [-1, -1]])
+    end
+
+    it "case 28" do
+      chunk = "000000000000000000000000000000000000000000000000" \
+              "000000000000000000000000000000000000000000000000" \
+              "00                                            00" \
+              "00           22222                            00" \
+              "00           22222                            00" \
+              "00                                            00" \
+              "000000000000000000000000000000000000000000000000" \
+              "000000000000000000000000000000000000000000000000" \
+              "                                                " \
+              "   11111                                        " \
+              "   11111                                        "
+      result = @simple_polygon_finder.new(
+        @bitmap_class.new(chunk, 48),
+        @matcher,
+        nil,
+        {named_sequences: true, versus: :a, treemap: true}
+      ).process_info
+      expect(result.metadata[:treemap]).to eq([[-1, -1], [0, 0], [-1, -1]])
+      result = @polygon_finder_class.new(
+        bitmap: @bitmap_class.new(chunk, 48),
+        matcher: @matcher,
+        options: {number_of_tiles: 4, versus: :a, treemap: true, compress: {uniq: true, linear: true}}
+      ).process_info
+      expect(result.metadata[:treemap]).to eq([[-1, -1], [-1, -1], [0, 0]])
+    end
+
+    it "case 29" do
+      chunk = "000000000000000000000000000000000000000000000000" \
+              "000000000000000000000000000000000000000000000000" \
+              "00                                            00" \
+              "00 111111111111111111                         00" \
+              "00 111111111111111111                         00" \
+              "00 11              11111111111111111111111111100" \
+              "00 11 22           11111111111111111111111111100" \
+              "00 11 22           11                         00" \
+              "00 11              11                         00" \
+              "00 111111111111111111                         00" \
+              "00 111111111111111111                         00" \
+              "00                                            00" \
+              "000000000000000000000000000000000000000000000000" \
+              "000000000000000000000000000000000000000000000000"
+      result = @simple_polygon_finder.new(
+        @bitmap_class.new(chunk, 48),
+        @matcher,
+        nil,
+        {named_sequences: true, versus: :a, treemap: true}
+      ).process_info
+      expect(result.metadata[:treemap]).to eq([[-1, -1], [0, 1]])
+      c_result = @polygon_finder_class.new(
+        bitmap: @bitmap_class.new(chunk, 48),
+        matcher: @matcher,
+        options: {number_of_tiles: 4, versus: :a, treemap: true, compress: {uniq: true, linear: true}}
+      ).process_info
+      expect(c_result.points).to eq([{outer: [{x: 0, y: 0}, {x: 0, y: 13}, {x: 11, y: 13}, {x: 47, y: 13}, {x: 47, y: 0}, {x: 11, y: 0}], inner: [[{x: 11, y: 12}, {x: 1, y: 11}, {x: 1, y: 2}, {x: 11, y: 1}, {x: 35, y: 1}, {x: 46, y: 2}, {x: 46, y: 4}, {x: 35, y: 5}, {x: 23, y: 5}, {x: 20, y: 4}, {x: 20, y: 3}, {x: 11, y: 3}, {x: 3, y: 3}, {x: 3, y: 10}, {x: 11, y: 10}, {x: 20, y: 10}, {x: 20, y: 7}, {x: 23, y: 6}, {x: 35, y: 6}, {x: 46, y: 7}, {x: 46, y: 11}, {x: 35, y: 12}, {x: 23, y: 12}], [{x: 4, y: 8}, {x: 4, y: 5}, {x: 19, y: 5}, {x: 19, y: 8}]]}, {outer: [{x: 6, y: 6}, {x: 6, y: 7}, {x: 7, y: 7}, {x: 7, y: 6}], inner: []}])
+      expect(c_result.metadata[:treemap]).to eq([[-1, -1], [0, 1]])
     end
   end
 end

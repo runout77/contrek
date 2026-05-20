@@ -11,9 +11,8 @@
 #include <vector>
 #include "InnerPolyline.h"
 
-InnerPolyline::InnerPolyline(std::vector<Point*> raw_coordinates, Shape* shape, bool recombined)
+InnerPolyline::InnerPolyline(std::vector<Point*> raw_coordinates, Shape* shape)
   : raw_coordinates_(std::move(raw_coordinates)),
-    recombined_(recombined),
     shape_(shape) {}
 InnerPolyline::InnerPolyline(Sequence* sequence)
   : sequence_(sequence) {

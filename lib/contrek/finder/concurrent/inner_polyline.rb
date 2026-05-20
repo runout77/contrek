@@ -1,12 +1,11 @@
 module Contrek
   module Concurrent
     class InnerPolyline
-      attr_reader :sequence, :recombined
+      attr_reader :sequence
 
-      def initialize(shape: nil, raw_coordinates: [], sequence: nil, recombined: false)
+      def initialize(shape: nil, raw_coordinates: [], sequence: nil)
         @raw = raw_coordinates if raw_coordinates
         @sequence = sequence if sequence
-        @recombined = recombined
         @shape = shape
       end
 

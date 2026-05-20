@@ -14,16 +14,14 @@
 
 class InnerPolyline {
  public:
-  explicit InnerPolyline(std::vector<Point*> raw_coordinates, Shape* shape, bool recombined = false);
+  explicit InnerPolyline(std::vector<Point*> raw_coordinates, Shape* shape);
   explicit InnerPolyline(Sequence* sequence);
   std::vector<Point*>& raw();
   Sequence* sequence() { return this->sequence_; }
   Bounds& vertical_bounds();
-  bool recombined() { return this->recombined_; }
   Shape* shape();
   Shape* assigned_shape = nullptr;
  private:
-  bool recombined_ = false;
   std::vector<Point*> raw_coordinates_;
   Sequence* sequence_ = nullptr;
   Shape* shape_;
