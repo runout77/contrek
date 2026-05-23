@@ -14,7 +14,12 @@
 #include <string>
 #include <map>
 #include <iostream>
+#include <memory>
 #include <utility>
+#include <fstream>
+#include <sstream>
+#include <stdexcept>
+#include <limits>
 #include "../bitmaps/Bitmap.h"
 #include "NodeCluster.h"
 #include "Node.h"
@@ -58,6 +63,8 @@ struct ProcessResult {
   std::list<Polygon> polygons;
   std::string named_sequence;
   std::vector<std::pair<int, int>> treemap;
+  std::vector<std::unique_ptr<Point>> cloned_points_storage;
+
   void draw_on_bitmap(RawBitmap& canvas) const;
 
   void print_polygons() {
@@ -103,14 +110,22 @@ struct ProcessResult {
     new_res->named_sequence = this->named_sequence;
     new_res->treemap = this->treemap;
 
+    size_t estimated_points = 0;
+    for (const auto& poly : this->polygons) {
+      estimated_points += poly.outer.size();
+      for (const auto& seq : poly.inner) estimated_points += seq.size();
+    }
+    new_res->cloned_points_storage.reserve(estimated_points);
+
     for (const auto& poly : this->polygons) {
       Polygon new_poly;
-      // Bounds
+      // bounds
       new_poly.bounds = poly.bounds;
       // outer
       for (const Point* p : poly.outer) {
         if (p) {
-          new_poly.outer.push_back(new Point(p->x, p->y));
+          new_res->cloned_points_storage.push_back(std::make_unique<Point>(p->x, p->y));
+          new_poly.outer.push_back(new_res->cloned_points_storage.back().get());
         }
       }
       // inner
@@ -118,7 +133,8 @@ struct ProcessResult {
         std::vector<Point*> new_seq;
         for (const Point* p : seq) {
           if (p) {
-            new_seq.push_back(new Point(p->x, p->y));
+            new_res->cloned_points_storage.push_back(std::make_unique<Point>(p->x, p->y));
+            new_seq.push_back(new_res->cloned_points_storage.back().get());
           }
         }
         new_poly.inner.push_back(new_seq);
@@ -126,6 +142,61 @@ struct ProcessResult {
       new_res->polygons.push_back(new_poly);
     }
     return new_res;
+  }
+
+  std::string to_svg() const {
+    std::vector<std::string> lines;
+    lines.push_back(
+      "<svg xmlns=\"http://www.w3.org/2000/svg\" "
+      "width=\"" + std::to_string(width) +
+      "\" height=\"" + std::to_string(height) + "\">");
+    for (const auto& poly : polygons) {
+      { // outer
+        std::ostringstream pts;
+        bool first = true;
+        for (const Point* p : poly.outer) {
+          if (!p) continue;
+          if (!first)
+              pts << " ";
+          first = false;
+          pts << p->x << "," << p->y;
+        }
+        lines.push_back(
+          "<polygon points=\"" + pts.str() +
+          "\" fill=\"none\" stroke=\"red\" stroke-width=\"1\"/>");
+      }
+      // inner
+      for (const auto& sequence : poly.inner) {
+        if (sequence.empty()) continue;
+        std::ostringstream pts;
+        bool first = true;
+        for (const Point* p : sequence) {
+          if (!p) continue;
+          if (!first) pts << " ";
+          first = false;
+          pts << p->x << "," << p->y;
+        }
+        lines.push_back(
+          "<polygon points=\"" + pts.str() +
+          "\" fill=\"none\" stroke=\"green\" stroke-width=\"1\"/>");
+      }
+    }
+    lines.push_back("</svg>");
+    std::ostringstream result;
+    for (size_t i = 0; i < lines.size(); ++i) {
+      result << lines[i];
+      if (i + 1 < lines.size()) result << "\n";
+    }
+    return result.str();
+  }
+
+  void save_svg(const std::string& filename) const {
+    std::ofstream file(filename);
+    if (!file.is_open()) {
+      throw std::runtime_error("Unable to open SVG file: " + filename);
+    }
+    file << to_svg();
+    file.close();
   }
 };
 

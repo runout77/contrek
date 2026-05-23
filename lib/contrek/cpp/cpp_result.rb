@@ -1,6 +1,8 @@
 module Contrek
   module Cpp
     class CPPResult
+      include Shared::Result
+
       def polygons=(list)
         @polygons_storage = list
       end

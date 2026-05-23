@@ -30,16 +30,17 @@ void run_test() {
 }
 
 int main() {
-  MallocExtension::instance()->SetNumericProperty(
-    "tcmalloc.max_total_thread_cache_bytes",
-    1024 * 1024 * 1024);
-
+  #ifdef USE_TCMALLOC
+    MallocExtension::instance()->SetNumericProperty(
+      "tcmalloc.max_total_thread_cache_bytes",
+      1024 * 1024 * 1024);
+  #endif
   Contrek::Config cfg;
   cfg.threads = 8;
   cfg.tiles = 8;
   cfg.compress_unique = true;
   // cfg.treemap = true;
-  // cfg.connectivity_mode = Contrek::Connectivity::OMNIDIRECTIONAL;
+  cfg.connectivity_mode = Contrek::Connectivity::OMNIDIRECTIONAL;
 
   CpuTimer cpu_timer;
   cpu_timer.start();
@@ -50,6 +51,7 @@ int main() {
   result->print_info();
   std::cout << "Found polygons: " << result->groups << std::endl;
   std::cout << "Time: " << cpu_timer.stop() << " ms" << std::endl;
+  // result->save_svg("output.svg");
 
   // run_test();
   return 0;

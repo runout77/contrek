@@ -342,17 +342,18 @@ void stream_png_image(const std::string& filepath, uint32_t stripe_height) {
 
     std::cout << "Merging polygons ..." << std::endl;
     ProcessResult *merged_result = vmerger.process_info();
-    std::cout << "Founds total polygons: " << merged_result->groups << std::endl;
 
     if (merged_result) {
-      RawBitmap full_bitmap;
+      std::cout << "Founds total polygons: " << merged_result->groups << std::endl;
+      /*RawBitmap full_bitmap;
       full_bitmap.define(total_width, total_height, 4, true);
       full_bitmap.fill(255, 255, 255);
       merged_result->draw_on_bitmap(full_bitmap);
       std::cout << "Saving whole png ..." << std::endl;
       if (full_bitmap.save_to_png("whole.png")) {
         std::cout << "Png saved!" << std::endl;
-      }
+      }*/
+      merged_result->save_svg("whole.svg");
     }
     delete merged_result;
     // frees memory

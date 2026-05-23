@@ -13,6 +13,7 @@
 #include <vector>
 #include <memory>
 #include <cstdint>
+#include <string_view>
 
 #include "Finder.h"
 #include "FastPngBitmap.h"
@@ -43,21 +44,44 @@ struct Config {
   Connectivity connectivity_mode = Connectivity::ORTHOGONAL;
 };
 
-inline std::unique_ptr<ProcessResult> trace(const std::string& image_path, const Config& cfg = Config()) {
-  auto bitmap = std::make_unique<FastPngBitmap>(image_path);
+struct TraceContext {
+  std::unique_ptr<FastPngBitmap> bitmap;
+  std::unique_ptr<Matcher> matcher;
+  std::vector<std::string> internal_args;
+  std::unique_ptr<Finder> finder;
+  std::unique_ptr<ProcessResult> result;
+
+  // this allows result direct access
+  const ProcessResult* operator->() const { return result.get(); }
+  ProcessResult* operator->() { return result.get(); }
+  const ProcessResult& operator*() const { return *result; }
+  ProcessResult& operator*() { return *result; }
+
+  // context can be moved not copied
+  TraceContext() = default;
+  TraceContext(const TraceContext&) = delete;
+  TraceContext& operator=(const TraceContext&) = delete;
+  TraceContext(TraceContext&&) = default;
+  TraceContext& operator=(TraceContext&&) = default;
+};
+
+inline TraceContext trace(const std::string& image_path, const Config& cfg = Config()) {
+  TraceContext ctx;
+
+  ctx.bitmap = std::make_unique<FastPngBitmap>(image_path);
 
   int32_t color_to_match = (cfg.target_color == -1)
-                           ? bitmap->rgb_value_at(0, 0)
-                           : cfg.target_color;
+                             ? ctx.bitmap->rgb_value_at(0, 0)
+                             : cfg.target_color;
 
-  std::unique_ptr<Matcher> matcher;
   if (cfg.mode == MatchMode::NOT_COLOR) {
-    matcher = std::make_unique<RGBNotMatcher>(color_to_match);
+    ctx.matcher = std::make_unique<RGBNotMatcher>(color_to_match);
   } else {
-    matcher = std::make_unique<RGBMatcher>(color_to_match);
+    ctx.matcher = std::make_unique<RGBMatcher>(color_to_match);
   }
 
-  std::vector<std::string> internal_args = {"--versus=a"};
+  ctx.internal_args = {"--versus=a"};
+
   struct Mapping { bool flag; std::string_view arg; };
   const Mapping mappings[] = {
     {cfg.compress_unique,      "--compress_uniq"},
@@ -65,18 +89,17 @@ inline std::unique_ptr<ProcessResult> trace(const std::string& image_path, const
     {cfg.compress_visvalingam, "--compress_visvalingam"},
     {cfg.treemap,              "--treemap"}
   };
-
-  for (auto& m : mappings) {
-      if (m.flag) internal_args.emplace_back(m.arg);
+  for (const auto& m : mappings) {
+    if (m.flag) ctx.internal_args.emplace_back(m.arg);
   }
-  internal_args.push_back("--number_of_tiles=" + std::to_string(cfg.tiles));
+  ctx.internal_args.push_back("--number_of_tiles=" + std::to_string(cfg.tiles));
   if (cfg.connectivity_mode == Connectivity::OMNIDIRECTIONAL) {
-    internal_args.push_back("--connectivity=" + std::to_string(8));
+    ctx.internal_args.push_back("--connectivity=" + std::to_string(8));
   }
+  ctx.finder = std::make_unique<Finder>(cfg.threads, ctx.bitmap.get(), ctx.matcher.get(), &ctx.internal_args);
+  ctx.result = std::unique_ptr<ProcessResult>(ctx.finder->process_info());
 
-  Finder finder(cfg.threads, bitmap.get(), matcher.get(), &internal_args);
-
-  return std::unique_ptr<ProcessResult>(finder.process_info());
+  return ctx;
 }
 
 }  // namespace Contrek
