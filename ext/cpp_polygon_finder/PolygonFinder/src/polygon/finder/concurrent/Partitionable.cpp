@@ -87,10 +87,16 @@ void Partitionable::trasmute_parts()
         }
         return false;
       });
-      if (count == inside->size && count < inside_compare->size) {
-        inside->type = Part::EXCLUSIVE;
-        inside->trasmuted = true;
-        break;
+      if (count == inside->size) {
+        if (count < inside_compare->size) {
+          inside->type = Part::EXCLUSIVE;
+          inside->trasmuted = true;
+          break;
+        } else if ( count == inside_compare->size &&
+                    inside->next == nullptr &&
+                    inside_compare->prev == nullptr) {
+          inside->mirror = true;
+        }
       }
     }
   }

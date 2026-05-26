@@ -83,5 +83,21 @@ RSpec.shared_examples "multiprocessing" do
       puts result.metadata[:benchmarks].inspect
       # verify_treemap(result)
     end
+
+    it "divides image into 8 tiles (10240x10240)" do
+      skip unless @polygon_finder_class == Contrek::Cpp::CPPConcurrentFinder
+      filename = "sample_10240x10240"
+      workers = 8
+      png_bitmap = @png_bitmap_class.new("./spec/files/images/#{filename}.png")
+      rgb_matcher = @png_not_matcher.new(png_bitmap.rgb_value_at(0, 0))
+      polygonfinder = @polygon_finder_class.new(
+        bitmap: png_bitmap,
+        matcher: rgb_matcher,
+        options: {number_of_tiles: workers, versus: :a, connectivity: 8, compress: {uniq: true, linear: true}}
+      )
+      result = polygonfinder.process_info
+      puts result.metadata[:benchmarks].inspect
+      expect(result.to_svg).to match_expected_svg(filename, number_of_tiles: workers, store_svg: true)
+    end
   end
 end

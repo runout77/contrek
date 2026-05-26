@@ -203,5 +203,61 @@ RSpec.shared_examples "connectivity" do
       ).process_info
       expect(result.points).to eq([{outer: [{x: 0, y: 0}, {x: 0, y: 19}, {x: 9, y: 19}, {x: 19, y: 19}, {x: 19, y: 0}, {x: 9, y: 0}], inner: [[{x: 4, y: 16}, {x: 4, y: 14}, {x: 10, y: 14}, {x: 10, y: 16}], [{x: 4, y: 10}, {x: 4, y: 8}, {x: 10, y: 8}, {x: 10, y: 10}], [{x: 4, y: 4}, {x: 4, y: 2}, {x: 18, y: 2}, {x: 18, y: 13}, {x: 9, y: 13}, {x: 9, y: 11}, {x: 15, y: 10}, {x: 15, y: 5}, {x: 9, y: 5}]]}])
     end
+
+    it "problematic case 3" do
+      #        ---------*----------
+      chunk = "0000                " \
+              "00000               " \
+              "000000              " \
+              "0000000000          " \
+              "0000000000          " \
+              "00        000000    " \
+              "00        000000    " \
+              "00        000000    " \
+              "0000000000          " \
+              "0000000000          " \
+              "0000000000          "
+      result = @polygon_finder_class.new(
+        bitmap: @bitmap_class.new(chunk, 20),
+        matcher: @matcher,
+        options: {number_of_tiles: 2, versus: :a, connectivity: 8, compress: {uniq: true, linear: true}}
+      ).process_info
+      expect(result.points).to eq([{outer: [{x: 0, y: 0}, {x: 0, y: 10}, {x: 9, y: 10}, {x: 9, y: 8}, {x: 15, y: 7}, {x: 15, y: 5}, {x: 9, y: 4}, {x: 9, y: 3}, {x: 5, y: 2}, {x: 3, y: 0}], inner: [[{x: 1, y: 7}, {x: 1, y: 5}, {x: 10, y: 5}, {x: 10, y: 7}]]}])
+
+      result = @polygon_finder_class.new(
+        bitmap: @bitmap_class.new(chunk, 20),
+        matcher: @matcher,
+        options: {number_of_tiles: 2, versus: :o, connectivity: 8, compress: {uniq: true, linear: true}}
+      ).process_info
+      expect(result.points).to eq([{outer: [{x: 3, y: 0}, {x: 5, y: 2}, {x: 9, y: 3}, {x: 9, y: 4}, {x: 15, y: 5}, {x: 15, y: 7}, {x: 9, y: 8}, {x: 9, y: 10}, {x: 0, y: 10}, {x: 0, y: 0}], inner: [[{x: 1, y: 5}, {x: 1, y: 7}, {x: 10, y: 7}, {x: 10, y: 5}]]}])
+    end
+
+    it "problematic case 4" do
+      #          ---------*----------
+      chunk = "                0000" \
+                "               00000" \
+                "              000000" \
+                "         00000000000" \
+                "         00000000000" \
+                "    00000         00" \
+                "    00000         00" \
+                "    00000         00" \
+                "         00000000000" \
+                "         00000000000" \
+                "         00000000000"
+      result = @polygon_finder_class.new(
+        bitmap: @bitmap_class.new(chunk, 20),
+        matcher: @matcher,
+        options: {number_of_tiles: 2, versus: :a, connectivity: 8, compress: {uniq: true, linear: true}}
+      ).process_info
+      expect(result.points).to eq([{outer: [{x: 9, y: 3}, {x: 9, y: 4}, {x: 4, y: 5}, {x: 4, y: 7}, {x: 9, y: 8}, {x: 9, y: 10}, {x: 19, y: 10}, {x: 19, y: 0}, {x: 16, y: 0}, {x: 14, y: 2}], inner: [[{x: 8, y: 7}, {x: 8, y: 5}, {x: 18, y: 5}, {x: 18, y: 7}]]}])
+
+      result = @polygon_finder_class.new(
+        bitmap: @bitmap_class.new(chunk, 20),
+        matcher: @matcher,
+        options: {number_of_tiles: 2, versus: :o, connectivity: 8, compress: {uniq: true, linear: true}}
+      ).process_info
+      expect(result.points).to eq([{outer: [{x: 9, y: 3}, {x: 14, y: 2}, {x: 16, y: 0}, {x: 19, y: 0}, {x: 19, y: 10}, {x: 9, y: 10}, {x: 9, y: 8}, {x: 4, y: 7}, {x: 4, y: 5}, {x: 9, y: 4}], inner: [[{x: 8, y: 5}, {x: 8, y: 7}, {x: 18, y: 7}, {x: 18, y: 5}]]}])
+    end
   end
 end

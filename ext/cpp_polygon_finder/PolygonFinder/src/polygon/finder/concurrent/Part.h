@@ -33,6 +33,7 @@ class Part : public Queueable<Point> {
   bool inverts = false;
   bool trasmuted = false;
   bool dead_end = false;
+  bool mirror = false;
   Part* next = nullptr;
   Part* prev = nullptr;
   Part* circular_next = nullptr;

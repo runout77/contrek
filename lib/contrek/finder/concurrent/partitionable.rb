@@ -73,6 +73,10 @@ module Contrek
               inside.trasmuted = true
               break
             end
+            if count == inside.size && count == inside_compare.size &&
+                inside.next.nil? && inside_compare.prev.nil?
+              inside.mirror = true
+            end
           end
         end
       end

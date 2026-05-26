@@ -95,7 +95,10 @@ All notable changes to this project will be documented in this file.
 
 ## [1.2.3] - 2026-05-23
 ### Changed
-### Changed
 * **SVG Conversion:** Added utility methods to convert point coordinates directly into SVG paths.
 * **Contrek API & RAII Architecture:** Refactored the Contrek API to utilize an RAII (Resource Acquisition Is Initialization) pattern, safely wrapping both the trace engine and the processing results within a unified context lifecycle shell.
 * **ProcessResult Memory Management:** Updated `ProcessResult` to properly manage resource deallocation during cloning operations, ensuring deep-copied or moved internal points are automatically and safely freed when the context scope ends.
+
+## [1.2.4] - 2026-05-26
+### Changed
+* Fixed an issue in connectivity8 tracing mode that, under specific rare conditions, disrupted the topological continuity of external contours in favor of internal ones.

@@ -86,9 +86,8 @@ void Cursor::traverse_outer(Part* act_part,
         auto& q_set = new_position->end_point()->queues();
         auto it = std::find_if(q_set.begin(), q_set.end(), [&](Queueable<Point>* q) {
           Part* p = static_cast<Part*>(q);
-          return p->versus() == -versus && p->polyline()->tile != act_part->polyline()->tile;
+          return (p->mirror || act_part->mirror || p->versus() == -versus) && p->polyline()->tile != act_part->polyline()->tile;
         });
-
         Part* part = nullptr;
         if (it != q_set.end()) {
           part = static_cast<Part*>(*it);
@@ -97,24 +96,26 @@ void Cursor::traverse_outer(Part* act_part,
           const auto n = all_parts.size();
           Part *last_last_part = n >= 2 ? all_parts[n - 2] : nullptr;
           if (last_last_part != part) {
+            bool all_seam = false;
             if (n >= 2) {
-              bool all_seam = true;
+              all_seam = true;
               for (std::size_t i = all_parts.size() - 2; i < all_parts.size(); ++i) {
                 if (all_parts[i]->type != Part::SEAM) {
                   all_seam = false;
                   break;
                 }
               }
-              if (all_seam) break;
             }
-            if (shapes_sequence_lookup.insert(part->polyline()->shape).second) {
-              shapes_sequence.push_back(part->polyline()->shape);
+            if (!all_seam) {
+              if (shapes_sequence_lookup.insert(part->polyline()->shape).second) {
+                shapes_sequence.push_back(part->polyline()->shape);
+              }
+              part->next_position(new_position);
+              part->dead_end = true;
+              act_part = part;
+              jumped_to_new_part = true;
+              break;
             }
-            part->next_position(new_position);
-            part->dead_end = true;
-            act_part = part;
-            jumped_to_new_part = true;
-            break;
           }
         }
         if (!jumped_to_new_part) {

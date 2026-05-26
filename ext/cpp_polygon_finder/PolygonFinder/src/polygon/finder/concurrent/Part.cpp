@@ -65,7 +65,13 @@ void Part::orient()
 { if (this->size <= 1 || (this->size == 2 && this->inverts)) {
     this->versus_ = 0;
   } else {
-    this->versus_ = (this->tail->payload->y - this->head->payload->y) > 0 ? 1 : -1;
+    int diff = this->tail->payload->y - this->head->payload->y;
+    if (diff == 0) {
+      this->mirror = true;
+      this->versus_ = 0;
+    } else {
+      this->versus_ = diff > 0 ? 1 : -1;
+    }
   }
 }
 
@@ -78,6 +84,7 @@ std::string Part::inspect() {
   std::stringstream ss;
   ss << "part " << part_index
   << " (versus=" << this->versus_
+  << " mirror=" << this->mirror
   << " inv=" << this->inverts
   << " trm=" << this->trasmuted
   << " touched=" << this->touched_
