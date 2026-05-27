@@ -17,6 +17,8 @@
 #include <cstring>
 #include <algorithm>
 #include <cstdio>
+#include <sys/resource.h>
+
 #include "polygon/finder/PolygonFinder.h"
 #include "polygon/finder/concurrent/ClippedPolygonFinder.h"
 #include "polygon/bitmaps/Bitmap.h"
@@ -260,6 +262,16 @@ void Tests::test_h()
   delete right_result;
 }
 
+double get_peak_rss() {
+  struct rusage r_usage;
+  getrusage(RUSAGE_SELF, &r_usage);
+#ifdef __APPLE__
+  return r_usage.ru_maxrss / (1024.0 * 1024.0);
+#else
+  return r_usage.ru_maxrss / 1024.0;
+#endif
+}
+
 /* In this example, PNG data is read by streaming into a user-defined buffer height.
   Contrek scans each stripe and extracts the polygons. Finally, it merges all
   polygons from every stripe as if they had been read from a single image and saves
@@ -303,7 +315,7 @@ void stream_png_image(const std::string& filepath, uint32_t stripe_height) {
     }
 
     size_t row_size = static_cast<size_t>(total_width) * 4;
-    // main strpes loop
+    // main stripes loop
     for (uint32_t current_y_offset = 0; current_y_offset < total_height; current_y_offset += stripe_height) {
       int uncovered_height = total_height - current_y_offset;
 
@@ -366,4 +378,5 @@ void stream_png_image(const std::string& filepath, uint32_t stripe_height) {
 
 void Tests::test_i() {
   stream_png_image("../images/graphs_1024x1024.png", 300);
+  std::cout << "Memory usage peak: " << get_peak_rss() << " MB" << std::endl;
 }

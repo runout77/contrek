@@ -103,7 +103,6 @@ void PolygonFinder::scan() {
 ProcessResult* PolygonFinder::process_info() {
   ProcessResult *pr = new ProcessResult();
   pr->groups = this->node_cluster->sequences.size();
-  pr->polygons = std::move(this->node_cluster->polygons);
   pr->benchmarks = std::move(this->reports);
   pr->treemap = this->node_cluster->treemap;
   pr->width = this->source_bitmap->w();
@@ -124,6 +123,7 @@ ProcessResult* PolygonFinder::process_info() {
     pr->named_sequence = sequence;
   }
   else pr->named_sequence = "";
+  pr->polygons = std::move(this->node_cluster->polygons);
   return(pr);
 }
 

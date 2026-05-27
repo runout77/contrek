@@ -102,3 +102,7 @@ All notable changes to this project will be documented in this file.
 ## [1.2.4] - 2026-05-26
 ### Changed
 * Fixed an issue in connectivity8 tracing mode that, under specific rare conditions, disrupted the topological continuity of external contours in favor of internal ones.
+
+## [1.2.5] - 2026-05-27
+### Changed
+- **Refactored `ProcessResult.clone()`:** Switched from fragmented dynamic allocation to a contiguous `std::vector` with explicit `.reserve()`. Eliminates heap fragmentation during high-res streaming.

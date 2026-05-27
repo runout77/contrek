@@ -62,6 +62,7 @@ struct Point {
     return x == other.x && y == other.y;
   }
   Point(int x_, int y_) : x(x_), y(y_) {}
+  Point() : x(0), y(0) {}
 };
 
 class Node : public  Listable {

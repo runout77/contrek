@@ -63,7 +63,7 @@ struct ProcessResult {
   std::list<Polygon> polygons;
   std::string named_sequence;
   std::vector<std::pair<int, int>> treemap;
-  std::vector<std::unique_ptr<Point>> cloned_points_storage;
+  std::vector<Point> cloned_points_storage;
 
   void draw_on_bitmap(RawBitmap& canvas) const;
 
@@ -119,22 +119,25 @@ struct ProcessResult {
 
     for (const auto& poly : this->polygons) {
       Polygon new_poly;
-      // bounds
       new_poly.bounds = poly.bounds;
+      new_poly.outer.reserve(poly.outer.size());
       // outer
       for (const Point* p : poly.outer) {
         if (p) {
-          new_res->cloned_points_storage.push_back(std::make_unique<Point>(p->x, p->y));
-          new_poly.outer.push_back(new_res->cloned_points_storage.back().get());
+          new_res->cloned_points_storage.push_back(Point(p->x, p->y));
+          size_t idx = new_res->cloned_points_storage.size() - 1;
+          new_poly.outer.push_back(&new_res->cloned_points_storage[idx]);
         }
       }
       // inner
       for (const auto& seq : poly.inner) {
         std::vector<Point*> new_seq;
+        new_seq.reserve(seq.size());
         for (const Point* p : seq) {
           if (p) {
-            new_res->cloned_points_storage.push_back(std::make_unique<Point>(p->x, p->y));
-            new_seq.push_back(new_res->cloned_points_storage.back().get());
+            new_res->cloned_points_storage.push_back(Point(p->x, p->y));
+            size_t idx = new_res->cloned_points_storage.size() - 1;
+            new_seq.push_back(&new_res->cloned_points_storage[idx]);
           }
         }
         new_poly.inner.push_back(new_seq);
