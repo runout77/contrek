@@ -56,16 +56,16 @@ void RawBitmap::draw_pixel(int x, int y, unsigned char r, unsigned char g, unsig
   if (bpp > 3) p[3] = a;
 }
 
-uint32_t RawBitmap::define(uint width, uint height, int bytes_per_pixel, bool clear)
-{ this->width = width;
+size_t RawBitmap::define(uint width, uint height, int bytes_per_pixel, bool clear)
+{ this->width  = width;
   this->height = height;
   this->bpp = bytes_per_pixel;
-  uint32_t dimension = (static_cast<uint32_t>(width) * static_cast<uint32_t>(height)) * bytes_per_pixel;
+  size_t dimension = static_cast<size_t>(width) * static_cast<size_t>(height) * static_cast<size_t>(bytes_per_pixel);
   this->image = std::make_unique<unsigned char[]>(dimension);
   if (clear) {
     std::fill(image.get(), image.get() + dimension, 0);
   }
-  return dimension;
+  return static_cast<uint32_t>(dimension);
 }
 
 void RawBitmap::fill(unsigned char r, unsigned char g, unsigned char b, unsigned char a) {

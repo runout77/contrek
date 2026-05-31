@@ -46,8 +46,8 @@ int main() {
   cpu_timer.start();
   std::cout << "--- Start Native Benchmark ---" << std::endl;
   // auto result = Contrek::trace("../images/graphs_1024x1024.png", cfg);
-  // auto result = Contrek::trace("../images/sample_10240x10240.png", cfg);
-  auto result = Contrek::trace("../images/test_20480x20480.png", cfg);
+  auto result = Contrek::trace("../images/sample_10240x10240.png", cfg);
+  // auto result = Contrek::trace("../images/test_20480x20480.png", cfg);
   result->print_info();
   std::cout << "Found polygons: " << result->groups << std::endl;
   std::cout << "Time: " << cpu_timer.stop() << " ms" << std::endl;

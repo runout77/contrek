@@ -106,3 +106,9 @@ All notable changes to this project will be documented in this file.
 ## [1.2.5] - 2026-05-27
 ### Changed
 - **Refactored `ProcessResult.clone()`:** Switched from fragmented dynamic allocation to a contiguous `std::vector` with explicit `.reserve()`. Eliminates heap fragmentation during high-res streaming.
+
+## [1.2.6] - 2026-05-31
+### Changed
+- **Refactored `spng.c` function `rgb8_row_to_rgba8`:** Extended a loop counter to `size_t` (previously limited to `uint32_t`), which was causing segmentation faults when reading massive images (e.g., 81920x81920).
+- **Refactored `RawBitmap.define` function:** Updated area and size calculations to use full 64-bit integers.
+- **Refactored `PolygonFinder.to_svg_stream()` function:** Optimized performance to efficiently handle massive SVG streams of 2 GB and beyond.

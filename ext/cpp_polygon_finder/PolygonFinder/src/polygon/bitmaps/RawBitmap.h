@@ -25,7 +25,7 @@ class RawBitmap : public Bitmap {
   unsigned int rgb_value_at(int x, int y);
   const unsigned char* get_row_ptr(int y) const;
   int get_bytes_per_pixel() const;
-  uint32_t define(uint width, uint height, int bytes_per_pixel, bool clear = false);
+  size_t define(uint width, uint height, int bytes_per_pixel, bool clear = false);
   void draw_pixel(int x, int y, unsigned char r, unsigned char g, unsigned char b, unsigned char a = 255);
   bool save_to_png(const std::string& filename);
   void fill(unsigned char r, unsigned char g, unsigned char b, unsigned char a = 255);

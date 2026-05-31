@@ -8,6 +8,7 @@
  */
 
 #include "Tests.h"
+#include <sys/resource.h>
 #include <string.h>
 #include <iostream>
 #include <list>
@@ -17,7 +18,6 @@
 #include <cstring>
 #include <algorithm>
 #include <cstdio>
-#include <sys/resource.h>
 
 #include "polygon/finder/PolygonFinder.h"
 #include "polygon/finder/concurrent/ClippedPolygonFinder.h"
@@ -279,7 +279,7 @@ double get_peak_rss() {
   This approach allows for processing large PNG files on systems where memory
   would otherwise be insufficient.
 */
-void stream_png_image(const std::string& filepath, uint32_t stripe_height) {
+void stream_png_image(const std::string& filepath, uint32_t stripe_height, bool generate_svg = false, bool generate_png = false) {
     std::vector<ProcessResult*> result_clones;
     std::vector<std::string> varguments = {};
     VerticalMerger vmerger(0, &varguments);
@@ -305,6 +305,7 @@ void stream_png_image(const std::string& filepath, uint32_t stripe_height) {
 
     // allocates stripe buffer
     RawBitmap stripe_bitmap;
+    std::cout << total_width << " " << stripe_height << std::endl;
     stripe_bitmap.define(total_width, stripe_height, 4, true);
     RGBNotMatcher not_matcher(-1);
 
@@ -315,6 +316,7 @@ void stream_png_image(const std::string& filepath, uint32_t stripe_height) {
     }
 
     size_t row_size = static_cast<size_t>(total_width) * 4;
+    int stripe_count = 0;
     // main stripes loop
     for (uint32_t current_y_offset = 0; current_y_offset < total_height; current_y_offset += stripe_height) {
       int uncovered_height = total_height - current_y_offset;
@@ -344,12 +346,13 @@ void stream_png_image(const std::string& filepath, uint32_t stripe_height) {
       PolygonFinder polygon_finder(&stripe_bitmap, &not_matcher, nullptr, &finder_arguments);
       ProcessResult *result = polygon_finder.process_info();
       if (result) {
-        std::cout << "Founds polygons: " << result->groups << std::endl;
+        std::cout << "stripe " << stripe_count << ": found polygons " << result->groups << std::endl;
         ProcessResult* safe_result = result->clone();
         result_clones.push_back(safe_result);
         vmerger.add_tile(*safe_result);
         delete result;
       }
+      stripe_count++;
     }
 
     std::cout << "Merging polygons ..." << std::endl;
@@ -357,15 +360,20 @@ void stream_png_image(const std::string& filepath, uint32_t stripe_height) {
 
     if (merged_result) {
       std::cout << "Founds total polygons: " << merged_result->groups << std::endl;
-      /*RawBitmap full_bitmap;
-      full_bitmap.define(total_width, total_height, 4, true);
-      full_bitmap.fill(255, 255, 255);
-      merged_result->draw_on_bitmap(full_bitmap);
-      std::cout << "Saving whole png ..." << std::endl;
-      if (full_bitmap.save_to_png("whole.png")) {
-        std::cout << "Png saved!" << std::endl;
-      }*/
-      merged_result->save_svg("whole.svg");
+      if (generate_png) {
+        RawBitmap full_bitmap;
+        full_bitmap.define(total_width, total_height, 4, true);
+        full_bitmap.fill(255, 255, 255);
+        merged_result->draw_on_bitmap(full_bitmap);
+        std::cout << "Saving whole png ..." << std::endl;
+        if (full_bitmap.save_to_png("whole.png")) {
+          std::cout << "Png saved!" << std::endl;
+        }
+      }
+      if (generate_svg) {
+        merged_result->save_svg("whole.svg");
+        std::cout << "Svg saved!" << std::endl;
+      }
     }
     delete merged_result;
     // frees memory

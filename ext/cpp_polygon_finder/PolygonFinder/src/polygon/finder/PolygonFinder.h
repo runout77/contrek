@@ -147,50 +147,37 @@ struct ProcessResult {
     return new_res;
   }
 
-  std::string to_svg() const {
-    std::vector<std::string> lines;
-    lines.push_back(
-      "<svg xmlns=\"http://www.w3.org/2000/svg\" "
-      "width=\"" + std::to_string(width) +
-      "\" height=\"" + std::to_string(height) + "\">");
+  void to_svg_stream(std::ostream& os) const {
+    os << "<svg xmlns=\"http://www.w3.org/2000/svg\" "
+       << "width=\"" << width << "\" height=\"" << height << "\">\n";
     for (const auto& poly : polygons) {
-      { // outer
-        std::ostringstream pts;
+      // --- OUTER (Red) ---
+      if (!poly.outer.empty()) {
+        os << "<polygon points=\"";
         bool first = true;
         for (const Point* p : poly.outer) {
           if (!p) continue;
-          if (!first)
-              pts << " ";
+          if (!first) os << " ";
           first = false;
-          pts << p->x << "," << p->y;
+          os << p->x << "," << p->y;
         }
-        lines.push_back(
-          "<polygon points=\"" + pts.str() +
-          "\" fill=\"none\" stroke=\"red\" stroke-width=\"1\"/>");
+        os << "\" fill=\"none\" stroke=\"red\" stroke-width=\"1\"/>\n";
       }
-      // inner
+      // --- INNER (Green) ---
       for (const auto& sequence : poly.inner) {
         if (sequence.empty()) continue;
-        std::ostringstream pts;
+        os << "<polygon points=\"";
         bool first = true;
         for (const Point* p : sequence) {
           if (!p) continue;
-          if (!first) pts << " ";
+          if (!first) os << " ";
           first = false;
-          pts << p->x << "," << p->y;
+          os << p->x << "," << p->y;
         }
-        lines.push_back(
-          "<polygon points=\"" + pts.str() +
-          "\" fill=\"none\" stroke=\"green\" stroke-width=\"1\"/>");
+        os << "\" fill=\"none\" stroke=\"green\" stroke-width=\"1\"/>\n";
       }
     }
-    lines.push_back("</svg>");
-    std::ostringstream result;
-    for (size_t i = 0; i < lines.size(); ++i) {
-      result << lines[i];
-      if (i + 1 < lines.size()) result << "\n";
-    }
-    return result.str();
+    os << "</svg>";
   }
 
   void save_svg(const std::string& filename) const {
@@ -198,7 +185,7 @@ struct ProcessResult {
     if (!file.is_open()) {
       throw std::runtime_error("Unable to open SVG file: " + filename);
     }
-    file << to_svg();
+    to_svg_stream(file);
     file.close();
   }
 };
