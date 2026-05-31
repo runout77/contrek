@@ -534,7 +534,7 @@ static void u16_row_to_bigendian(void *row, size_t size)
         write_u16(&px[i], px[i]);
     }
 }
-
+/*
 static void rgb8_row_to_rgba8(const unsigned char *row, unsigned char *out, uint32_t n)
 {
     uint32_t i;
@@ -542,6 +542,22 @@ static void rgb8_row_to_rgba8(const unsigned char *row, unsigned char *out, uint
     {
         memcpy(out + i * 4, row + i * 3, 3);
         out[i*4+3] = 255;
+    }
+}*/
+
+/* Fix overflow Gigapixel images */
+static void rgb8_row_to_rgba8(const unsigned char *row, unsigned char *out, uint32_t n)
+{
+    size_t i;
+    for(i=0; i < n; i++)
+    {
+        out[0] = row[0];
+        out[1] = row[1];
+        out[2] = row[2];
+        out[3] = 255;
+
+        out += 4;
+        row += 3;
     }
 }
 
