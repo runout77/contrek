@@ -42,7 +42,7 @@ class Finder : public Poolable {
   CpuTimer cpu_timer;
 
  protected:
-  Queue<Tile*> tiles;
+  Queue<Tile*> tiles_;
   int maximum_width_;
   int height = 0;
   void process_tiles();
@@ -55,4 +55,5 @@ class Finder : public Poolable {
   int maximum_width() const { return maximum_width_; }
   virtual ProcessResult* process_info();
   const pf_Options& options() const { return options_; }
+  Queue<Tile*>& tiles() { return tiles_; }
 };

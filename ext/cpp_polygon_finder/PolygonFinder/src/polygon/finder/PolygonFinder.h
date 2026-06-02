@@ -59,6 +59,7 @@ struct pf_Options {
 struct ProcessResult {
   int groups;
   int width, height;
+  bool has_bounds = false;
   std::map<std::string, double> benchmarks;
   std::list<Polygon> polygons;
   std::string named_sequence;

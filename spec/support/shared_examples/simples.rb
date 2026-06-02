@@ -287,5 +287,31 @@ RSpec.shared_examples "simples" do
          inner: []}
       ])
     end
+    it "returns bounds" do
+      chunk = "                " \
+              "   AAAAAAAAA    " \
+              "   AAAAAAAAA    " \
+              "   AAAAAAAAA    " \
+              "                " \
+              "       EEE      " \
+              "       EEE      " \
+              "                "
+      result = @polygon_finder_class.new(
+        @bitmap_class.new(chunk, 16),
+        @matcher,
+        nil,
+        {named_sequences: true, bounds: true, compress: {uniq: true, linear: true}}
+      ).process_info
+      expect(result.metadata[:named_sequence]).to eq("AAAAA-EEE")
+      expect(result.metadata[:groups]).to eq(2)
+      expect(result.points).to eq([
+        {outer: [{x: 3, y: 1}, {x: 3, y: 3}, {x: 11, y: 3}, {x: 11, y: 1}],
+         bounds: {max_x: 11, max_y: 3, min_x: 3, min_y: 1},
+         inner: []},
+        {bounds: {max_x: 9, max_y: 6, min_x: 7, min_y: 5},
+         outer: [{x: 7, y: 5}, {x: 7, y: 6}, {x: 9, y: 6}, {x: 9, y: 5}],
+         inner: []}
+      ])
+    end
   end
 end

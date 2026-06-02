@@ -95,3 +95,10 @@ std::string Polyline::named() {
     return this->named_;
   }
 }
+
+void Polyline::fill_bounds(RectBounds& target_bounds) const {
+  target_bounds.min_x = this->min_x;
+  target_bounds.max_x = this->max_x;
+  target_bounds.min_y = this->min_y_;
+  target_bounds.max_y = this->max_y_;
+}

@@ -60,7 +60,7 @@ Finder::Finder(int number_of_threads, Bitmap *bitmap, Matcher *matcher, std::vec
       Tile* tile = new Tile(this, payload.tile_start_x, payload.tile_end_x,
                             std::to_string(payload.tile_index), Benchmarks {0, 0});
       tile->initial_process(finder);
-      tiles.queue_push(tile);
+      tiles_.queue_push(tile);
     });
 
     x = tile_end_x - 1;
@@ -79,7 +79,7 @@ void Finder::process_tiles() {
   std::vector<Tile*> arriving_tiles;
 
   while (true) {
-    Tile* tile = tiles.queue_pop();
+    Tile* tile = tiles_.queue_pop();
 
     if (tile->whole()) {
       this->whole_tile = tile;
@@ -116,7 +116,7 @@ void Finder::process_tiles() {
       arriving_tiles.erase(it);
       enqueue(cluster, [this](Cluster* c) {
         Tile* merged_tile = c->merge_tiles();
-        tiles.queue_push(merged_tile);
+        tiles_.queue_push(merged_tile);
         delete c;
       });
     } else {
@@ -146,6 +146,7 @@ ProcessResult* Finder::process_info() {
   pr->groups = pr->polygons.size();
   pr->width = this->maximum_width_;
   pr->height = this->height;
+  pr->has_bounds = this->options_.bounds;
   FakeCluster fake_cluster(pr->polygons, this->options_);
   cpu_timer.start();
   fake_cluster.compress_coords(pr->polygons, this->options_);

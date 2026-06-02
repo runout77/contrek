@@ -107,6 +107,7 @@ ProcessResult* PolygonFinder::process_info() {
   pr->treemap = this->node_cluster->treemap;
   pr->width = this->source_bitmap->w();
   pr->height = this->source_bitmap->h();
+  pr->has_bounds = this->node_cluster->options->bounds;
 
   if (this->node_cluster->options->named_sequences && typeid(*this->source_bitmap) == typeid(Bitmap))
   { std::string sequence;

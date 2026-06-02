@@ -112,3 +112,7 @@ All notable changes to this project will be documented in this file.
 - **Refactored `spng.c` function `rgb8_row_to_rgba8`:** Extended a loop counter to `size_t` (previously limited to `uint32_t`), which was causing segmentation faults when reading massive images (e.g., 81920x81920).
 - **Refactored `RawBitmap.define` function:** Updated area and size calculations to use full 64-bit integers.
 - **Refactored `PolygonFinder.to_svg_stream()` function:** Optimized performance to efficiently handle massive SVG streams of 2 GB and beyond.
+
+## [1.2.7] - 2026-06-02
+### Changed
+- **Refactored `bounds` option:** Starting from this release, precalculated bounds for each polygon can now be requested in concurrent mode as well, in addition to single-threaded mode.

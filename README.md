@@ -286,6 +286,18 @@ result.points
 For pure Ruby implementations (`{ native: false }`), coordinates are always expressed as points.  
 In this case, both `polygons` and `points` return the same data, represented as hashes with `x` and `y` keys.
 
+For each returned polygon, it is possible to get its bounding box. You just need to request it as an option (`bounds`), for example:
+```ruby
+{named_sequences: true, bounds: true, compress: {uniq: true, linear: true}}
+```
+Each entry will contain the precalculated bounds key:
+```ruby
+[{:bounds=>{:min_x=>3, :max_x=>11, :min_y=>1, :max_y=>3},
+  :outer=>[{:x=>3, :y=>1}, {:x=>3, :y=>3}, {:x=>11, :y=>3}, {:x=>11, :y=>1}],
+  :inner=>[]}]
+```
+
+
 ## Metadata
 
 Metadata associated with the result can be accessed via:

@@ -172,6 +172,7 @@ class To_Ruby<ProcessResult*>
     }
     RubyResult* rr = new RubyResult();
     Rice::Data_Object<RubyResult> rb_result(rr);
+    bool inject_bounds = pr->has_bounds;
 
     Rice::Hash return_me = Rice::Hash();
     Rice::Hash benchmarks_rb;
@@ -206,12 +207,14 @@ class To_Ruby<ProcessResult*>
       }
       poly_hash[Symbol("inner")] = inner_collection;
       // BOUNDS
-      Rice::Hash bounds_hash = Rice::Hash();
-      bounds_hash[Symbol("min_x")] = x.bounds.min_x;
-      bounds_hash[Symbol("max_x")] = x.bounds.max_x;
-      bounds_hash[Symbol("min_y")] = x.bounds.min_y;
-      bounds_hash[Symbol("max_y")] = x.bounds.max_y;
-      poly_hash[Symbol("bounds")] = bounds_hash;
+      if (inject_bounds) {
+        Rice::Hash bounds_hash = Rice::Hash();
+        bounds_hash[Symbol("min_x")] = x.bounds.min_x;
+        bounds_hash[Symbol("max_x")] = x.bounds.max_x;
+        bounds_hash[Symbol("min_y")] = x.bounds.min_y;
+        bounds_hash[Symbol("max_y")] = x.bounds.max_y;
+        poly_hash[Symbol("bounds")] = bounds_hash;
+      }
 
       out.push(poly_hash);
     }

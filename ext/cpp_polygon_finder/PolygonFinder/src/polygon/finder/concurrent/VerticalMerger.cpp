@@ -21,7 +21,7 @@ VerticalMerger::VerticalMerger(int number_of_threads, std::vector<std::string> *
 
 void VerticalMerger::add_tile(ProcessResult& result)
 { transpose(result);
-  if (this->tiles.size() > 0) {
+  if (this->tiles_.size() > 0) {
     translate(result, this->current_x);
   }
   adjust(result);

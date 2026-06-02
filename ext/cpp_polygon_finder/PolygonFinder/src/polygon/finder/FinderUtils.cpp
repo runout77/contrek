@@ -108,12 +108,13 @@ void FinderUtils::sanitize_options(pf_Options& options, std::vector<std::string>
       break;
     }
   }
-  /*std::cout << "-----------" << std::endl;
+  /* std::cout << "-----------" << std::endl;
   std::cout << "versus " << options.versus << std::endl;
+  std::cout << "bounds " << options.bounds << std::endl;
   std::cout << "number_of_tiles " << options.number_of_tiles << std::endl;
   std::cout << "uniq " << options.compress_uniq << std::endl;
   std::cout << "linear " << options.compress_linear << std::endl;
   std::cout << "visvalingam " << options.compress_visvalingam << std::endl;
-  std::cout << options.compress_visvalingam_tolerance << std::endl;
-  std::cout << "-----------" << std::endl;*/
+  std::cout << "visvalingam tolernace " << options.compress_visvalingam_tolerance << std::endl;
+  std::cout << "-----------" << std::endl; */
 }

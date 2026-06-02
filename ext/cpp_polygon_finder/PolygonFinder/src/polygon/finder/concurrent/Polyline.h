@@ -52,6 +52,7 @@ class Polyline : public Partitionable {
   InnerPolyline* inside_inner_polyline = nullptr;
   std::string named();
   void set_named(std::string force_named) { this->named_ = force_named; }
+  void fill_bounds(RectBounds& target_bounds) const;
 
  private:
   std::vector<Point*> raw_;
