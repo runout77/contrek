@@ -116,3 +116,6 @@ All notable changes to this project will be documented in this file.
 ## [1.2.7] - 2026-06-02
 ### Changed
 - **Refactored `bounds` option:** Starting from this release, precalculated bounds for each polygon can now be requested in concurrent mode as well, in addition to single-threaded mode.
+
+## [1.2.8] - 2026-06-07
+- **Optimize main pixel scanning loop:** Implemented 4-way loop unrolling to maximize L1 cache hits and eliminate redundant RAM lookups via direct register bit-casting.

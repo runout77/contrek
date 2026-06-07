@@ -1,5 +1,5 @@
 # Contrek
-Contrek is a Ruby gem powered by a <u>standalone C++17 core library</u> for fast contour tracing and edge detection in PNG images and raw memory streams. It employs a **topological approach** to extract polygonal contours, representing shapes as a connected graph of shared endpoints. This ensures perfect adjacency and structural integrity for shape analysis and raster-to-vector workflows, such as PNG to SVG conversion, managed via libspng (0.7.4) with multithreading support.
+Contrek is a Ruby gem powered by a <u>[standalone C++17 core library](#-c-standalone-library-usage)</u> for fast contour tracing and edge detection in PNG images and raw memory streams. It employs a **topological approach** to extract polygonal contours, representing shapes as a connected graph of shared endpoints. This ensures perfect adjacency and structural integrity for shape analysis and raster-to-vector workflows, such as PNG to SVG conversion, managed via libspng (0.7.4) with multithreading support.
 
 
 ## About Contrek library

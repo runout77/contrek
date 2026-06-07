@@ -20,6 +20,8 @@
 #include <sstream>
 #include <stdexcept>
 #include <limits>
+#include <cstdint>
+
 #include "../bitmaps/Bitmap.h"
 #include "NodeCluster.h"
 #include "Node.h"
@@ -210,15 +212,80 @@ class PolygonFinder {
   void run_loop(M* specific_matcher, F&& fetch_color, int offset) {
     int img_h = this->source_bitmap->h();
     int bpp = this->source_bitmap->get_bytes_per_pixel();
+
     for (int y = 0; y < img_h; y++) {
       const unsigned char* row_ptr = this->source_bitmap->get_row_ptr(y);
       const unsigned char* p = row_ptr + (this->start_x * bpp);
+
       int min_x = 0;
       bool matching = false;
       unsigned char last_red_value = 0;
-      for (int x = this->start_x; x < this->end_x; x++) {
+
+      int x = this->start_x;
+
+      if (bpp == 4) {
+        for (; x <= this->end_x - 4; x += 4) {
+          // read 4 pixels (16 bytes)
+          unsigned int c0 = fetch_color(p);
+          unsigned int c1 = fetch_color(p + 4);
+          unsigned int c2 = fetch_color(p + 8);
+          unsigned int c3 = fetch_color(p + 12);
+
+          // extracts value (used as debugging segment label)
+          unsigned char v0 = static_cast<unsigned char>(c0);
+          unsigned char v1 = static_cast<unsigned char>(c1);
+          unsigned char v2 = static_cast<unsigned char>(c2);
+          unsigned char v3 = static_cast<unsigned char>(c3);
+
+          p += 16;
+
+          bool m0 = specific_matcher->match(c0);
+          bool m1 = specific_matcher->match(c1);
+          bool m2 = specific_matcher->match(c2);
+          bool m3 = specific_matcher->match(c3);
+
+          if (m0) {
+            if (!matching) {
+              min_x = x; last_red_value = v0; matching = true;
+            }
+          } else if (matching) {
+            this->node_cluster->add_node(min_x, x - 1, y, last_red_value, offset);
+            matching = false;
+          }
+
+          if (m1) {
+            if (!matching) {
+              min_x = x + 1; last_red_value = v1; matching = true;
+            }
+          } else if (matching) {
+            this->node_cluster->add_node(min_x, x, y, last_red_value, offset);
+            matching = false;
+          }
+
+          if (m2) {
+            if (!matching) {
+              min_x = x + 2; last_red_value = v2; matching = true;
+            }
+          } else if (matching) {
+            this->node_cluster->add_node(min_x, x + 1, y, last_red_value, offset);
+            matching = false;
+          }
+
+          if (m3) {
+            if (!matching) {
+              min_x = x + 3; last_red_value = v3; matching = true;
+            }
+          } else if (matching) {
+            this->node_cluster->add_node(min_x, x + 2, y, last_red_value, offset);
+            matching = false;
+          }
+        }
+      }
+
+      // remaining pixels (width not a multiple of 4)
+      for (; x < this->end_x; x++) {
         unsigned int color = fetch_color(p);
-        unsigned char current_val = p[0];
+        unsigned char current_val = static_cast<unsigned char>(color);
         p += bpp;
         if (specific_matcher->match(color)) {
           if (!matching) {
@@ -226,14 +293,14 @@ class PolygonFinder {
             last_red_value = current_val;
             matching = true;
           }
-          if (x == this->end_x - 1) {
-            this->node_cluster->add_node(min_x, x, y, last_red_value, offset);
-            matching = false;
-          }
         } else if (matching) {
           this->node_cluster->add_node(min_x, x - 1, y, last_red_value, offset);
           matching = false;
         }
+      }
+
+      if (matching) {
+        this->node_cluster->add_node(min_x, this->end_x - 1, y, last_red_value, offset);
       }
     }
   }
