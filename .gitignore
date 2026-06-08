@@ -3,6 +3,7 @@
 .ruby-version
 # rspec failure tracking
 .rspec_status
+/spec/files/performance_history.json
 
 /ext/cpp_polygon_finder/PolygonFinder/build/
 /ext/cpp_polygon_finder/PolygonFinder/contrek

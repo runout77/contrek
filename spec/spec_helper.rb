@@ -5,6 +5,9 @@ require "digest"
 require "tempfile"
 require "ruby-prof"
 
+# Normal execution => bundle exec rspec
+# With performance => PERF=1 bundle exec rspec
+# Only performance => PERF=1 bundle exec rspec --tag performance
 RSpec.configure do |config|
   # config.before(:example) do |example|
   #  puts "Running: #{example.full_description}"
@@ -12,7 +15,7 @@ RSpec.configure do |config|
   Dir["./spec/support/**/*.rb"].sort.each { |f| require f }
   # Enable flags like --only-failures and --next-failure
   config.example_status_persistence_file_path = ".rspec_status"
-
+  config.filter_run_excluding performance: true unless ENV["PERF"]
   # Disable RSpec exposing methods globally on `Module` and `main`
   config.disable_monkey_patching!
 

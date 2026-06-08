@@ -100,4 +100,8 @@ RSpec.describe Contrek::Cpp::CPPConcurrentFinder, type: :class do
   describe "shared_test" do
     include_examples "generic"
   end
+
+  describe "shared_test" do
+    include_examples "performances"
+  end
 end

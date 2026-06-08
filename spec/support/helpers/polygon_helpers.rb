@@ -6,7 +6,6 @@ module PolygonHelpers
   end
 end
 
-# Attiva l’helper nei test
 RSpec.configure do |config|
   config.include PolygonHelpers
 end
