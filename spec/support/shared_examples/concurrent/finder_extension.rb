@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 RSpec.shared_examples "finder_extension" do
   describe "various complex cases" do
     it "case during cpp porting 2" do

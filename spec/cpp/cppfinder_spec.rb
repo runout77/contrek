@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 RSpec.describe Contrek::Cpp::CPPConcurrentFinder, type: :class do
   before do
     @matcher = CPPValueNotMatcher.new(" ")

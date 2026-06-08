@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 RSpec.describe CPPPolygonFinder, type: :class do
   describe "CPPPolygonFinder on image" do
     it "trace contourn on sample image" do

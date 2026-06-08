@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 RSpec.describe Contrek, type: :class do
   describe "shape finder" do
     it "trace contour" do

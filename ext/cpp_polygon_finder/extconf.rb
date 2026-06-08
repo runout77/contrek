@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "mkmf-rice"
 
 has_tcmalloc = find_library("tcmalloc", "malloc")

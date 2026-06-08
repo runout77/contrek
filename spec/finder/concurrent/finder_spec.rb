@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 RSpec.describe Contrek::Concurrent::Finder, type: :class do
   before do
     @ruby_bitmap_class = Contrek::Bitmaps::ChunkyBitmap

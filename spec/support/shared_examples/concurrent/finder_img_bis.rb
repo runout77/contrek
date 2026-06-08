@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 RSpec.shared_examples "finder_img_bis" do
   describe "various image cases part 2" do
     it "divides image into large number of tiles (1200x800) clockwise" do

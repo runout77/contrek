@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "contrek/version"
 require "contrek/bitmaps/painting"
 require "contrek/bitmaps/bitmap"

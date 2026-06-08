@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 RSpec.describe Map::MercatorProjection, type: :class do
   describe "center test" do
     it "verifies constants" do

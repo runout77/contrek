@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 # rubocop:disable Layout/ArrayAlignment, Layout/FirstArrayElementIndentation
 RSpec.shared_examples "finder" do
   describe "various simple cases" do

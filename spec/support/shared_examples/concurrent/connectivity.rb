@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 RSpec.shared_examples "connectivity" do
   describe "various cases" do
     it "connections 8 case 0" do

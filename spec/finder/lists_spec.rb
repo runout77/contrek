@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 RSpec.describe Contrek::Finder::List, type: :class do
   describe "List class" do
     it "grab" do

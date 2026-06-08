@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 RSpec.shared_examples "finder_img" do
   describe "various image cases" do
     it "divides large image into growing number of tiles" do

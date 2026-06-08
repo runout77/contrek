@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 class TestClass
   prepend Contrek::Concurrent::Poolable
 
