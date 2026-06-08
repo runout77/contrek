@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 RSpec.describe Contrek::Finder::Node, type: :class do
   describe "Node class" do
     it "verify constants" do

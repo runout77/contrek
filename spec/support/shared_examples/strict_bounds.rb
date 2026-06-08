@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 RSpec.shared_examples "strict_bounds" do
   describe "simple cases" do
     it "strict bounds mode versus o up" do

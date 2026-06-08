@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 RSpec.shared_examples "concurrent_treemap" do
   describe "merges treemaps" do
     it "case 1" do

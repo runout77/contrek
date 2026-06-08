@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 RSpec.shared_examples "multiprocessing" do
   describe "various multithreading cases" do
     it "works with 8 thread and 8 tiles" do

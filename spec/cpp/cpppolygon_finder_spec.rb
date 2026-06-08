@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 RSpec.describe CPPPolygonFinder, type: :class do
   before do
     @matcher = CPPValueNotMatcher.new(" ")

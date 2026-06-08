@@ -1,0 +1,11 @@
+AllCops:
+  DisabledByDefault: true
+  TargetRubyVersion: 3.1
+  Exclude:
+    - 'bin/**/*'
+    - 'vendor/**/*'
+
+# Attiva l'obbligo del magic comment
+Style/FrozenStringLiteralComment:
+  Enabled: true
+  EnforcedStyle: always

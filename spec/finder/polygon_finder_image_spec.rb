@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 RSpec.describe Contrek::Finder::PolygonFinder, type: :class do
   describe "PolygonFinder on image" do
     it "trace contourn on sample image" do

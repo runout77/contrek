@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Contrek
   module Finder
     class NodeCluster
@@ -286,7 +287,7 @@ module Contrek
         @root_nodes << node
 
         if node.y > 0
-          # all nodes untle up_node.max_x >= node.min_x
+          # all nodes until up_node.max_x >= node.min_x
           up_nodes = @vert_nodes[node.y - 1]
           up_nodes_count = up_nodes.size
           if up_nodes_count > 0

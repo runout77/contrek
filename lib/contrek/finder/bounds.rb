@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 Bounds = Struct.new(:min_x, :max_x, :min_y, :max_y) do
   def self.empty
     new(Float::INFINITY, -Float::INFINITY, Float::INFINITY, -Float::INFINITY)

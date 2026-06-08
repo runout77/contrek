@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Map
   class MercatorProjection
     MERCATOR_RANGE = 256

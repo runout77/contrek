@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # https://bost.ocks.org/mike/simplify/
 # https://github.com/metteo/jts/blob/master/jts-core/src/main/java/com/vividsolutions/jts/simplify/VWLineSimplifier.java
 

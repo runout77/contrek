@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "yaml"
 RSpec.shared_examples "complex" do
   describe "simple cases" do

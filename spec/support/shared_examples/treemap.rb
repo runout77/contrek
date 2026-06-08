@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 RSpec.shared_examples "treemap" do
   describe "simple cases" do
     it "scans 3 level 1" do

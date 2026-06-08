@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 RSpec.describe Contrek::Bitmaps::RgbCppColor, type: :class do
   describe "rgb color" do
     it "initializes rgb color struct (ABGR)" do

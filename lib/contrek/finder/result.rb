@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Contrek
   module Finder
     Result = Struct.new(:polygons, :metadata) do

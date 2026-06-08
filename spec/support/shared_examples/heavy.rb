@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 RSpec.shared_examples "heavy" do
   describe "simple cases" do
     it "scans poly 1160x772", sample_1160x772: true do

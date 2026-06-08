@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 RSpec.shared_examples "simples" do
   describe "simple cases" do
     it "detects only one sequence" do

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 RSpec.describe Contrek::Finder::PolygonFinder, type: :class do
   before do
     @rows = 10

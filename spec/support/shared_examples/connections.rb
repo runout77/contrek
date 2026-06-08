@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 RSpec.shared_examples "connections" do
   describe "simple cases" do
     it "supports 8 connections" do
