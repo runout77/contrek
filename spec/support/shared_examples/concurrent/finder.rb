@@ -2612,6 +2612,89 @@ RSpec.shared_examples "finder" do
       expect(result.metadata[:height]).to eq(599)
       expect(result.points).to match_expected_polygons("graphs_1024x300.png", number_of_tiles: 2)
     end
+
+    it "progressive merging on disk" do
+      stripe1 = "00000000        " \
+                "00000000        " \
+                "00    00        " \
+                "00000000  000000" \
+                "00000000  000000" \
+                "          00  00"
+      stripe2 = "          00  00" \
+                "          00  00" \
+                "0000000   00  00" \
+                "0000000   000000" \
+                "00   00   000000" \
+                "00   00         "
+      stripe3 = "00   00         " \
+                "00   00  0000000" \
+                "00   00  0000000" \
+                "00   00  00   00" \
+                "00   00  00   00" \
+                "00   00  0000000" \
+                "00   00  0000000" \
+                "00   00         "
+      stripe4 = "00   00         " \
+                "00   00         " \
+                "00   00         " \
+                "00   00         " \
+                "0000000         " \
+                "0000000         "
+      # non streaming pattern
+      stripe1_result = @simple_polygon_finder.new(@bitmap_class.new(stripe1, 16),
+        @matcher,
+        nil,
+        {versus: :o, bounds: true, strict_bounds: true}).process_info
+      stripe2_result = @simple_polygon_finder.new(@bitmap_class.new(stripe2, 16),
+        @matcher,
+        nil,
+        {versus: :o, bounds: true, strict_bounds: true}).process_info
+      stripe3_result = @simple_polygon_finder.new(@bitmap_class.new(stripe3, 16),
+        @matcher,
+        nil,
+        {versus: :o, bounds: true, strict_bounds: true}).process_info
+      stripe4_result = @simple_polygon_finder.new(@bitmap_class.new(stripe4, 16),
+        @matcher,
+        nil,
+        {versus: :o, bounds: true, strict_bounds: true}).process_info
+      step_finder = @vertical_merger.new(options: {compress: {uniq: true, linear: true}})
+      step_finder.add_tile(stripe1_result)
+      step_finder.add_tile(stripe2_result)
+      step_finder.add_tile(stripe3_result)
+      step_finder.add_tile(stripe4_result)
+      result = step_finder.process_info
+      expect(result.metadata[:width]).to eq(16)
+      expect(result.metadata[:height]).to eq(23)
+      expect(result.points).to eq([{outer: [{x: 7, y: 1}, {x: 7, y: 4}, {x: 0, y: 4}, {x: 0, y: 0}, {x: 7, y: 0}], inner: [[{x: 6, y: 1}, {x: 1, y: 1}, {x: 1, y: 3}, {x: 6, y: 3}, {x: 6, y: 2}]]}, {outer: [{x: 15, y: 4}, {x: 15, y: 9}, {x: 10, y: 9}, {x: 10, y: 3}, {x: 15, y: 3}], inner: [[{x: 14, y: 4}, {x: 11, y: 4}, {x: 11, y: 8}, {x: 14, y: 8}, {x: 14, y: 5}]]}, {outer: [{x: 6, y: 8}, {x: 6, y: 22}, {x: 0, y: 22}, {x: 0, y: 7}, {x: 6, y: 7}], inner: [[{x: 5, y: 9}, {x: 5, y: 8}, {x: 1, y: 8}, {x: 1, y: 21}, {x: 5, y: 21}, {x: 5, y: 10}]]}, {outer: [{x: 15, y: 12}, {x: 15, y: 16}, {x: 9, y: 16}, {x: 9, y: 11}, {x: 15, y: 11}], inner: [[{x: 14, y: 12}, {x: 10, y: 12}, {x: 10, y: 15}, {x: 14, y: 15}, {x: 14, y: 13}]]}])
+
+      # streaming to svg file pattern
+      stripes = [stripe1, stripe2, stripe3, stripe4]
+      width = result.metadata[:width]
+      height = result.metadata[:height]
+      shared_stream = @streaming_file.new("output.svg")
+      v_merger_options = {bounds: true, compress: {uniq: true, linear: true}}
+      step_finder = @streaming_merger.new(
+        options: v_merger_options,
+        stream_to: shared_stream,
+        total_width: width,
+        total_height: height
+      )
+      stripes.each do |stripe|
+        stripe_result = @simple_polygon_finder.new(@bitmap_class.new(stripe, 16),
+          @matcher,
+          nil,
+          {versus: :o, bounds: true, strict_bounds: true, compress: {uniq: true, linear: true}}).process_info
+        last = stripes.last == stripe
+        step_finder.add_tile(stripe_result, last)
+      end
+      result = step_finder.process_info
+      expect(result.metadata[:groups]).to eq(4)
+      expect(result.metadata[:width]).to eq(16)
+      expect(result.metadata[:height]).to eq(23)
+      expect(result.points).to be_empty # all polygons are on file
+      shared_stream.rewind
+      expect(shared_stream.read).to match_expected_svg("test_#{width}x#{height}", number_of_tiles: stripes.count)
+    end
   end
 end
 # rubocop:enable Layout/ArrayAlignment, Layout/FirstArrayElementIndentation

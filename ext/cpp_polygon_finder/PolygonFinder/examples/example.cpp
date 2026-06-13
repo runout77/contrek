@@ -26,7 +26,8 @@ void run_test() {
   // test_suite.test_g();
   // test_suite.test_h();
   // test_suite.test_i();
-  std::cout << "compute time =" << cpu_timer.stop() << std::endl;
+  // test_suite.test_l();
+  std::cout << "compute time = " << cpu_timer.stop() << std::endl;
 }
 
 int main() {
@@ -35,6 +36,7 @@ int main() {
       "tcmalloc.max_total_thread_cache_bytes",
       1024 * 1024 * 1024);
   #endif
+
   Contrek::Config cfg;
   cfg.threads = 8;
   cfg.tiles = 8;
@@ -51,7 +53,7 @@ int main() {
   result->print_info();
   std::cout << "Found polygons: " << result->groups << std::endl;
   std::cout << "Time: " << cpu_timer.stop() << " ms" << std::endl;
-  // result->save_svg("output.svg");
+  // result->save_svg("output.svg");*/
 
   // run_test();
   return 0;

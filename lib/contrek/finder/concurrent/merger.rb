@@ -3,6 +3,7 @@
 module Contrek
   module Concurrent
     class Merger < Finder
+      attr_reader :tiles
       prepend Poolable
 
       def initialize(options: {})

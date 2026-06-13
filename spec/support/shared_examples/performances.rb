@@ -67,6 +67,6 @@ RSpec.shared_examples "performances" do
       ).process_info
     end
     puts result.metadata[:benchmarks].inspect
-    expect(result.to_svg).to match_expected_svg(filename, number_of_tiles: workers, store_svg: true)
+    expect(result.to_svg).to match_expected_svg(filename, number_of_tiles: workers)
   end
 end

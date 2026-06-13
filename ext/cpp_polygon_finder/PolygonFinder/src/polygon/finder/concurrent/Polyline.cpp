@@ -21,7 +21,7 @@ Polyline::Polyline(Tile* tile, const std::vector<Point*>& polygon, const std::op
   tile(tile)
 { if (bounds.has_value()) {
     min_x =  bounds->min_x;
-    max_x = bounds->max_x;
+    max_x_ = bounds->max_x;
     min_y_ =  bounds->min_y;
     max_y_ = bounds->max_y;
   } else {
@@ -32,17 +32,17 @@ Polyline::Polyline(Tile* tile, const std::vector<Point*>& polygon, const std::op
 
 int Polyline::width() {
   if (raw_.empty()) return 0;
-  return(max_x - min_x);
+  return(max_x_ - min_x);
 }
 
 bool Polyline::boundary() {
-  return( tile->tg_border(Point{min_x, 0}) || tile->tg_border(Point{max_x, 0}));
+  return( tile->tg_border(Point{min_x, 0}) || tile->tg_border(Point{max_x_, 0}));
 }
 
 void Polyline::find_boundary() {
   if (raw_.empty()) return;
   min_x =  std::numeric_limits<int>::max();
-  max_x = -std::numeric_limits<int>::max();
+  max_x_ = -std::numeric_limits<int>::max();
   min_y_ =  std::numeric_limits<int>::max();
   max_y_ = -std::numeric_limits<int>::max();
   for (Point* p : raw_) {
@@ -50,7 +50,7 @@ void Polyline::find_boundary() {
     int x = p->x;
     int y = p->y;
     if (x < min_x) min_x = x;
-    if (x > max_x) max_x = x;
+    if (x > max_x_) max_x_ = x;
     if (y < min_y_) min_y_ = y;
     if (y > max_y_) max_y_ = y;
   }
@@ -98,7 +98,7 @@ std::string Polyline::named() {
 
 void Polyline::fill_bounds(RectBounds& target_bounds) const {
   target_bounds.min_x = this->min_x;
-  target_bounds.max_x = this->max_x;
+  target_bounds.max_x = this->max_x_;
   target_bounds.min_y = this->min_y_;
   target_bounds.max_y = this->max_y_;
 }

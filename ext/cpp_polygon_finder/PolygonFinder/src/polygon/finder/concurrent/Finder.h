@@ -35,7 +35,6 @@ class Finder : public Poolable {
   Matcher *matcher;
   pf_Options options_;
   std::vector<std::string> input_options;
-  Tile* whole_tile = nullptr;
   std::queue<ClippedPolygonFinder*> finders;
   std::mutex finders_mutex;
   std::map<std::string, double> reports;
@@ -45,6 +44,7 @@ class Finder : public Poolable {
   Queue<Tile*> tiles_;
   int maximum_width_;
   int height = 0;
+  Tile* whole_tile = nullptr;
   void process_tiles();
 
  public:

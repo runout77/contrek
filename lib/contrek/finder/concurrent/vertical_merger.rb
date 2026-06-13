@@ -12,8 +12,8 @@ module Contrek
         super
       end
 
-      def process_info
-        transpose(super)
+      def process_info(flush: false)
+        transpose(super())
       end
 
       private

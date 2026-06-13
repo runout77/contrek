@@ -96,6 +96,8 @@
 #include "PolygonFinder/src/polygon/finder/concurrent/HorizontalMerger.cpp"
 #include "PolygonFinder/src/polygon/finder/concurrent/VerticalMerger.h"
 #include "PolygonFinder/src/polygon/finder/concurrent/VerticalMerger.cpp"
+#include "PolygonFinder/src/polygon/finder/concurrent/StreamingMerger.h"
+#include "PolygonFinder/src/polygon/finder/concurrent/StreamingMerger.cpp"
 #include "PolygonFinder/src/polygon/finder/concurrent/ShapePool.h"
 #include "PolygonFinder/src/polygon/finder/concurrent/ShapePool.cpp"
 extern "C" {
@@ -290,6 +292,36 @@ ProcessResult ruby_result_to_process_result(Rice::Object rb_result) {
 
 }  // namespace Rice::detail
 
+struct OfstreamWrapper {
+  std::string path;
+  std::ofstream stream;
+  OfstreamWrapper(std::string p) : path(p), stream(p, std::ios::out) {}
+  void close() { stream.close(); }
+  bool closed() { return !stream.is_open(); }
+  void rewind() { /* noop */ }
+  std::string read() {
+    stream.flush();
+    std::ifstream in(path);
+    return std::string((std::istreambuf_iterator<char>(in)),
+                        std::istreambuf_iterator<char>());
+  }
+  std::ofstream& get_stream() { return stream; }
+};
+
+StreamingMerger* create_streaming_merger(Object self,
+                                         int number_of_threads,
+                                         std::vector<std::string>* options,
+                                         Object stream_obj,
+                                         int total_width,
+                                         int total_height) {
+  OfstreamWrapper* wrapper = Rice::detail::From_Ruby<OfstreamWrapper*>().convert(stream_obj.value());
+  return new StreamingMerger(number_of_threads, options, &wrapper->get_stream(), total_width, total_height);
+}
+
+OfstreamWrapper* create_ofstream(Object self, std::string path) {
+  return new OfstreamWrapper(path);
+}
+
 extern "C"
 void Init_cpp_polygon_finder() {
   #ifdef HAVE_TCMALLOC
@@ -384,9 +416,27 @@ void Init_cpp_polygon_finder() {
     define_class<HorizontalMerger, Merger>("CPPHorizontalMerger")
     .define_constructor(Constructor<HorizontalMerger, int, std::vector<std::string>*>(), Arg("number_of_threads"), Arg("options") = nullptr, Arg("yield_gvl") = true);
 
-    Data_Type<VerticalMerger> rb_cVerticalMerger =
+  Data_Type<VerticalMerger> rb_cVerticalMerger =
     define_class<VerticalMerger, Merger>("CPPVerticalMerger")
-    .define_constructor(Constructor<VerticalMerger, int, std::vector<std::string>*>(), Arg("number_of_threads"), Arg("options") = nullptr, Arg("yield_gvl") = true);
+    .define_constructor(Constructor<VerticalMerger, int, std::vector<std::string>*>(), Arg("number_of_threads"), Arg("options") = nullptr, Arg("yield_gvl") = true)
+    .define_method("add_tile", [](VerticalMerger& self, Object rb_result) {
+      ProcessResult pr = Rice::detail::ruby_result_to_process_result(rb_result);
+      self.add_tile(pr);
+        });
+
+  Data_Type<OfstreamWrapper> rb_cstd_ofstream = define_class<OfstreamWrapper>("CPPOfstream");
+    rb_cstd_ofstream.define_singleton_method("new", &create_ofstream);
+    rb_cstd_ofstream.define_method("close",   [](OfstreamWrapper& self) { self.close(); });
+    rb_cstd_ofstream.define_method("closed?", [](OfstreamWrapper& self) { return self.closed(); });
+    rb_cstd_ofstream.define_method("rewind",  [](OfstreamWrapper& self) { self.rewind(); });
+    rb_cstd_ofstream.define_method("read",    [](OfstreamWrapper& self) { return self.read(); });
+
+  Data_Type<StreamingMerger> rb_cstreaming_merger = define_class<StreamingMerger, VerticalMerger>("CPPStreamingMerger");
+    rb_cstreaming_merger.define_method("add_tile", [](StreamingMerger& self, Object rb_result, bool flush) {
+      ProcessResult pr = Rice::detail::ruby_result_to_process_result(rb_result);
+      self.add_tile(pr, flush);
+    });
+    rb_cstreaming_merger.define_singleton_method("new", &create_streaming_merger);
 
   Module mContrek = define_module("Contrek");
   Module mCpp = define_module_under(mContrek, "Cpp");

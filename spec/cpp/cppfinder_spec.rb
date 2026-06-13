@@ -13,7 +13,9 @@ RSpec.describe Contrek::Cpp::CPPConcurrentFinder, type: :class do
     @simple_polygon_finder = CPPPolygonFinder
     @merger = Contrek::Cpp::CPPConcurrentHorizontalMerger
     @vertical_merger = Contrek::Cpp::CPPConcurrentVerticalMerger
+    @streaming_merger = Contrek::Cpp::CPPConcurrentStreamingMerger
     @result = Contrek::Cpp::CPPResult
+    @streaming_file = Contrek::Cpp::CPPTempfile
   end
 
   describe "base tests", base: true do
