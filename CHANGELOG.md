@@ -119,3 +119,6 @@ All notable changes to this project will be documented in this file.
 
 ## [1.2.8] - 2026-06-07
 - **Optimize main pixel scanning loop:** Implemented 4-way loop unrolling to maximize L1 cache hits and eliminate redundant RAM lookups via direct register bit-casting.
+
+## [1.2.9] - 2026-06-13
+- **Streaming merger:** The streaming merger class extends VerticalMerger and adds a useful feature: the progressive extraction of contours into a disk buffer (SVG file). In this way, all extracted polygons that are no longer within the junction zone of the next stripe are removed from the system and streamed directly to disk. This incredibly reduces memory consumption, allowing the processing of very large files on machines with low memory availability, at the expense of increased processing times. An example of this technique is available in both C++ and Ruby in the repository.
