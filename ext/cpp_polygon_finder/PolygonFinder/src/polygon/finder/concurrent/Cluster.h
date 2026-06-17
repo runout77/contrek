@@ -31,7 +31,7 @@ class Cluster {
   Tile* merge_tiles();
   const std::vector<Tile*> tiles() const { return tiles_; }
   Hub* hub() { return hub_; }
-  static void list_to_string(std::vector<Point*> list);
+  static void list_to_string(std::vector<Point> list);
   PartPool parts_pool;
   std::deque<Position> positions_pool;
   const Finder* finder() const { return finder_; };

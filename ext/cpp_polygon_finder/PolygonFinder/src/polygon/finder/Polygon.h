@@ -14,8 +14,8 @@
 #include "RectBounds.h"
 
 struct Polygon {
-  std::vector<Point*> outer;
-  std::list<std::vector<Point*>> inner;
+  std::vector<Point> outer;
+  std::list<std::vector<Point>> inner;
   RectBounds bounds;
   Polygon() : bounds(RectBounds::empty()) {}
 };

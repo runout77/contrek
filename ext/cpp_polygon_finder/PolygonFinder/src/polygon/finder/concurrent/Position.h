@@ -17,7 +17,7 @@ class EndPoint;
 class Hub;
 class Position : public QNode<Point>{
  public:
-  explicit Position(Hub* hub, Point* point);
+  explicit Position(Hub* hub, const Point& point);
   explicit Position(EndPoint* end_point);
   EndPoint* end_point() { return end_point_; }
   void before_rem(Queueable<Point>* q) override;

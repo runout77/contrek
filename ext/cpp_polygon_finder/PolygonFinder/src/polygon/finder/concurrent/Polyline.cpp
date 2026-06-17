@@ -16,8 +16,8 @@
 #include "Tile.h"
 #include "Shape.h"
 
-Polyline::Polyline(Tile* tile, const std::vector<Point*>& polygon, const std::optional<RectBounds>& bounds)
-: raw_(polygon),
+Polyline::Polyline(Tile* tile, std::vector<Point> polygon, const std::optional<RectBounds>& bounds)
+: raw_(std::move(polygon)),
   tile(tile)
 { if (bounds.has_value()) {
     min_x =  bounds->min_x;
@@ -45,10 +45,9 @@ void Polyline::find_boundary() {
   max_x_ = -std::numeric_limits<int>::max();
   min_y_ =  std::numeric_limits<int>::max();
   max_y_ = -std::numeric_limits<int>::max();
-  for (Point* p : raw_) {
-    if (!p) continue;
-    int x = p->x;
-    int y = p->y;
+  for (const Point& p : raw_) {
+    int x = p.x;
+    int y = p.y;
     if (x < min_x) min_x = x;
     if (x > max_x_) max_x_ = x;
     if (y < min_y_) min_y_ = y;
@@ -68,17 +67,17 @@ bool Polyline::vert_bounds_intersect(Bounds& vertical_bounds)
 { return !(this->max_y_ < vertical_bounds.min || vertical_bounds.max < this->min_y_);
 }
 
-bool Polyline::within(std::vector<Point*>& points) {
+bool Polyline::within(std::vector<Point>& points) {
   size_t n = points.size();
   if (n < 3) return false;
-  const int tx = this->raw_[0]->x;
-  const int ty = this->raw_[0]->y;
+  const int tx = this->raw_[0].x;
+  const int ty = this->raw_[0].y;
   bool inside = false;
   for (size_t i = 0, j = n - 1; i < n; j = i++) {
-    const Point* pi = points[i];
-    const Point* pj = points[j];
-    if (((pi->y > ty) != (pj->y > ty)) &&
-        (tx < (pj->x - pi->x) * (ty - pi->y) / (pj->y - pi->y) + pi->x)) {
+    const Point& pi = points[i];
+    const Point& pj = points[j];
+    if (((pi.y > ty) != (pj.y > ty)) &&
+        (tx < (pj.x - pi.x) * (ty - pi.y) / (pj.y - pi.y) + pi.x)) {
       inside = !inside;
     }
   }

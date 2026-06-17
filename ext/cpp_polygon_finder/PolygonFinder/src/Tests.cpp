@@ -60,16 +60,16 @@ void Tests::test_a()
   std::vector<int> array_compare;
 
   for (const auto& x : o->polygons)
-  { for (const Point* p : x.outer) {
-      array_compare.push_back(p->x);
-      array_compare.push_back(p->y);
+  { for (const Point& p : x.outer) {
+      array_compare.push_back(p.x);
+      array_compare.push_back(p.y);
     }
     if (outer_array != array_compare) throw std::runtime_error("Wrong OUTER results!");
     array_compare.clear();
     for (const auto& z : x.inner)
-    { for (const Point* y : z)
-      { array_compare.push_back(y->x);
-        array_compare.push_back(y->y);
+    { for (const Point& y : z)
+      { array_compare.push_back(y.x);
+        array_compare.push_back(y.y);
       }
     }
     if (inner_array != array_compare) throw std::runtime_error("Wrong INNER results!");
@@ -97,9 +97,9 @@ void Tests::test_b()
 
 void Tests::test_c()
 { Sequence sequence;
-  Point* p1 = new Point({1, 1});
-  Point* p2 = new Point({2, 2});
-  Point* p3 = new Point({3, 3});
+  Point p1{1, 1};
+  Point p2{2, 2};
+  Point p3{3, 3};
 
   Hub* hub = new Hub(4);
 
@@ -114,7 +114,7 @@ void Tests::test_c()
   if (sequence.size != 3) throw std::runtime_error("Wrong sequence size");
 
   // iterator() initially gives head
-  Point* head = sequence.head->payload;
+  const Point& head = sequence.head->payload;
   if (head != p1) throw std::runtime_error("Wrong head");
   if (sequence.iterator()->payload != p1) throw std::runtime_error("Wrong iterator to head");
   if (sequence.iterator() != pos1) throw std::runtime_error("Wrong iterator to head");
@@ -134,10 +134,6 @@ void Tests::test_c()
   // rewind
   sequence.rewind();
   if (sequence.iterator()->payload != p1) throw std::runtime_error("Wrong iterator to head");
-
-  delete p1;
-  delete p2;
-  delete p3;
 
   delete hub;
 
@@ -348,10 +344,8 @@ void stream_png_image(const std::string& filepath, uint32_t stripe_height, bool 
       ProcessResult *result = polygon_finder.process_info();
       if (result) {
         std::cout << "stripe " << stripe_count << ": found polygons " << result->groups << std::endl;
-        ProcessResult* safe_result = result->clone();
-        result_clones.push_back(safe_result);
-        vmerger.add_tile(*safe_result);
-        delete result;
+        result_clones.push_back(result);
+        vmerger.add_tile(*result);
       }
       stripe_count++;
     }
@@ -467,10 +461,8 @@ void stream_progressive_png_image(const std::string& filepath, uint32_t stripe_h
         ProcessResult *result = polygon_finder.process_info();
         if (result) {
           std::cout << "stripe " << stripe_count << ": found polygons " << result->groups << std::endl;
-          ProcessResult* safe_result = result->clone();
-          result_clones.push_back(safe_result);
-          vmerger.add_tile(*safe_result, !(current_y_offset + stripe_height < total_height));
-          delete result;
+          result_clones.push_back(result);
+          vmerger.add_tile(*result, !(current_y_offset + stripe_height < total_height));
         }
         stripe_count++;
       }

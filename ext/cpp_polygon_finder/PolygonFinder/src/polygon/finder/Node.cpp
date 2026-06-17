@@ -100,33 +100,31 @@ Node* Node::my_next_outer(Node *last, int versus) {
   return get_tangent_node_by_virtual_index(this->tangs_sequence[last_node_index]);
 }
 
-Point* Node::coords_entering_to(Node *enter_to, int mode, int tracking) {
+Point Node::coords_entering_to(Node *enter_to, int mode, int tracking) {
   int enter_to_index;
   if (enter_to->y < this->y) enter_to_index = enter_to->abs_x_index + this->up_indexer;
   else                       enter_to_index = this->down_indexer - enter_to->abs_x_index;
 
   int tg_index = this->tangs_sequence[enter_to_index];
-  Point* point;
   if (tg_index < 0) {
     Node& node_up = cluster->vert_nodes[y + T_UP][-(tg_index + 1)];
     if (mode == Node::A) {
       enter_to->track |= TURNER[tracking][OMAX - 1];
-      point = &node_up.end_point;
+      return node_up.end_point;
     } else {
       enter_to->track |= TURNER[tracking][OMIN - 1];
-      point = &node_up.start_point;
+      return node_up.start_point;
     }
   } else {
     Node& node_down = cluster->vert_nodes[y + T_DOWN][tg_index];
     if (mode == Node::A) {
       enter_to->track |= TURNER[tracking][OMIN - 1];
-      point = &node_down.start_point;
+      return node_down.start_point;
     } else {
       enter_to->track |= TURNER[tracking][OMAX - 1];
-      point = &node_down.end_point;
+      return node_down.end_point;
     }
   }
-  return point;
 }
 
 Node* Node::get_tangent_node_by_virtual_index(int virtual_index) {

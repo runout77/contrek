@@ -67,7 +67,6 @@ struct ProcessResult {
   std::list<Polygon> polygons;
   std::string named_sequence;
   std::vector<std::pair<int, int>> treemap;
-  std::vector<Point> cloned_points_storage;
 
   void draw_on_bitmap(RawBitmap& canvas) const;
 
@@ -75,12 +74,12 @@ struct ProcessResult {
     int counter = 0;
     for (const auto& polygon : polygons) {
       std::cout << counter << " - " << "outer" << "\n";
-      for (const Point* p : polygon.outer) std::cout << p->toString();
+      for (const Point& p : polygon.outer) std::cout << p.toString();
       bool first = true;
       for (const auto& seq : polygon.inner) {
         if (!first) std::cout << "\n";
         first = false;
-        for (const Point* p : seq) std::cout << p->toString();
+        for (const Point& p : seq) std::cout << p.toString();
       }
       std::cout << "\n" << polygon.bounds.to_string() <<"\n";
       counter++;
@@ -96,60 +95,13 @@ struct ProcessResult {
 
   void translate(int x) {
     for (auto& polygon : polygons) {
-      for (Point* p : polygon.outer) p->x += x;
-      for (const auto& seq : polygon.inner) {
-        for (Point* p : seq) p->x += x;
+      for (Point& p : polygon.outer) p.x += x;
+      for (auto& seq : polygon.inner) {
+        for (Point& p : seq) p.x += x;
       }
       polygon.bounds.min_x += x;
       polygon.bounds.max_x += x;
     }
-  }
-
-  ProcessResult* clone() const {
-    ProcessResult* new_res = new ProcessResult();
-    new_res->groups = this->groups;
-    new_res->width = this->width;
-    new_res->height = this->height;
-    new_res->benchmarks = this->benchmarks;
-    new_res->named_sequence = this->named_sequence;
-    new_res->treemap = this->treemap;
-    new_res->versus = this->versus;
-
-    size_t estimated_points = 0;
-    for (const auto& poly : this->polygons) {
-      estimated_points += poly.outer.size();
-      for (const auto& seq : poly.inner) estimated_points += seq.size();
-    }
-    new_res->cloned_points_storage.reserve(estimated_points);
-
-    for (const auto& poly : this->polygons) {
-      Polygon new_poly;
-      new_poly.bounds = poly.bounds;
-      new_poly.outer.reserve(poly.outer.size());
-      // outer
-      for (const Point* p : poly.outer) {
-        if (p) {
-          new_res->cloned_points_storage.push_back(Point(p->x, p->y));
-          size_t idx = new_res->cloned_points_storage.size() - 1;
-          new_poly.outer.push_back(&new_res->cloned_points_storage[idx]);
-        }
-      }
-      // inner
-      for (const auto& seq : poly.inner) {
-        std::vector<Point*> new_seq;
-        new_seq.reserve(seq.size());
-        for (const Point* p : seq) {
-          if (p) {
-            new_res->cloned_points_storage.push_back(Point(p->x, p->y));
-            size_t idx = new_res->cloned_points_storage.size() - 1;
-            new_seq.push_back(&new_res->cloned_points_storage[idx]);
-          }
-        }
-        new_poly.inner.push_back(new_seq);
-      }
-      new_res->polygons.push_back(new_poly);
-    }
-    return new_res;
   }
 
   void to_svg_stream(std::ostream& os) const {
@@ -160,11 +112,10 @@ struct ProcessResult {
       if (!poly.outer.empty()) {
         os << "<polygon points=\"";
         bool first = true;
-        for (const Point* p : poly.outer) {
-          if (!p) continue;
+        for (const Point& p : poly.outer) {
           if (!first) os << " ";
           first = false;
-          os << p->x << "," << p->y;
+          os << p.x << "," << p.y;
         }
         os << "\" fill=\"none\" stroke=\"red\" stroke-width=\"1\"/>\n";
       }
@@ -173,11 +124,10 @@ struct ProcessResult {
         if (sequence.empty()) continue;
         os << "<polygon points=\"";
         bool first = true;
-        for (const Point* p : sequence) {
-          if (!p) continue;
+        for (const Point& p : sequence) {
           if (!first) os << " ";
           first = false;
-          os << p->x << "," << p->y;
+          os << p.x << "," << p.y;
         }
         os << "\" fill=\"none\" stroke=\"green\" stroke-width=\"1\"/>\n";
       }

@@ -29,10 +29,10 @@ class ShapePool {
 
  public:
   Shape* acquire_shape(Polyline* outer_polyline, const std::vector<InnerPolyline*>& inner_polylines);
-  InnerPolyline* acquire_inner_polyline(std::vector<Point*> coords, Shape* s);
+  InnerPolyline* acquire_inner_polyline(std::vector<Point> coords, Shape* s);
   InnerPolyline* acquire_inner_polyline(Sequence* seq);
   Sequence* acquire_sequence();
-  Polyline* acquire_polyline(Tile* tile, const std::vector<Point*>& polygon, const std::optional<RectBounds>& bounds);
+  Polyline* acquire_polyline(Tile* tile, std::vector<Point> polygon, const std::optional<RectBounds>& bounds);
   void set_owner(Tile* tile);
   void detach_shape();
 };

@@ -13,12 +13,12 @@
 #include "UniqReducer.h"
 #include "Reducer.h"
 
-UniqReducer::UniqReducer(std::vector<Point*>& list_of_points) : Reducer(list_of_points) {
+UniqReducer::UniqReducer(std::vector<Point>& list_of_points) : Reducer(list_of_points) {
 }
 
 struct is_near {
-  bool operator() (Point* first, Point* second) const {
-    return first->x == second->x && first->y == second->y;
+  bool operator() (const Point& first, const Point& second) const {
+    return first.x == second.x && first.y == second.y;
   }
 };
 

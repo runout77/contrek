@@ -15,8 +15,8 @@
 struct Point;
 class Reducer {
  public:
-  explicit Reducer(std::vector<Point*>& list_of_points);
+  explicit Reducer(std::vector<Point>& list_of_points);
   virtual void reduce();
  protected:
-  std::vector<Point*> &points;
+  std::vector<Point> &points;
 };

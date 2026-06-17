@@ -31,8 +31,8 @@ void ShapePool::detach_shape() {
   }
 }
 
-InnerPolyline* ShapePool::acquire_inner_polyline(std::vector<Point*> coords, Shape* shape) {
-  inner_polylines_storage.emplace_back(coords, shape);
+InnerPolyline* ShapePool::acquire_inner_polyline(std::vector<Point> coords, Shape* shape) {
+  inner_polylines_storage.emplace_back(std::move(coords), shape);
   InnerPolyline* ip = &inner_polylines_storage.back();
   return ip;
 }
@@ -49,8 +49,8 @@ Sequence* ShapePool::acquire_sequence() {
   return s;
 }
 
-Polyline* ShapePool::acquire_polyline(Tile* tile, const std::vector<Point*>& polygon, const std::optional<RectBounds>& bounds = std::nullopt) {
-  polylines_storage.emplace_back(tile, polygon, bounds);
+Polyline* ShapePool::acquire_polyline(Tile* tile, std::vector<Point> polygon, const std::optional<RectBounds>& bounds = std::nullopt) {
+  polylines_storage.emplace_back(tile, std::move(polygon), bounds);
   Polyline* p = &polylines_storage.back();
   return p;
 }

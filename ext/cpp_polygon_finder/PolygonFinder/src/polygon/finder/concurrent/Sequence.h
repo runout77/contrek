@@ -24,12 +24,12 @@ class Sequence : public Queueable<Point>{
   Shape* shape = nullptr;
   Bounds vertical_bounds;
   void compute_vertical_bounds();
-  const std::vector<Point*>& get_vector_cache() {
+  const std::vector<Point>& get_vector_cache() {
     if (vector_cache.empty() && this->size > 0) {
       vector_cache = this->to_vector();
     }
     return vector_cache;
   }
  private:
-  std::vector<Point*> vector_cache;
+  std::vector<Point> vector_cache;
 };

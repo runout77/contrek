@@ -26,7 +26,7 @@ void run_test() {
   // test_suite.test_g();
   // test_suite.test_h();
   // test_suite.test_i();
-  // test_suite.test_l();
+  test_suite.test_l();
   std::cout << "compute time = " << cpu_timer.stop() << std::endl;
 }
 
@@ -55,6 +55,6 @@ int main() {
   std::cout << "Time: " << cpu_timer.stop() << " ms" << std::endl;
   // result->save_svg("output.svg");
 
-  // run_test();
+  //run_test();
   return 0;
 }

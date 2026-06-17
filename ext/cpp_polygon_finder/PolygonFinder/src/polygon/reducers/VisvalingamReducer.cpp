@@ -10,7 +10,7 @@
 #include <vector>
 #include "VisvalingamReducer.h"
 
-VisvalingamReducer::VisvalingamReducer(std::vector<Point*>& list_of_points, float tolerance)
+VisvalingamReducer::VisvalingamReducer(std::vector<Point>& list_of_points, float tolerance)
   : Reducer(list_of_points) {
   this->tolerance = tolerance * tolerance;
 }
@@ -18,11 +18,11 @@ VisvalingamReducer::VisvalingamReducer(std::vector<Point*>& list_of_points, floa
 VisvalingamReducer::~VisvalingamReducer() {}
 
 void VisvalingamReducer::reduce() {
-  std::vector<Point*> new_points = this->simplify();
+  std::vector<Point> new_points = this->simplify();
   points.assign(new_points.begin(), new_points.end());
 }
 
-std::vector<Point*> VisvalingamReducer::simplify() {
+std::vector<Point> VisvalingamReducer::simplify() {
   Vertex* vwLine = Vertex::buildLine(points);
   float minArea = this->tolerance;
   for (;;) {

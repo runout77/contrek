@@ -20,11 +20,11 @@ class Queueable;
 template <typename T>
 class QNode {
  public:
-  T* payload;
+  T payload;
   QNode<T>* next  {nullptr};
   QNode<T>* prev  {nullptr};
   Queueable<T>* owner {nullptr};
-  explicit QNode(T* value) : payload(value) {}
+  explicit QNode(const T& value) : payload(value) {}
   virtual ~QNode() = default;
   virtual void before_rem(Queueable<T>* q) {}
   virtual void after_add(Queueable<T>* q) {}
@@ -129,8 +129,8 @@ class Queueable {
     }
   }
 
-  std::vector<T*> to_vector() const {
-    std::vector<T*> out;
+  std::vector<T> to_vector() const {
+    std::vector<T> out;
     out.reserve(this->size);
     QNode<T>* current = head;
     while (current) {

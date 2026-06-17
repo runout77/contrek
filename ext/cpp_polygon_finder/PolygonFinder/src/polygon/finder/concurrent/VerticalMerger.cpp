@@ -12,7 +12,6 @@
 #include <vector>
 #include <algorithm>
 #include <utility>
-#include <unordered_set>
 #include "VerticalMerger.h"
 
 VerticalMerger::VerticalMerger(int number_of_threads, std::vector<std::string> *options)
@@ -36,21 +35,13 @@ ProcessResult* VerticalMerger::process_info() {
 
 void VerticalMerger::transpose(ProcessResult& result) {
   std::swap(result.width, result.height);
-  std::unordered_set<Point*> seen;
   for (auto& polygon : result.polygons) {
-    auto process_p = [&](Point* p) {
-      if (p) {
-        if (seen.insert(p).second) {
-          std::swap(p->x, p->y);
-        }
-      }
-    };
-    for (Point* p : polygon.outer) {
-      process_p(p);
+    for (Point& p : polygon.outer) {
+      std::swap(p.x, p.y);
     }
     for (auto& sequence : polygon.inner) {
-      for (Point* p : sequence) {
-        process_p(p);
+      for (Point& p : sequence) {
+        std::swap(p.x, p.y);
       }
     }
     std::swap(polygon.bounds.min_x, polygon.bounds.min_y);

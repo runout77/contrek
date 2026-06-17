@@ -65,18 +65,18 @@ void StreamingMerger::stream_polygons(Tile* tile, bool flush) {
 
 void StreamingMerger::stream_raw_polygon(const Shape* shape) {
   std::ostringstream outer_oss;
-  const std::vector<Point*> points = shape->outer_polyline->raw();
+  const std::vector<Point>& points = shape->outer_polyline->raw();
   for (size_t i = 0; i < points.size(); ++i) {
-    outer_oss << points[i]->y << "," << points[i]->x;
+    outer_oss << points[i].y << "," << points[i].x;
     if (i < points.size() - 1) outer_oss << " ";
   }
   *stream << svg_outer_polygon_string(outer_oss.str());
 
   for (const auto& inner_polyline : shape->inner_polylines) {
     std::ostringstream inner_oss;
-    const std::vector<Point*> inner_points = inner_polyline->raw();
+    const std::vector<Point>& inner_points = inner_polyline->raw();
     for (size_t i = 0; i < inner_points.size(); ++i) {
-      inner_oss << inner_points[i]->y << "," << inner_points[i]->x;
+      inner_oss << inner_points[i].y << "," << inner_points[i].x;
       if (i < inner_points.size() - 1) inner_oss << " ";
     }
     *stream << svg_inner_polygon_string(inner_oss.str());

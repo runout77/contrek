@@ -9,7 +9,7 @@
 
 #include "Reducer.h"
 
-Reducer::Reducer(std::vector<Point*>& list_of_points)
+Reducer::Reducer(std::vector<Point>& list_of_points)
 : points(list_of_points) {
 }
 

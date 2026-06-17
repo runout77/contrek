@@ -37,9 +37,9 @@ ProcessResult* Merger::process_info() {
 
 void Merger::translate(ProcessResult& result, int offset) {
   for (auto& polygon : result.polygons) {
-    for (Point* p : polygon.outer) p->x += offset;
-    for (const auto& seq : polygon.inner) {
-      for (Point* p : seq) p->x += offset;
+    for (Point& p : polygon.outer) p.x += offset;
+    for (auto& seq : polygon.inner) {
+      for (Point& p : seq) p.x += offset;
     }
     polygon.bounds.min_x += offset;
     polygon.bounds.max_x += offset;

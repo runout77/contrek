@@ -13,10 +13,10 @@
 #include "Part.h"
 #include "Polyline.h"
 
-Position::Position(Hub* hub, Point* point)
+Position::Position(Hub* hub, const Point& point)
 : QNode<Point>(point)
 { if (hub != nullptr) {
-    int key = point->y;
+    int key = point.y;
     EndPoint* existing_ep = hub->get(key);
     if (existing_ep == nullptr)
     { end_point_ = hub->put(key, hub->spawn_end_point());

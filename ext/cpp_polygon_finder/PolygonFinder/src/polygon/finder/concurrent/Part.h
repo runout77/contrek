@@ -40,7 +40,7 @@ class Part : public Queueable<Point> {
   std::string toString() const { return "Part type = " + std::to_string(static_cast<uint32_t>(type)); }
   Polyline* polyline() { return polyline_; }
   Position* next_position(Position* force_position);
-  void add_position(Point* point);
+  void add_position(const Point& point);
   Types type;
   bool innerable();
   const bool touched() const { return touched_; }

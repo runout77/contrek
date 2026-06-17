@@ -29,7 +29,7 @@ Position* Part::next_position(Position* force_position) {
   if (force_position != nullptr)
   { QNode<Point>* move_to_this = nullptr;
     this->reverse_each([&](QNode<Point>* pos) -> bool {
-      if (*(pos->payload) == *(force_position->payload)) {
+      if (pos->payload == force_position->payload) {
         move_to_this = pos;
         return false;
       }
@@ -46,7 +46,7 @@ Position* Part::next_position(Position* force_position) {
   }
 }
 
-void Part::add_position(Point* point) {
+void Part::add_position(const Point& point) {
   Cluster* c = this->polyline_->tile->cluster;
   Hub* hub = is(EXCLUSIVE) ? nullptr : c->hub();
   c->positions_pool.emplace_back(hub, point);
@@ -65,7 +65,7 @@ void Part::orient()
 { if (this->size <= 1 || (this->size == 2 && this->inverts)) {
     this->versus_ = 0;
   } else {
-    int diff = this->tail->payload->y - this->head->payload->y;
+    int diff = this->tail->payload.y - this->head->payload.y;
     if (diff == 0) {
       this->mirror = true;
       this->versus_ = 0;
@@ -76,14 +76,14 @@ void Part::orient()
 }
 
 bool Part::within(Part* other) {
-  const auto [self_min, self_max] = std::minmax(this->head->payload->y, this->tail->payload->y);
-  const auto [other_min, other_max] = std::minmax(other->head->payload->y, other->tail->payload->y);
+  const auto [self_min, self_max] = std::minmax(this->head->payload.y, this->tail->payload.y);
+  const auto [other_min, other_max] = std::minmax(other->head->payload.y, other->tail->payload.y);
   return (self_min >= other_min) && (self_max <= other_max);
 }
 
 bool Part::same_length(Part* other) {
-  return( std::abs(this->head->payload->y - this->tail->payload->y) ==
-          std::abs(other->head->payload->y - other->tail->payload->y));
+  return( std::abs(this->head->payload.y - this->tail->payload.y) ==
+          std::abs(other->head->payload.y - other->tail->payload.y));
 }
 
 constexpr std::string_view typeToString(Part::Types t) noexcept {
@@ -112,7 +112,7 @@ std::string Part::inspect() {
   << ", " << this->size << "x) of " << this->polyline()->tile->name() << " " << this->polyline()->named()
   << " (" << typeToString(type) << ") (";
   this->each([&](QNode<Point>* pos) -> bool {
-    ss << pos->payload->toString();
+    ss << pos->payload.toString();
     return true;
   });
   ss << ")";
@@ -122,18 +122,18 @@ std::string Part::inspect() {
 std::vector<EndPoint*> Part::continuum_to(const Part& other_part) const {
   if (this->size <= 2 && this->inverts && other_part.size <= 2 && other_part.inverts) return {};
 
-  Point* target = other_part.head->payload;
+  const Point& target = other_part.head->payload;
   QNode<Point>* cursor = this->tail;
 
   while (cursor != nullptr) {
-    if (*cursor->payload == *target) {
+    if (cursor->payload == target) {
       QNode<Point>* s = cursor;
       QNode<Point>* o = other_part.head;
       bool match = true;
       int count = 0;
 
       while (s != nullptr && o != nullptr) {
-        if (!(*s->payload == *o->payload)) {
+        if (!(s->payload == o->payload)) {
           match = false;
           break;
         }

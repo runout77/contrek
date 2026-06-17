@@ -41,9 +41,9 @@ void Partitionable::partition()
   PartPool& pool = polyline->tile->cluster->parts_pool;
   Part *current_part = nullptr;
   int n = 0;
-  Point* prev_position = nullptr;
-  for (Point* position : polyline->raw())
-  { if (polyline->tile->tg_border(*position))
+  const Point* prev_position = nullptr;
+  for (const Point& position : polyline->raw())
+  { if (polyline->tile->tg_border(position))
     { if (current_part == nullptr) {
         current_part = pool.acquire(Part::SEAM, polyline);
       } else if (!current_part->is(Part::SEAM)) {
@@ -56,12 +56,12 @@ void Partitionable::partition()
       this->add_part(current_part);
       current_part = pool.acquire(Part::EXCLUSIVE, polyline);
     }
-    if (n > 0 && *prev_position == *position) {
+    if (n > 0 && *prev_position == position) {
       current_part->inverts = true;
     }
     current_part->add_position(position);
     n++;
-    prev_position = position;
+    prev_position = &position;
   }
   this->add_part(current_part);
 

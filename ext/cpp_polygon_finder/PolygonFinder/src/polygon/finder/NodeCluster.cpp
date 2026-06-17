@@ -18,7 +18,6 @@
 #include "NodeCluster.h"
 #include "Node.h"
 #include "RectBounds.h"
-#include "PointPool.h"
 #include "../reducers/UniqReducer.h"
 #include "../reducers/LinearReducer.h"
 #include "../reducers/VisvalingamReducer.h"
@@ -44,7 +43,7 @@ NodeCluster::~NodeCluster() {
 void NodeCluster::compress_coords(std::list<Polygon>& polygons, pf_Options options) {
   if (!(options.compress_linear || options.compress_uniq || options.compress_visvalingam)) return;
 
-  auto compress_sequence = [&](std::vector<Point*>& points_vec) {
+  auto compress_sequence = [&](std::vector<Point>& points_vec) {
     if (points_vec.empty()) return;
 
     if (options.compress_uniq) {
@@ -122,9 +121,9 @@ void NodeCluster::plot(int versus) {
         next_node = root_node->get_tangent_node_by_virtual_index(root_node->tangs_sequence.front());
 
       if (next_node != nullptr)
-      { Point* p = next_node->coords_entering_to(root_node, versus_inverter[versus], Node::OUTER);
+      { Point p = next_node->coords_entering_to(root_node, versus_inverter[versus], Node::OUTER);
+        poly.bounds.expand(p.x, p.y);
         poly.outer.push_back(p);
-        poly.bounds.expand(p->x, p->y);
       }
       if ((this->nodes > 0) && (next_node != nullptr))
       { plot_node(poly.outer, next_node, root_node, versus, poly.bounds);
@@ -137,7 +136,7 @@ void NodeCluster::plot(int versus) {
         int index_inner = 0;
         while (inner_plot->size() > 0)
         { this->plot_sequence.clear();
-          std::vector<Point*> inner_sequence;
+          std::vector<Point> inner_sequence;
           std::list<Node*>::iterator first_i;
           Node *first = nullptr;
 
@@ -243,7 +242,7 @@ std::pair<int, int> NodeCluster::test_in_hole_o(Node* node)
   return {-1, -1};
 }
 
-void NodeCluster::plot_inner_node(std::vector<Point*>& sequence_coords, Node *node, int versus, Node *stop_at, Node *start_node) {
+void NodeCluster::plot_inner_node(std::vector<Point>& sequence_coords, Node *node, int versus, Node *stop_at, Node *start_node) {
   Node *current_node = node;
   bool strict_bounds = this->options->strict_bounds;
   while (current_node != nullptr) {
@@ -279,8 +278,8 @@ void NodeCluster::plot_inner_node(std::vector<Point*>& sequence_coords, Node *no
         }
       }
     } else if (strict_bounds) {
-        sequence_coords.push_back(this->points_pool.acquire((first_is_max ? last_node->max_x : last_node->min_x), current_node->y));
-        sequence_coords.push_back(this->points_pool.acquire((first_is_max ? next_node->min_x : next_node->max_x), current_node->y));
+        sequence_coords.push_back(Point{(first_is_max ? last_node->max_x : last_node->min_x), current_node->y});
+        sequence_coords.push_back(Point{(first_is_max ? next_node->min_x : next_node->max_x), current_node->y});
       }
 
     if (current_node->track_uncomplete()) {
@@ -293,7 +292,7 @@ void NodeCluster::plot_inner_node(std::vector<Point*>& sequence_coords, Node *no
   }
 }
 
-void NodeCluster::plot_node(std::vector<Point*>& sequence_coords, Node *node, Node *start_node, int versus, RectBounds& bounds) {
+void NodeCluster::plot_node(std::vector<Point>& sequence_coords, Node *node, Node *start_node, int versus, RectBounds& bounds) {
   Node *current_node = node;
   bool strict_bounds = this->options->strict_bounds;
 
@@ -315,23 +314,23 @@ void NodeCluster::plot_node(std::vector<Point*>& sequence_coords, Node *node, No
       plot = (n == next_node);
     }
     if (plot) {
-      Point* p = last_node->coords_entering_to(current_node, versus, Node::OUTER);
+      Point p = last_node->coords_entering_to(current_node, versus, Node::OUTER);
+      bounds.expand(p.x, p.y);
       sequence_coords.push_back(p);
-      bounds.expand(p->x, p->y);
       if (current_node != start_node) {
         inner_plot->contains(current_node) ? inner_plot->remove(current_node) : inner_plot->push_back(current_node);
         if (last_node->y == next_node->y) {
-          Point* p1 = next_node->coords_entering_to(current_node, versus_inverter[versus], Node::OUTER);
+          Point p1 = next_node->coords_entering_to(current_node, versus_inverter[versus], Node::OUTER);
+          bounds.expand(p1.x, p1.y);
           sequence_coords.push_back(p1);
-          bounds.expand(p1->x, p1->y);
           inner_plot->contains(current_node) ? inner_plot->remove(current_node) : inner_plot->push_back(current_node);
         }
       }
     } else if (strict_bounds) {
         bool is_down = current_node->y > last_node->y;
         bool is_a = (versus == Node::A);
-        sequence_coords.push_back(this->points_pool.acquire((is_down == is_a ? last_node->min_x : last_node->max_x), current_node->y));
-        sequence_coords.push_back(this->points_pool.acquire((is_down == is_a ? next_node->max_x : next_node->min_x), current_node->y));
+        sequence_coords.push_back(Point{(is_down == is_a ? last_node->min_x : last_node->max_x), current_node->y});
+        sequence_coords.push_back(Point{(is_down == is_a ? next_node->max_x : next_node->min_x), current_node->y});
       }
 
     if (current_node == start_node) {

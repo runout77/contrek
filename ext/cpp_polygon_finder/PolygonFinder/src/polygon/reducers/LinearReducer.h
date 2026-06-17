@@ -14,9 +14,9 @@
 
 class LinearReducer : public Reducer {
  public:
-  explicit LinearReducer(std::vector<Point*>& list_of_points);
+  explicit LinearReducer(std::vector<Point>& list_of_points);
   void reduce();
 
  private:
-  std::array<int, 2> seq_dir(Point *a, Point *b);
+  std::array<int, 2> seq_dir(const Point& a, const Point& b);
 };

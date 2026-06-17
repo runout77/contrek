@@ -16,15 +16,15 @@ class Part;
 
 class EndPoint {
  public:
-  EndPoint() : point_(nullptr) {}
+  EndPoint() {}
 
-  void set_point(Point* p) { point_ = p; }
-  Point* get_point() const { return point_; }
+  void set_point(const Point& p) { point_ = p; }
+  const Point& get_point() const { return point_; }
   std::vector<Queueable<Point>*>& queues() { return queues_; }
   bool queues_include(Queueable<Point>* q) const;
   bool tracked_outer = false;
 
  private:
-  Point* point_;
+  Point point_;
   std::vector<Queueable<Point>*> queues_;
 };

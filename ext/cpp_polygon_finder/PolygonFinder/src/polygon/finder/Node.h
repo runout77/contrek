@@ -61,6 +61,9 @@ struct Point {
   bool operator==(const Point& other) const {
     return x == other.x && y == other.y;
   }
+  bool operator!=(const Point& other) const {
+    return !(*this == other);
+  }
   Point(int x_, int y_) : x(x_), y(y_) {}
   Point() : x(0), y(0) {}
 };
@@ -96,7 +99,7 @@ class Node : public  Listable {
   NodeCluster* cluster;
   void add_intersection(Node& other_node, int other_node_index);
   SmallVec tangs_sequence;
-  Point* coords_entering_to(Node *enter_to, int mode, int tracking);
+  Point coords_entering_to(Node *enter_to, int mode, int tracking);
   Node* my_next_outer(Node *last, int versus);
   Node* my_next_inner(Node *last, int versus);
   Node* get_tangent_node_by_virtual_index(int vitual_index);

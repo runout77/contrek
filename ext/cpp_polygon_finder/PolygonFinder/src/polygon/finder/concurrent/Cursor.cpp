@@ -29,7 +29,7 @@ Sequence* Cursor::join_outers()
                        this->shapes_sequence_,
                        outer_joined_polyline);
 
-  if (*outer_joined_polyline->head->payload == *outer_joined_polyline->tail->payload &&
+  if (outer_joined_polyline->head->payload == outer_joined_polyline->tail->payload &&
       this->cluster.tiles().front()->left() &&
       this->cluster.tiles().back()->right()) outer_joined_polyline->pop();
 
@@ -151,11 +151,11 @@ std::vector<InnerPolyline*> Cursor::join_inners(Sequence* outer_seq, bool treema
           retme_sequence->move_from(*part, [&](QNode<Point>* pos) -> bool {
           Position *position = static_cast<Position*>(pos);
           if (part->is(Part::ADDED) &&
-             !(position->payload->y >= bounds.min &&
-              position->payload->y <= bounds.max)) {
+             !(position->payload.y >= bounds.min &&
+              position->payload.y <= bounds.max)) {
             return(false);
           }
-            return(!(polyline->tile->tg_border(*position->payload) && position->end_point()->tracked_outer));
+            return(!(polyline->tile->tg_border(position->payload) && position->end_point()->tracked_outer));
           });
         }
         if (retme_sequence->is_not_vertical()) {
@@ -175,7 +175,7 @@ void Cursor::mark_children(std::vector<EndPoint*>& end_points, const Polyline* o
   for (size_t i = 0; i + 1 < end_points.size(); i += 2) {
     const auto& a = end_points[i];
     const auto& b = end_points[i + 1];
-    auto [y_min, y_max] = std::minmax(a->get_point()->y, b->get_point()->y);
+    auto [y_min, y_max] = std::minmax(a->get_point().y, b->get_point().y);
     for (int y = y_min + 1; y < y_max; ++y) {
       EndPoint* end_point = this->cluster.hub()->get(y);
       if (end_point) {
@@ -199,9 +199,9 @@ void Cursor::traverse_inner(Part* act_part, std::vector<Part*>& all_parts, Bound
       auto [min_it, max_it] = std::minmax_element(
         points.begin(),
         points.end(),
-        [](Point* a, Point* b) { return a->y < b->y; });
-      bounds.min = std::min(bounds.min, (*min_it)->y);
-      bounds.max = std::max(bounds.max, (*max_it)->y);
+        [](const Point& a, const Point& b) { return a.y < b.y; });
+      bounds.min = std::min(bounds.min, min_it->y);
+      bounds.max = std::max(bounds.max, max_it->y);
     }
     if (act_part->innerable()) {
       all_parts.push_back(act_part);

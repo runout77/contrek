@@ -18,7 +18,6 @@
 #include "Lists.h"
 #include "RectBounds.h"
 #include "Polygon.h"
-#include "PointPool.h"
 
 class Node;
 struct Point;
@@ -26,8 +25,8 @@ struct pf_Options;
 
 class NodeCluster {
  private:
-  void plot_node(std::vector<Point*>& sequence_coords, Node *node, Node *start_node, int versus, RectBounds& bounds);
-  void plot_inner_node(std::vector<Point*>& sequence_coords, Node *node, int versus, Node *stop_at, Node *start_node);
+  void plot_node(std::vector<Point>& sequence_coords, Node *node, Node *start_node, int versus, RectBounds& bounds);
+  void plot_inner_node(std::vector<Point>& sequence_coords, Node *node, int versus, Node *stop_at, Node *start_node);
   std::vector<Node*> plot_sequence;
   List *inner_plot;
   List *inner_new;
@@ -35,7 +34,6 @@ class NodeCluster {
   int count = 0;
   int nodes;
   int width;
-  PointPool points_pool;
 
  public:
   pf_Options *options;

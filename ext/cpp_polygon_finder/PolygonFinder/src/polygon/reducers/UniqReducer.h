@@ -13,6 +13,6 @@
 
 class UniqReducer : public Reducer {
  public:
-  explicit UniqReducer(std::vector<Point*>& list_of_points);
+  explicit UniqReducer(std::vector<Point>& list_of_points);
   void reduce();
 };

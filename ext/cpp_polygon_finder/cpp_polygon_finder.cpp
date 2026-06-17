@@ -27,8 +27,6 @@
 #include "PolygonFinder/src/polygon/finder/List.h"
 #include "PolygonFinder/src/polygon/finder/Lists.cpp"
 #include "PolygonFinder/src/polygon/finder/Lists.h"
-#include "PolygonFinder/src/polygon/finder/PointPool.h"
-#include "PolygonFinder/src/polygon/finder/PointPool.cpp"
 #include "PolygonFinder/src/polygon/finder/Polygon.h"
 #include "PolygonFinder/src/polygon/bitmaps/Bitmap.h"
 #include "PolygonFinder/src/polygon/bitmaps/Bitmap.cpp"
@@ -191,20 +189,20 @@ class To_Ruby<ProcessResult*>
     Rice::Array out;
     for (Polygon& x : pr->polygons)
     { Rice::Hash poly_hash = Rice::Hash();
-      // OUTER: std::vector<Point*>
+      // OUTER: std::vector<Point>
       Rice::Array outer_flat;
-      for (Point* p : x.outer) {
-        outer_flat.push(p->x);
-        outer_flat.push(p->y);
+      for (const Point& p : x.outer) {
+        outer_flat.push(p.x);
+        outer_flat.push(p.y);
       }
       poly_hash[Symbol("outer")] = outer_flat;
-      // INNER: std::list<std::vector<Point*>>
+      // INNER: std::list<std::vector<Point>>
       Rice::Array inner_collection;
-      for (const std::vector<Point*>& sequence : x.inner) {
+      for (const std::vector<Point>& sequence : x.inner) {
         Rice::Array sequence_flat;
-        for (Point* p : sequence) {
-          sequence_flat.push(p->x);
-          sequence_flat.push(p->y);
+        for (const Point& p : sequence) {
+          sequence_flat.push(p.x);
+          sequence_flat.push(p.y);
         }
         inner_collection.push(sequence_flat);
       }
@@ -272,17 +270,17 @@ ProcessResult ruby_result_to_process_result(Rice::Object rb_result) {
     for (size_t j = 0; j < outer_flat.size(); j += 2) {
       int px = detail::From_Ruby<int>().convert(outer_flat[j].value());
       int py = detail::From_Ruby<int>().convert(outer_flat[j+1].value());
-      poly.outer.push_back(new Point(px, py));
+      poly.outer.push_back(Point(px, py));
     }
     // INNER
     Rice::Array inner_collection = (Rice::Array)rb_poly[Symbol("inner")];
     for (size_t j = 0; j < inner_collection.size(); ++j) {
       Rice::Array sequence_flat = (Rice::Array)inner_collection[j];
-      std::vector<Point*> hole;
+      std::vector<Point> hole;
       for (size_t k = 0; k < sequence_flat.size(); k += 2) {
         int px = detail::From_Ruby<int>().convert(sequence_flat[k].value());
         int py = detail::From_Ruby<int>().convert(sequence_flat[k+1].value());
-        hole.push_back(new Point(px, py));
+        hole.push_back(Point(px, py));
       }
       poly.inner.push_back(hole);
     }

@@ -40,10 +40,10 @@ void Cluster::add(Tile* tile) {
   }
 }
 
-void Cluster::list_to_string(std::vector<Point*> list)
+void Cluster::list_to_string(std::vector<Point> list)
 { std::cout << "(" << &list << ") ";
-  for (Point* point : list) {
-    std::cout << point->toString();
+  for (const Point& point : list) {
+    std::cout << point.toString();
   }
   std::cout << std::endl;
 }

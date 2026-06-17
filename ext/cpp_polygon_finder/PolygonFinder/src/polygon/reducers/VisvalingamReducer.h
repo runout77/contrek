@@ -17,21 +17,21 @@ struct Point;
 
 class VisvalingamReducer : public Reducer {
  public:
-  VisvalingamReducer(std::vector<Point*>& list_of_points, float tolerance);
+  VisvalingamReducer(std::vector<Point>& list_of_points, float tolerance);
   virtual ~VisvalingamReducer();
   void reduce();
-  std::vector<Point*> simplify();
+  std::vector<Point> simplify();
 
   class Triangle {
    public:
-    static int area(Point* a, Point* b, Point* c) {
-      return std::abs(((c->x - a->x) * (b->y - a->y) - (b->x - a->x) * (c->y - a->y)) / 2);
+    static int area(const Point& a, const Point& b, const Point& c) {
+      return std::abs(((c.x - a.x) * (b.y - a.y) - (b.x - a.x) * (c.y - a.y)) / 2);
     }
   };
 
   class Vertex {
     const float MAX_AREA = std::numeric_limits<float>::max();
-    explicit Vertex(Point* pt) {
+    explicit Vertex(const Point& pt) {
       this->pt = pt;
       this->prev = nullptr;
       this->next = nullptr;
@@ -40,7 +40,7 @@ class VisvalingamReducer : public Reducer {
     }
 
    public:
-    Point* pt;
+    Point pt;
     void setNext(Vertex* nextp) { this->next = nextp; }
     void setPrec(Vertex* prev) { this->prev = prev; }
     void updateArea() {
@@ -54,10 +54,10 @@ class VisvalingamReducer : public Reducer {
     Vertex* get_next() { return this->next; }
     bool isLiving() { return this->isLive; }
 
-    static Vertex* buildLine(std::vector<Point*>& pts) {
+    static Vertex* buildLine(std::vector<Point>& pts) {
       Vertex* first = nullptr;
       Vertex* prev = nullptr;
-      for (Point* p : pts) {
+      for (const Point& p : pts) {
         Vertex* v = new Vertex(p);
         if (!first) first = v;
         v->setPrec(prev);
@@ -88,8 +88,8 @@ class VisvalingamReducer : public Reducer {
       return result;
     }
 
-    static std::vector<Point*> getCoordinates(Vertex* head) {
-      std::vector<Point*> coords;
+    static std::vector<Point> getCoordinates(Vertex* head) {
+      std::vector<Point> coords;
       Vertex* curr = head;
       while (curr) {
         coords.push_back(curr->pt);
