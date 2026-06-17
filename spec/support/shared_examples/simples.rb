@@ -28,6 +28,7 @@ RSpec.shared_examples "simples" do
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true}).process_info
       expect(result.metadata[:named_sequence]).to eq("")
       expect(result.metadata[:groups]).to eq(0)
+      expect(result.metadata[:versus]).to eq(:a)
       expect(result.points).to eq([])
     end
     it "empty" do

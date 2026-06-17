@@ -10,11 +10,25 @@
 #include <vector>
 #include "Shape.h"
 #include "ShapePool.h"
+#include "Tile.h"
 
 Shape* ShapePool::acquire_shape(Polyline* outer_polyline, const std::vector<InnerPolyline*>& inner_polylines) {
-  shapes_storage.emplace_back(outer_polyline, inner_polylines);
+  shapes_storage.emplace_back(this, outer_polyline, inner_polylines);
   Shape* shape = &shapes_storage.back();
+  this->shapes_count++;
   return shape;
+}
+
+void ShapePool::set_owner(Tile* tile) {
+  this->owner_tile_ = tile;
+}
+
+void ShapePool::detach_shape() {
+  this->shapes_count--;
+  if (this->shapes_count == 0) {
+    this->owner_tile_->unregister_pool(this);
+    delete this;
+  }
 }
 
 InnerPolyline* ShapePool::acquire_inner_polyline(std::vector<Point*> coords, Shape* shape) {

@@ -18,7 +18,7 @@
 #include "../../CpuTimer.h"
 
 Cluster::Cluster(Finder *finder, int height, int start_x, int end_x)
-  : finder(finder)
+  : finder_(finder)
 { tiles_.reserve(2);  // only two (left|right)
   this->hub_ = new Hub(height);
 }
@@ -49,7 +49,7 @@ void Cluster::list_to_string(std::vector<Point*> list)
 }
 
 Tile* Cluster::merge_tiles() {
-  bool treemap = this->finder->options().treemap;
+  bool treemap = this->finder_->options().treemap;
   double tot_inner = 0;
   double tot_outer = 0;
   CpuTimer timer;
@@ -141,7 +141,7 @@ Tile* Cluster::merge_tiles() {
   };
 
   Tile* tile = new Tile(
-    this->finder, tiles_.front()->start_x(), tiles_.back()->end_x(), tiles_.front()->name() + tiles_.back()->name(), b);
+    this->finder_, tiles_.front()->start_x(), tiles_.back()->end_x(), tiles_.front()->name() + tiles_.back()->name(), b);
 
   tile->assign_shapes(new_shapes);
   for (Tile* old_tile : tiles_) {

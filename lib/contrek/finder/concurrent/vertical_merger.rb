@@ -16,6 +16,10 @@ module Contrek
         transpose(super())
       end
 
+      def transpose?
+        true
+      end
+
       private
 
       def adjust(result)

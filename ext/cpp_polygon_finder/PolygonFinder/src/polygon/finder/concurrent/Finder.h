@@ -56,4 +56,6 @@ class Finder : public Poolable {
   virtual ProcessResult* process_info();
   const pf_Options& options() const { return options_; }
   Queue<Tile*>& tiles() { return tiles_; }
+  virtual bool transpose() const { return false; }
+  int versus;
 };

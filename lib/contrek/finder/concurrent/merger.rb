@@ -16,6 +16,7 @@ module Contrek
 
       def add_tile(result)
         @height ||= result.metadata[:height]
+        @options[:versus] ||= result.metadata[:versus]
         end_x = @current_x + result.metadata[:width]
 
         tile = Tile.new(

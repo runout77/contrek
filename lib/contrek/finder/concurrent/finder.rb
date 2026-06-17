@@ -99,6 +99,10 @@ module Contrek
         Contrek::Finder::Result.new(raw_polygons, metadata)
       end
 
+      def transpose?
+        false
+      end
+
       private
 
       def process_tiles!(bitmap, height:)

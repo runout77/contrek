@@ -32,6 +32,7 @@ void StreamingMerger::add_tile(ProcessResult& result, bool flush)
     this->process_tiles();
     this->tiles_.queue_push(this->whole_tile);
     this->stream_polygons(this->whole_tile, flush);
+    this->whole_tile->shapes().shrink_to_fit();
   }
 }
 
@@ -45,16 +46,18 @@ void StreamingMerger::stream_polygons(Tile* tile, bool flush) {
   ensure_header();
   if (int tile_end_x = tile->end_x(); true) {
     tile->shapes().erase(
-      std::remove_if(tile->shapes().begin(), tile->shapes().end(), [this, flush, tile_end_x](const Shape* shape) {
+      std::remove_if(tile->shapes().begin(), tile->shapes().end(), [this, flush, tile_end_x](Shape* shape) {
         if (flush || shape->outer_polyline->max_x() < (tile_end_x - 1)) {
           this->moved++;
           this->stream_raw_polygon(shape);
+          shape->detach_from_pool();
           return true;
         }
         return false;
       }),
       tile->shapes().end());
   }
+  stream->flush();
   if (flush) {
     ensure_footer();
   }

@@ -69,33 +69,48 @@ void Partitionable::partition()
 }
 
 void Partitionable::trasmute_parts()
-{ std::vector<Part*> insides;
-  for (Part* p : parts_) {
-    if (p->is(Part::SEAM)) insides.push_back(p);
-  }
-  if (insides.size() < 2) return;
+{ Polyline *polyline = static_cast<Polyline*>(this);
+  bool transpose = polyline->tile->cluster->finder()->transpose();
 
-  for (Part* inside : insides)
-  { for (Part* inside_compare : insides) {
-      if (inside == inside_compare || !inside_compare->is(Part::SEAM) ) continue;
-      int count = 0;
-      inside->each([&](QNode<Point>* pos) -> bool {
-        Position *position = static_cast<Position*>(pos);
-        if (position->end_point()->queues_include(inside_compare))
-        { count++;
-          return true;
+  for (Part* inside : parts_) {
+    if (!inside->is(Part::SEAM)) continue;
+    for (Part* inside_compare : parts_) {
+      if (inside == inside_compare || !inside_compare->is(Part::SEAM)) continue;
+
+      if (transpose) {
+        if (inside->within(inside_compare)) {
+          Part* target_part;
+          if (!inside->same_length(inside_compare)) {
+            target_part = inside;
+            target_part->type = Part::EXCLUSIVE;
+            target_part->trasmuted = true;
+            std::vector<Queueable<Point>*>& a = static_cast<Position*>(target_part->head)->end_point()->queues();
+            a.erase(std::remove(a.begin(), a.end(), target_part), a.end());
+            std::vector<Queueable<Point>*>& b = static_cast<Position*>(target_part->tail)->end_point()->queues();
+            b.erase(std::remove(b.begin(), b.end(), target_part), b.end());
+            break;
+          }
         }
-        return false;
-      });
-      if (count == inside->size) {
-        if (count < inside_compare->size) {
-          inside->type = Part::EXCLUSIVE;
-          inside->trasmuted = true;
-          break;
-        } else if ( count == inside_compare->size &&
-                    inside->next == nullptr &&
-                    inside_compare->prev == nullptr) {
-          inside->mirror = true;
+      } else {
+        int count = 0;
+        inside->each([&](QNode<Point>* pos) -> bool {
+          Position *position = static_cast<Position*>(pos);
+          if (position->end_point()->queues_include(inside_compare))
+          { count++;
+            return true;
+          }
+          return false;
+        });
+        if (count == inside->size) {
+          if (count < inside_compare->size) {
+            inside->type = Part::EXCLUSIVE;
+            inside->trasmuted = true;
+            break;
+          } else if ( count == inside_compare->size &&
+                      inside->next == nullptr &&
+                      inside_compare->prev == nullptr) {
+            inside->mirror = true;
+          }
         }
       }
     }

@@ -3,7 +3,7 @@
 module Contrek
   module Concurrent
     class Cluster
-      attr_reader :tiles, :hub
+      attr_reader :tiles, :hub, :finder
 
       def initialize(finder:, height:, start_x:, end_x:)
         @finder = finder

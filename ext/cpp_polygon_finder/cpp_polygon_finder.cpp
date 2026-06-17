@@ -186,6 +186,7 @@ class To_Ruby<ProcessResult*>
     return_me[Symbol("named_sequence")] = pr->named_sequence;
     return_me[Symbol("width")] = pr->width;
     return_me[Symbol("height")] = pr->height;
+    return_me[Symbol("versus")] = Symbol(pr->versus == Node::O ? "o" : "a");
 
     Rice::Array out;
     for (Polygon& x : pr->polygons)
@@ -251,6 +252,7 @@ ProcessResult ruby_result_to_process_result(Rice::Object rb_result) {
   Rice::Hash metadata = rb_result.iv_get("@metadata_storage");
   pr.width = detail::From_Ruby<int>().convert(metadata[Symbol("width")].value());
   pr.height = detail::From_Ruby<int>().convert(metadata[Symbol("height")].value());
+  pr.versus = metadata[Symbol("versus")] == Symbol("o") ? Node::O : Node::A;
 
   Rice::Array rb_polygons = rb_result.iv_get("@polygons_storage");
   for (size_t i = 0; i < rb_polygons.size(); ++i) {

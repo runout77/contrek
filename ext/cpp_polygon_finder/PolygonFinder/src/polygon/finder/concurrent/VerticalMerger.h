@@ -17,6 +17,7 @@ class VerticalMerger : public Merger {
   VerticalMerger(int number_of_threads, std::vector<std::string> *options);
   void add_tile(ProcessResult& result) override;
   ProcessResult* process_info() override;
+  bool transpose() const override { return true; };
 
  private:
   void transpose(ProcessResult& result);

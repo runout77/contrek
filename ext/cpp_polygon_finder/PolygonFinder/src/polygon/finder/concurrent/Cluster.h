@@ -18,7 +18,7 @@
 
 class Cluster {
  private:
-  Finder *finder;
+  Finder *finder_;
   std::vector<Tile*> tiles_;
   Hub *hub_ = nullptr;
   void assign_ancestry(Shape *shape, InnerPolyline* inner_polyline);
@@ -34,4 +34,5 @@ class Cluster {
   static void list_to_string(std::vector<Point*> list);
   PartPool parts_pool;
   std::deque<Position> positions_pool;
+  const Finder* finder() const { return finder_; };
 };

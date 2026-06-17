@@ -16,9 +16,10 @@
 
 class Point;
 class Polyline;
+class ShapePool;
 class Shape {
  public:
-  Shape(Polyline* outer_polyline, const std::vector<InnerPolyline*>& inner_polylines);
+  Shape(ShapePool* shape_pool, Polyline* outer_polyline, const std::vector<InnerPolyline*>& inner_polylines);
   Polyline* outer_polyline = nullptr;
   std::vector<InnerPolyline*> inner_polylines;
   Shape* merged_to_shape = nullptr;
@@ -29,6 +30,8 @@ class Shape {
   Shape* parent_shape() { return parent_shape_; }
   void set_parent_shape(Shape*);
   std::string name();
+  void detach_from_pool();
  private:
   Shape* parent_shape_ = nullptr;
+  ShapePool* shape_pool_ = nullptr;
 };

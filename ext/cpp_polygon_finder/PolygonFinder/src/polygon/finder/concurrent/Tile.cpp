@@ -27,6 +27,7 @@ Tile::Tile(Finder *finder, int start_x, int end_x, std::string name, const Bench
   name_(name),
   benchmarks(b) {
   this->shapes_pool = new ShapePool();
+  this->shapes_pool->set_owner(this);
   this->shapes_pools.push_back(this->shapes_pool);
 }
 
@@ -156,6 +157,14 @@ std::vector<std::pair<int, int>> Tile::compute_treemap()
 void Tile::adopt(Tile* other) {
   for (ShapePool* pool : other->shapes_pools) {
     this->shapes_pools.push_back(pool);
+    pool->set_owner(this);
   }
   other->shapes_pools.clear();
+}
+
+void Tile::unregister_pool(ShapePool* shape_pool) {
+  auto it = std::find(this->shapes_pools.begin(), this->shapes_pools.end(), shape_pool);
+  if (it != this->shapes_pools.end()) {
+    this->shapes_pools.erase(it);
+  }
 }

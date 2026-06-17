@@ -75,6 +75,26 @@ void Part::orient()
   }
 }
 
+bool Part::within(Part* other) {
+  const auto [self_min, self_max] = std::minmax(this->head->payload->y, this->tail->payload->y);
+  const auto [other_min, other_max] = std::minmax(other->head->payload->y, other->tail->payload->y);
+  return (self_min >= other_min) && (self_max <= other_max);
+}
+
+bool Part::same_length(Part* other) {
+  return( std::abs(this->head->payload->y - this->tail->payload->y) ==
+          std::abs(other->head->payload->y - other->tail->payload->y));
+}
+
+constexpr std::string_view typeToString(Part::Types t) noexcept {
+  switch (t) {
+    case Part::SEAM:      return "SEAM";
+    case Part::EXCLUSIVE: return "EXCLUSIVE";
+    case Part::ADDED:     return "ADDED";
+    default:        return "UNKNOWN";
+  }
+}
+
 std::string Part::inspect() {
   size_t part_index = 0;
   auto it = std::find(this->polyline()->parts().begin(), this->polyline()->parts().end(), this);
@@ -89,8 +109,8 @@ std::string Part::inspect() {
   << " trm=" << this->trasmuted
   << " touched=" << this->touched_
   << " dead_end=" << this->dead_end
-  << ", " << this->size << "x) of " << this->polyline()->tile->name()
-  << " (" << std::to_string(static_cast<uint32_t>(type)) << ") (";
+  << ", " << this->size << "x) of " << this->polyline()->tile->name() << " " << this->polyline()->named()
+  << " (" << typeToString(type) << ") (";
   this->each([&](QNode<Point>* pos) -> bool {
     ss << pos->payload->toString();
     return true;

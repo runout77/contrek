@@ -49,6 +49,8 @@ class Part : public Queueable<Point> {
   void orient();
   std::string inspect();
   std::vector<EndPoint*> continuum_to(const Part& other_part) const;
+  bool within(Part* other);
+  bool same_length(Part* other);
 
  private:
   int versus_ = 0;

@@ -20,6 +20,7 @@ void Merger::add_tile(ProcessResult& result)
 { if (this->height == 0) {
     this->height = result.height;
   }
+  this->versus = result.versus;
   int end_x = this->current_x + result.width;
   Tile* tile = new Tile(this, this->current_x, end_x, std::to_string(tiles_.size()), Benchmarks {0, 0});
   tile->assign_raw_polygons(result.polygons, result.treemap);

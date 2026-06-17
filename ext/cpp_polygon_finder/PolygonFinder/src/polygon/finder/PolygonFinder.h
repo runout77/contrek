@@ -61,6 +61,7 @@ struct pf_Options {
 struct ProcessResult {
   int groups;
   int width, height;
+  int versus;
   bool has_bounds = false;
   std::map<std::string, double> benchmarks;
   std::list<Polygon> polygons;
@@ -112,6 +113,7 @@ struct ProcessResult {
     new_res->benchmarks = this->benchmarks;
     new_res->named_sequence = this->named_sequence;
     new_res->treemap = this->treemap;
+    new_res->versus = this->versus;
 
     size_t estimated_points = 0;
     for (const auto& poly : this->polygons) {

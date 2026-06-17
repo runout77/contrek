@@ -59,4 +59,5 @@ class Tile {
   std::vector<ShapePool*> shapes_pools;
   ShapePool* shapes_pool;
   void adopt(Tile* other);
+  void unregister_pool(ShapePool* shape_pool);
 };

@@ -58,26 +58,40 @@ module Contrek
       # meaning that all its points are repeated in another, longer sequence,
       # then the shorter one is converted to EXCLUSIVE and marked as transmuted
       def trasmute_parts!
-        insides = @parts.select { |p| p.is?(Part::SEAM) }
-        return if insides.size < 2
+        transpose = tile.cluster.finder.transpose?
 
-        insides.each do |inside|
-          (insides - [inside]).each do |inside_compare|
+        @parts.each do |inside|
+          next unless inside.is?(Part::SEAM)
+          @parts.each do |inside_compare|
+            next if inside == inside_compare
             next unless inside_compare.is?(Part::SEAM)
 
-            count = 0
-            inside.each do |position|
-              inclusion = position.end_point.queues.include?(inside_compare)
-              count += 1 if inclusion
-            end
-            if count == inside.size && count < inside_compare.size
-              inside.type = Part::EXCLUSIVE
-              inside.trasmuted = true
-              break
-            end
-            if count == inside.size && count == inside_compare.size &&
-                inside.next.nil? && inside_compare.prev.nil?
-              inside.mirror = true
+            if transpose
+              if inside.within?(inside_compare)
+                if !inside.same_length?(inside_compare)
+                  inside.type = Part::EXCLUSIVE
+                  inside.trasmuted = true
+                  inside.head.end_point.queues.delete(inside)
+                  inside.tail.end_point.queues.delete(inside)
+                  break
+                end
+              end
+            else
+              count = 0
+              inside.each do |position|
+                inclusion = position.end_point.queues.include?(inside_compare)
+                count += 1 if inclusion
+              end
+              if count == inside.size
+                if count < inside_compare.size
+                  inside.type = Part::EXCLUSIVE
+                  inside.trasmuted = true
+                  break
+                end
+                if count == inside_compare.size && inside.next.nil? && inside_compare.prev.nil?
+                  inside.mirror = true
+                end
+              end
             end
           end
         end

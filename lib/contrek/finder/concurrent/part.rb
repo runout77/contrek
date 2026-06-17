@@ -80,6 +80,17 @@ module Contrek
         end
       end
 
+      def within?(other)
+        self_min, self_max = [head.payload[:y], tail.payload[:y]].minmax
+        other_min, other_max = [other.head.payload[:y], other.tail.payload[:y]].minmax
+        self_min >= other_min && self_max <= other_max
+      end
+
+      def same_length?(other)
+        (head.payload[:y] - tail.payload[:y]).abs ==
+          (other.head.payload[:y] - other.tail.payload[:y]).abs
+      end
+
       def continuum_to?(other)
         return [] if size <= 2 && inverts && other.size <= 2 && other.inverts
         return [] if other.head.nil?

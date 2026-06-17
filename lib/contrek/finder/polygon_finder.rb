@@ -51,7 +51,8 @@ module Contrek
           benchmarks: format_benchmarks,
           width: @source_bitmap.w,
           height: @source_bitmap.h,
-          treemap: (@node_cluster.treemap if @options.has_key?(:treemap))
+          treemap: (@node_cluster.treemap if @options.has_key?(:treemap)),
+          versus: @options[:versus]
         }
         Result.new(@node_cluster.polygons, metadata)
       end

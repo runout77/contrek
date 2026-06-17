@@ -53,7 +53,7 @@ int main() {
   result->print_info();
   std::cout << "Found polygons: " << result->groups << std::endl;
   std::cout << "Time: " << cpu_timer.stop() << " ms" << std::endl;
-  // result->save_svg("output.svg");*/
+  // result->save_svg("output.svg");
 
   // run_test();
   return 0;

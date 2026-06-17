@@ -12,10 +12,12 @@
 #include <string>
 #include "Shape.h"
 #include "Polyline.h"
+#include "ShapePool.h"
 
-Shape::Shape(Polyline* outer_polyline, const std::vector<InnerPolyline*>& inner_polylines)
+Shape::Shape(ShapePool* shape_pool, Polyline* outer_polyline, const std::vector<InnerPolyline*>& inner_polylines)
 : outer_polyline(outer_polyline),
-  inner_polylines(inner_polylines) {
+  inner_polylines(inner_polylines),
+  shape_pool_(shape_pool) {
   for (InnerPolyline* ip : inner_polylines) {
     ip->assigned_shape = this;
   }
@@ -23,6 +25,10 @@ Shape::Shape(Polyline* outer_polyline, const std::vector<InnerPolyline*>& inner_
 
 void Shape::clear_inner() {
   inner_polylines.clear();
+}
+
+void Shape::detach_from_pool() {
+  shape_pool_->detach_shape();
 }
 
 void Shape::set_parent_shape(Shape* shape) {

@@ -89,6 +89,17 @@ module Contrek
         puts
       end
 
+      def transpose!
+        transposed = ""
+        w.times do |x|
+          h.times do |y|
+            transposed += value_at(x, y)
+          end
+        end
+        @raw = transposed
+        @module = h
+      end
+
       private
 
       def next_color(color)
