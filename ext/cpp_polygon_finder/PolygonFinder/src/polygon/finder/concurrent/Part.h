@@ -32,9 +32,11 @@ class Part : public Queueable<Point> {
   bool is(Types type);
   bool inverts = false;
   bool trasmuted = false;
+  bool transmutation_skip = false;
   bool dead_end = false;
   bool mirror = false;
   Part* next = nullptr;
+  Part* next_seam = nullptr;
   Part* prev = nullptr;
   Part* circular_next = nullptr;
   std::string toString() const { return "Part type = " + std::to_string(static_cast<uint32_t>(type)); }
@@ -51,6 +53,7 @@ class Part : public Queueable<Point> {
   std::vector<EndPoint*> continuum_to(const Part& other_part) const;
   bool within(Part* other);
   bool same_length(Part* other);
+  void try_transmutation();
 
  private:
   int versus_ = 0;

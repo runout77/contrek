@@ -102,9 +102,6 @@ module Contrek
         if act_part.is?(Part::EXCLUSIVE)
           return if act_part.size == 0
           while (position = act_part.next_position)
-            return if outer_joined_polyline.size > 1 &&
-              outer_joined_polyline.head.payload == position.payload &&
-              act_part == all_parts.first
             outer_joined_polyline.add(position)
           end
         else

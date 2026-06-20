@@ -8,6 +8,8 @@ module Contrek
       def initialize(*args, **kwargs, &block)
         super
         @parts = []
+        @first_seam = nil
+        @last_seam = nil
       end
 
       def add_part(new_part)
@@ -16,8 +18,14 @@ module Contrek
         last.next = last.circular_next = new_part if last
         new_part.circular_next = @parts.first
         new_part.prev = last
-
-        new_part.orient! if new_part.is?(Part::SEAM)
+        if new_part.is?(Part::SEAM)
+          @first_seam ||= new_part
+          if !@last_seam.nil?
+            @last_seam.next_seam = new_part
+          end
+          @last_seam = new_part
+          new_part.orient!
+        end
       end
 
       def inspect_parts
@@ -27,6 +35,8 @@ module Contrek
       def partition!
         current_part = nil
         @parts = []
+        @first_seam = nil
+        @last_seam = nil
 
         @raw.each_with_index do |position, n|
           if @tile.tg_border?(position)
@@ -49,7 +59,7 @@ module Contrek
         end
         add_part(current_part)
 
-        trasmute_parts!
+        transmute_parts!
       end
 
       private
@@ -57,42 +67,37 @@ module Contrek
       # If there are SEAM parts and one is canceled out by another within the same polyline,
       # meaning that all its points are repeated in another, longer sequence,
       # then the shorter one is converted to EXCLUSIVE and marked as transmuted
-      def trasmute_parts!
+      def transmute_parts!
         transpose = tile.cluster.finder.transpose?
-
-        @parts.each do |inside|
-          next unless inside.is?(Part::SEAM)
-          @parts.each do |inside_compare|
-            next if inside == inside_compare
-            next unless inside_compare.is?(Part::SEAM)
-
+        if (current_seam = @first_seam)
+          loop do
             if transpose
-              if inside.within?(inside_compare)
-                if !inside.same_length?(inside_compare)
-                  inside.type = Part::EXCLUSIVE
-                  inside.trasmuted = true
-                  inside.head.end_point.queues.delete(inside)
-                  inside.tail.end_point.queues.delete(inside)
-                  break
-                end
-              end
-            else
-              count = 0
-              inside.each do |position|
-                inclusion = position.end_point.queues.include?(inside_compare)
-                count += 1 if inclusion
-              end
-              if count == inside.size
-                if count < inside_compare.size
-                  inside.type = Part::EXCLUSIVE
-                  inside.trasmuted = true
-                  break
-                end
-                if count == inside_compare.size && inside.next.nil? && inside_compare.prev.nil?
-                  inside.mirror = true
+              transmute_transposed_part(current_seam)
+            elsif !current_seam.transmutation_skip
+              current_seam.try_transmutation!
+            end
+            current_seam = current_seam.next_seam
+            break if current_seam.nil?
+          end
+        end
+      end
+
+      def transmute_transposed_part(part)
+        if (current_seam = @first_seam)
+          loop do
+            if current_seam != part
+              if part.within?(current_seam)
+                if !part.same_length?(current_seam)
+                  part.type = Part::EXCLUSIVE
+                  part.trasmuted = true
+                  part.head.end_point.queues.delete(part)
+                  part.tail.end_point.queues.delete(part)
+                  return
                 end
               end
             end
+            current_seam = current_seam.next_seam
+            break if current_seam.nil?
           end
         end
       end

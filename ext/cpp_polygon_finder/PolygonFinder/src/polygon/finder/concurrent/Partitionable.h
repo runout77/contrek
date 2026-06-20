@@ -21,8 +21,10 @@ class Partitionable {
 
  protected:
   std::vector<Part*> parts_;
-
+  Part* first_seam = nullptr;
+  Part* last_seam = nullptr;
  private:
   void add_part(Part* new_part);
-  void trasmute_parts();
+  void transmute_parts();
+  void transmute_transposed_part(Part* part);
 };

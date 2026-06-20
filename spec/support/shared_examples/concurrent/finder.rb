@@ -2655,6 +2655,48 @@ RSpec.shared_examples "finder" do
       expect(result.points).to eq([{outer: [{x: 3, y: 1}, {x: 3, y: 2}, {x: 5, y: 2}, {x: 5, y: 1}, {x: 5, y: 1}, {x: 5, y: 2}, {x: 5, y: 3}, {x: 4, y: 3}, {x: 4, y: 2}, {x: 1, y: 2}, {x: 1, y: 3}, {x: 0, y: 3}, {x: 1, y: 2}, {x: 1, y: 1}, {x: 2, y: 0}, {x: 3, y: 0}], inner: []}])
     end
 
+    it "merge mode (example 14 vertical) bug fixing" do
+      up = "   00000                      " \
+              "    00000000000               " \
+              "  000        00               " \
+              "   0         00               " \
+              " 00          00               " \
+              " 00          00               "
+      down = " 00          00               " \
+              " 00          00               " \
+              " 00          00               " \
+              " 00000000000000               " \
+              " 00000000000000               "
+      result_up = @simple_polygon_finder.new(@bitmap_class.new(up, 30),
+        @matcher,
+        nil,
+        {versus: :a, bounds: true, strict_bounds: true}).process_info
+      result_down = @simple_polygon_finder.new(@bitmap_class.new(down, 30),
+        @matcher,
+        nil,
+        {versus: :a, bounds: true, strict_bounds: true}).process_info
+      expect(result_down.metadata[:versus]).to eq(:a)
+      step_finder = @vertical_merger.new
+      step_finder.add_tile(result_up)
+      step_finder.add_tile(result_down)
+      result = step_finder.process_info
+      expect(result.points).to eq([{outer: [{x: 4, y: 1}, {x: 2, y: 2}, {x: 3, y: 3}, {x: 3, y: 3}, {x: 4, y: 2}, {x: 4, y: 1}, {x: 13, y: 1}, {x: 13, y: 2}, {x: 13, y: 3}, {x: 13, y: 4}, {x: 13, y: 5}, {x: 13, y: 6}, {x: 13, y: 7}, {x: 13, y: 8}, {x: 2, y: 8}, {x: 2, y: 7}, {x: 2, y: 6}, {x: 2, y: 5}, {x: 2, y: 4}, {x: 1, y: 4}, {x: 1, y: 5}, {x: 1, y: 6}, {x: 1, y: 7}, {x: 1, y: 8}, {x: 1, y: 9}, {x: 14, y: 9}, {x: 14, y: 8}, {x: 14, y: 7}, {x: 14, y: 6}, {x: 14, y: 5}, {x: 14, y: 4}, {x: 14, y: 3}, {x: 14, y: 2}, {x: 14, y: 1}, {x: 7, y: 0}, {x: 3, y: 0}], inner: []}])
+
+      result_up = @simple_polygon_finder.new(@bitmap_class.new(up, 30),
+        @matcher,
+        nil,
+        {versus: :o, bounds: true, strict_bounds: true}).process_info
+      result_down = @simple_polygon_finder.new(@bitmap_class.new(down, 30),
+        @matcher,
+        nil,
+        {versus: :o, bounds: true, strict_bounds: true}).process_info
+      step_finder = @vertical_merger.new
+      step_finder.add_tile(result_up)
+      step_finder.add_tile(result_down)
+      result = step_finder.process_info
+      expect(result.points).to eq([{outer: [{x: 14, y: 1}, {x: 14, y: 2}, {x: 14, y: 3}, {x: 14, y: 4}, {x: 14, y: 5}, {x: 14, y: 6}, {x: 14, y: 7}, {x: 14, y: 8}, {x: 14, y: 9}, {x: 1, y: 9}, {x: 1, y: 8}, {x: 1, y: 7}, {x: 1, y: 6}, {x: 1, y: 5}, {x: 1, y: 4}, {x: 2, y: 4}, {x: 2, y: 5}, {x: 2, y: 6}, {x: 2, y: 7}, {x: 2, y: 8}, {x: 13, y: 8}, {x: 13, y: 7}, {x: 13, y: 6}, {x: 13, y: 5}, {x: 13, y: 4}, {x: 13, y: 3}, {x: 13, y: 2}, {x: 13, y: 1}, {x: 4, y: 1}, {x: 4, y: 2}, {x: 3, y: 3}, {x: 3, y: 3}, {x: 2, y: 2}, {x: 4, y: 1}, {x: 3, y: 0}, {x: 7, y: 0}], inner: []}])
+    end
+
     # This test demonstrates how join polygons by their coordinates. Youn need to build some results from scratch by
     # defining polygons each one composed by the outer polyline and a list of inners ones including its bounding box.
     # Finally you need to declare the width and the height of the whole area (tile) inside the metadata hash.

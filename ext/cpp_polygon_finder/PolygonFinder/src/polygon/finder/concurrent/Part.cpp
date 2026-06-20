@@ -75,6 +75,36 @@ void Part::orient()
   }
 }
 
+void Part::try_transmutation() {
+  auto& head_queues = static_cast<Position*>(this->head)->end_point()->queues();
+  if (head_queues.size() == 1) {
+    return;
+  }
+
+  auto other_head_it = std::find_if(head_queues.begin(), head_queues.end(), [this](auto* queueable_ptr) {
+    Part* part = static_cast<Part*>(queueable_ptr);
+    return part != this && part->polyline()->tile == this->polyline()->tile;
+  });
+
+  if (other_head_it != head_queues.end()) {
+    Part* other_head_part = static_cast<Part*>(*other_head_it);
+    auto& tail_queues = static_cast<Position*>(this->tail)->end_point()->queues();
+    auto found_in_tail = std::find(tail_queues.begin(), tail_queues.end(), other_head_part);
+    if (found_in_tail != tail_queues.end()) {
+      if ( (other_head_part->tail->payload.y == tail->payload.y && other_head_part->head->payload.y == head->payload.y) ||
+           (other_head_part->tail->payload.y == head->payload.y && other_head_part->head->payload.y == tail->payload.y)) {
+        if (this->next == nullptr && other_head_part->prev == nullptr) {
+            this->mirror = true;
+        }
+      } else {
+          this->type = Part::EXCLUSIVE;
+          this->trasmuted = true;
+          other_head_part->transmutation_skip = true;
+      }
+    }
+  }
+}
+
 bool Part::within(Part* other) {
   const auto [self_min, self_max] = std::minmax(this->head->payload.y, this->tail->payload.y);
   const auto [other_min, other_max] = std::minmax(other->head->payload.y, other->tail->payload.y);

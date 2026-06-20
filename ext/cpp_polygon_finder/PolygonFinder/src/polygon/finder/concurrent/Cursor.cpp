@@ -61,11 +61,6 @@ void Cursor::traverse_outer(Part* act_part,
       if (act_part->size == 0) return;
 
       while (Position *position = act_part->next_position(nullptr)) {
-        if (outer_joined_polyline->size > 1 &&
-          outer_joined_polyline->head->payload == position->payload &&
-          act_part == all_parts.front()) {
-          return;
-        }
         outer_joined_polyline->add(position);
       }
     } else {

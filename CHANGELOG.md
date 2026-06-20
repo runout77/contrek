@@ -126,3 +126,6 @@ All notable changes to this project will be documented in this file.
 ## [1.3.0] - 2026-06-17
 - **Streaming merger:** Improvements and bug fixing.
 - **CPP code:** All structures now own 'Point' instances by value instead of raw pointers. Removed now-redundant `clone()` method; results from `process_info()` are already self-contained since points are owned by value, so the defensive deep copy is no longer needed.
+
+## [1.3.1] - 2026-06-20
+- **Streaming merger:** The progressive streaming extraction mode has now reached new heights of efficiency on the C++ side. This mode allows the data source to be processed in contiguous blocks. All isolated polygons, as well as those extending into the bottom strips, are removed from the list and streamed directly to the SVG file. This drastically reduces RAM requirements. An extreme test on an 81920×81920 pixel image containing a massive number of polygons (20,000,000) was processed using roughly 40 strips of 2000 pixels each in less than 300 seconds, peaking at a RAM usage of just 13GB.

@@ -10,11 +10,13 @@ module Contrek
       ADDED = 2
 
       attr_reader :polyline, :touched
-      attr_accessor :next, :circular_next, :prev, :type, :dead_end, :inverts, :trasmuted, :versus, :mirror
+      attr_accessor :next, :circular_next, :prev, :type, :dead_end, :inverts,
+        :trasmuted, :versus, :mirror, :next_seam, :transmutation_skip
       def initialize(type, polyline)
         @type = type
         @polyline = polyline
         @next = nil
+        @next_seam = nil
         @circular_next = nil
         @prev = nil
         @dead_end = false
@@ -23,6 +25,7 @@ module Contrek
         @trasmuted = false
         @versus = 0
         @mirror = false
+        @transmutation_skip = false
       end
 
       def is?(type)
@@ -76,6 +79,27 @@ module Contrek
             0
           else
             diff.positive? ? 1 : -1
+          end
+        end
+      end
+
+      def try_transmutation!
+        head_queues = head.end_point.queues
+        return if head_queues.size == 1
+        other_head_part = head_queues.find { |part| part.polyline.tile == polyline.tile && part != self }
+        if other_head_part
+          tail_queues = tail.end_point.queues
+          if tail_queues.find { |part| part == other_head_part }
+            if (other_head_part.tail.payload[:y] == tail.payload[:y] && other_head_part.head.payload[:y] == head.payload[:y]) ||
+                (other_head_part.tail.payload[:y] == head.payload[:y] && other_head_part.head.payload[:y] == tail.payload[:y])
+              if self.next.nil? && other_head_part.prev.nil?
+                self.mirror = true
+              end
+            else
+              self.type = Part::EXCLUSIVE
+              self.trasmuted = true
+              other_head_part.transmutation_skip = true
+            end
           end
         end
       end

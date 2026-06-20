@@ -32,11 +32,23 @@ void Partitionable::add_part(Part* new_part)
   new_part->prev = last;
   new_part->circular_next = this->parts_.front();
 
-  if (new_part->is(Part::SEAM)) new_part->orient();
+  if (new_part->is(Part::SEAM)) {
+    if (!this->first_seam) {
+      this->first_seam = new_part;
+    }
+    if (this->last_seam) {
+      this->last_seam->next_seam = new_part;
+    }
+    this->last_seam = new_part;
+    new_part->orient();
+  }
 }
 
 void Partitionable::partition()
 { this->parts_.clear();
+  this->first_seam = nullptr;
+  this->last_seam = nullptr;
+
   Polyline *polyline = static_cast<Polyline*>(this);
   PartPool& pool = polyline->tile->cluster->parts_pool;
   Part *current_part = nullptr;
@@ -65,54 +77,42 @@ void Partitionable::partition()
   }
   this->add_part(current_part);
 
-  this->trasmute_parts();
+  this->transmute_parts();
 }
 
-void Partitionable::trasmute_parts()
-{ Polyline *polyline = static_cast<Polyline*>(this);
-  bool transpose = polyline->tile->cluster->finder()->transpose();
-
-  for (Part* inside : parts_) {
-    if (!inside->is(Part::SEAM)) continue;
-    for (Part* inside_compare : parts_) {
-      if (inside == inside_compare || !inside_compare->is(Part::SEAM)) continue;
-
-      if (transpose) {
-        if (inside->within(inside_compare)) {
-          Part* target_part;
-          if (!inside->same_length(inside_compare)) {
-            target_part = inside;
-            target_part->type = Part::EXCLUSIVE;
-            target_part->trasmuted = true;
-            std::vector<Queueable<Point>*>& a = static_cast<Position*>(target_part->head)->end_point()->queues();
-            a.erase(std::remove(a.begin(), a.end(), target_part), a.end());
-            std::vector<Queueable<Point>*>& b = static_cast<Position*>(target_part->tail)->end_point()->queues();
-            b.erase(std::remove(b.begin(), b.end(), target_part), b.end());
-            break;
-          }
-        }
-      } else {
-        int count = 0;
-        inside->each([&](QNode<Point>* pos) -> bool {
-          Position *position = static_cast<Position*>(pos);
-          if (position->end_point()->queues_include(inside_compare))
-          { count++;
-            return true;
-          }
-          return false;
-        });
-        if (count == inside->size) {
-          if (count < inside_compare->size) {
-            inside->type = Part::EXCLUSIVE;
-            inside->trasmuted = true;
-            break;
-          } else if ( count == inside_compare->size &&
-                      inside->next == nullptr &&
-                      inside_compare->prev == nullptr) {
-            inside->mirror = true;
+void Partitionable::transmute_transposed_part(Part* part) {
+  if (Part* current_seam = this->first_seam; current_seam != nullptr) {
+    while (current_seam != nullptr) {
+      if (current_seam != part) {
+        if (part->within(current_seam)) {
+          if (!part->same_length(current_seam)) {
+            part->type = Part::EXCLUSIVE;
+            part->trasmuted = true;
+            std::vector<Queueable<Point>*>& a = static_cast<Position*>(part->head)->end_point()->queues();
+            a.erase(std::remove(a.begin(), a.end(), part), a.end());
+            std::vector<Queueable<Point>*>& b = static_cast<Position*>(part->tail)->end_point()->queues();
+            b.erase(std::remove(b.begin(), b.end(), part), b.end());
           }
         }
       }
+      current_seam = current_seam->next_seam;
+    }
+  }
+}
+
+void Partitionable::transmute_parts()
+{ Polyline *polyline = static_cast<Polyline*>(this);
+  bool transpose = polyline->tile->cluster->finder()->transpose();
+  if (Part* current_seam = this->first_seam; current_seam != nullptr) {
+    while (current_seam != nullptr) {
+      if (transpose) {
+        transmute_transposed_part(current_seam);
+      } else {
+        if (!current_seam->transmutation_skip) {
+          current_seam->try_transmutation();
+        }
+      }
+      current_seam = current_seam->next_seam;
     }
   }
 }

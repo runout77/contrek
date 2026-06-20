@@ -34,5 +34,5 @@ class Cluster {
   static void list_to_string(std::vector<Point> list);
   PartPool parts_pool;
   std::deque<Position> positions_pool;
-  const Finder* finder() const { return finder_; };
+  const Finder* finder() const { return finder_; }
 };
