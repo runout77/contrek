@@ -16,20 +16,22 @@
 #include <vector>
 
 class StreamingMerger : public VerticalMerger {
- private:
+ protected:
   std::ofstream* stream;
   int total_width;
   int total_height;
   int moved = 0;
+
+  void stream_polygons(Tile* tile, bool flush = false);
+  virtual void stream_raw_polygon(const Shape* shape);
+  virtual void write_header() = 0;
+  virtual void write_footer() = 0;
+  virtual void write_outer_polygon_start() = 0;
+  virtual void write_outer_polygon_end() = 0;
+  virtual void write_inner_polygon_start() = 0;
+  virtual void write_inner_polygon_end() = 0;
   void ensure_header();
   void ensure_footer();
-  void stream_polygons(Tile* tile, bool flush = false);
-  void stream_raw_polygon(const Shape* shape);
-  virtual std::string svg_css();
-  virtual std::string svg_header_string();
-  virtual std::string svg_footer_string();
-  virtual std::string svg_outer_polygon_string(std::string_view points);
-  virtual std::string svg_inner_polygon_string(std::string_view points);
 
  public:
   StreamingMerger(int number_of_threads,

@@ -96,6 +96,7 @@
 #include "PolygonFinder/src/polygon/finder/concurrent/VerticalMerger.cpp"
 #include "PolygonFinder/src/polygon/finder/concurrent/StreamingMerger.h"
 #include "PolygonFinder/src/polygon/finder/concurrent/StreamingMerger.cpp"
+#include "PolygonFinder/src/polygon/finder/concurrent/SvgStreamingMerger.h"
 #include "PolygonFinder/src/polygon/finder/concurrent/ShapePool.h"
 #include "PolygonFinder/src/polygon/finder/concurrent/ShapePool.cpp"
 extern "C" {
@@ -315,7 +316,7 @@ StreamingMerger* create_streaming_merger(Object self,
                                          int total_width,
                                          int total_height) {
   OfstreamWrapper* wrapper = Rice::detail::From_Ruby<OfstreamWrapper*>().convert(stream_obj.value());
-  return new StreamingMerger(number_of_threads, options, &wrapper->get_stream(), total_width, total_height);
+  return new SvgStreamingMerger(number_of_threads, options, &wrapper->get_stream(), total_width, total_height);
 }
 
 OfstreamWrapper* create_ofstream(Object self, std::string path) {
