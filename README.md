@@ -58,7 +58,7 @@ The **Stripe-Merging** algorithm has been validated through a dedicated testing 
 * **Extraction Fidelity:** Verifying polygon precision across both engines.
 
 The complete testing suite, source code, and raw benchmarks are available here:
-👉 **[test_opencv_contrek](https://github.com/runout77/test_opencv_contrek)**
+👉 **[test_contrek](https://github.com/runout77/test_contrek)**
 
 ## Prerequisites
 
