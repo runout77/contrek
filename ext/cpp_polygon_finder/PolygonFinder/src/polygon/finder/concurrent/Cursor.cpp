@@ -125,7 +125,7 @@ void Cursor::traverse_outer(Part* act_part,
   }
 }
 
-std::vector<InnerPolyline*> Cursor::join_inners(Sequence* outer_seq, bool treemap) {
+std::vector<InnerPolyline*> Cursor::join_inners(bool treemap) {
   std::vector<InnerPolyline*> return_inner_polylines;
   std::vector<Shape*> processing_queue = shapes_sequence_;
   for (size_t i = 0; i < shapes_sequence_.size(); ++i)

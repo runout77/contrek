@@ -21,7 +21,7 @@ class Cursor {
  public:
   Cursor(Cluster& cluster, Shape* shape);
   Sequence* join_outers();
-  std::vector<InnerPolyline*> join_inners(Sequence* outer_seq, bool treemap);
+  std::vector<InnerPolyline*> join_inners(bool treemap);
   std::list<InnerPolyline*> orphan_inners() { return orphan_inners_; }
   const std::vector<Shape*>& shapes_sequence() const { return shapes_sequence_; }
 

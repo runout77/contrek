@@ -86,7 +86,7 @@ Tile* Cluster::merge_tiles() {
 
         timer.start();
         std::vector<InnerPolyline*> new_inners = shape->inner_polylines;
-        std::vector<InnerPolyline*> new_inner_polylines = cursor.join_inners(new_outer, treemap);
+        std::vector<InnerPolyline*> new_inner_polylines = cursor.join_inners(treemap);
         tot_inner += timer.stop();
 
         for (InnerPolyline* inner_polyline : new_inner_polylines) {
