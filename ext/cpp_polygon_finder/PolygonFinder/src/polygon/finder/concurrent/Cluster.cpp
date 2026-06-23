@@ -78,10 +78,8 @@ Tile* Cluster::merge_tiles() {
 
       if (shape->outer_polyline->any_ancients) {
         Cursor cursor(*this, shape);
-        Sequence* new_outer = nullptr;
-
         timer.start();
-        new_outer = cursor.join_outers();
+        Sequence new_outer = cursor.join_outers();
         tot_outer += timer.stop();
 
         timer.start();
@@ -99,7 +97,7 @@ Tile* Cluster::merge_tiles() {
         for (auto s : cursor.orphan_inners()) {
           new_inners.push_back(s);
         }
-        Polyline* polyline = tile->shapes_pool->acquire_polyline(tile, new_outer->to_vector(), std::nullopt);
+        Polyline* polyline = tile->shapes_pool->acquire_polyline(tile, new_outer.to_vector(), std::nullopt);
         Shape* inserting_new_shape = tile->shapes_pool->acquire_shape(polyline, new_inners);
         new_shapes.push_back(inserting_new_shape);
         polyline->shape = inserting_new_shape;

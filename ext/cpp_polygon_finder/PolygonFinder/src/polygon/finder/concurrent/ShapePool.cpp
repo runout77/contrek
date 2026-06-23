@@ -44,12 +44,6 @@ InnerPolyline* ShapePool::acquire_inner_polyline(Sequence* seq) {
   return ip;
 }
 
-Sequence* ShapePool::acquire_sequence() {
-  sequences_storage.emplace_back();
-  Sequence* s = &sequences_storage.back();
-  return s;
-}
-
 Polyline* ShapePool::acquire_polyline(Tile* tile, std::vector<Point> polygon, const std::optional<RectBounds>& bounds = std::nullopt) {
   polylines_storage.emplace_back(tile, std::move(polygon), bounds);
   Polyline* p = &polylines_storage.back();

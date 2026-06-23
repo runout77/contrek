@@ -18,20 +18,20 @@ Cursor::Cursor(Cluster& cluster, Shape* shape)
 : cluster(cluster), shape(shape) {
 }
 
-Sequence* Cursor::join_outers()
+Sequence Cursor::join_outers()
 { Polyline* outer_polyline = shape->outer_polyline;
   this->shapes_sequence_.push_back(this->shape);
   this->shapes_sequence_lookup.insert(this->shape);
-  Sequence* outer_joined_polyline = outer_polyline->tile->shapes_pool->acquire_sequence();
+  Sequence outer_joined_polyline;
   std::vector<Part*> all_parts;
   this->traverse_outer(outer_polyline->parts().front(),
                        all_parts,
                        this->shapes_sequence_,
                        outer_joined_polyline);
 
-  if (outer_joined_polyline->head->payload == outer_joined_polyline->tail->payload &&
+  if (outer_joined_polyline.head->payload == outer_joined_polyline.tail->payload &&
       this->cluster.tiles().front()->left() &&
-      this->cluster.tiles().back()->right()) outer_joined_polyline->pop();
+      this->cluster.tiles().back()->right()) outer_joined_polyline.pop();
 
   for (Shape* shape : shapes_sequence_) {
     shape->outer_polyline->turn_on(Polyline::TRACKED_OUTER);
@@ -50,7 +50,7 @@ Sequence* Cursor::join_outers()
 void Cursor::traverse_outer(Part* act_part,
                             std::vector<Part*>& all_parts,
                             std::vector<Shape*>& shapes_sequence,
-                            Sequence* outer_joined_polyline) {
+                            Sequence& outer_joined_polyline) {
   while (act_part != nullptr) {
     Part* last_part = (!all_parts.empty()) ? all_parts.back() : nullptr;
     if (all_parts.empty() || last_part != act_part) {
@@ -61,7 +61,7 @@ void Cursor::traverse_outer(Part* act_part,
       if (act_part->size == 0) return;
 
       while (Position *position = act_part->next_position(nullptr)) {
-        outer_joined_polyline->add(position);
+        outer_joined_polyline.add(position);
       }
     } else {
       if (act_part->dead_end &&
@@ -69,13 +69,13 @@ void Cursor::traverse_outer(Part* act_part,
          last_part->is(Part::SEAM) &&
          last_part->polyline() == act_part->polyline()) return;
       while (Position *new_position = static_cast<Position*>(act_part->iterator())) {
-        if (outer_joined_polyline->size > 1 &&
-          outer_joined_polyline->head->payload == new_position->payload &&
+        if (outer_joined_polyline.size > 1 &&
+          outer_joined_polyline.head->payload == new_position->payload &&
           act_part == all_parts.front()) {
           return;
         }
         this->cluster.positions_pool.emplace_back(this->cluster.hub(), new_position->payload);
-        outer_joined_polyline->add(&this->cluster.positions_pool.back());
+        outer_joined_polyline.add(&this->cluster.positions_pool.back());
         new_position->end_point()->tracked_outer = true;
         int versus = act_part->versus();
         auto& q_set = new_position->end_point()->queues();
@@ -140,10 +140,10 @@ std::vector<InnerPolyline*> Cursor::join_inners(bool treemap) {
           .max = 0
         };
         traverse_inner(part, all_parts, bounds, tracked_end_points);
-        Sequence* retme_sequence = shape->outer_polyline->tile->shapes_pool->acquire_sequence();
+        Sequence retme_sequence;
         for (Part* part : all_parts)
         { part->touch();
-          retme_sequence->move_from(*part, [&](QNode<Point>* pos) -> bool {
+          retme_sequence.move_from(*part, [&](QNode<Point>* pos) -> bool {
           Position *position = static_cast<Position*>(pos);
           if (part->is(Part::ADDED) &&
              !(position->payload.y >= bounds.min &&
@@ -153,8 +153,8 @@ std::vector<InnerPolyline*> Cursor::join_inners(bool treemap) {
             return(!(polyline->tile->tg_border(position->payload) && position->end_point()->tracked_outer));
           });
         }
-        if (retme_sequence->is_not_vertical()) {
-          InnerPolyline* inner_polyline = polyline->tile->shapes_pool->acquire_inner_polyline(retme_sequence);
+        if (retme_sequence.is_not_vertical()) {
+          InnerPolyline* inner_polyline = polyline->tile->shapes_pool->acquire_inner_polyline(&retme_sequence);
           return_inner_polylines.push_back(inner_polyline);
           if (treemap) {
             mark_children(tracked_end_points, polyline, inner_polyline);

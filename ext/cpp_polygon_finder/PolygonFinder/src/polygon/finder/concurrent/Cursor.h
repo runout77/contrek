@@ -20,7 +20,7 @@
 class Cursor {
  public:
   Cursor(Cluster& cluster, Shape* shape);
-  Sequence* join_outers();
+  Sequence join_outers();
   std::vector<InnerPolyline*> join_inners(bool treemap);
   std::list<InnerPolyline*> orphan_inners() { return orphan_inners_; }
   const std::vector<Shape*>& shapes_sequence() const { return shapes_sequence_; }
@@ -34,7 +34,7 @@ class Cursor {
   void traverse_outer(Part* act_part,
                       std::vector<Part*>& all_parts,
                       std::vector<Shape*>& shapes_sequence,
-                      Sequence* outer_joined_polyline);
+                      Sequence& outer_joined_polyline);
   void traverse_inner(Part* act_part, std::vector<Part*> &all_parts, Bounds& bounds, std::vector<EndPoint*>& tracked_end_points);
   std::vector<Shape*> connect_missings(std::vector<Shape*> shapes_sequence, std::vector<Shape*> missing_shapes);
   void mark_children(std::vector<EndPoint*>& end_points, const Polyline* outer_polyline, InnerPolyline* inner_polyline);

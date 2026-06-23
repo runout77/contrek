@@ -24,14 +24,12 @@ class ShapePool {
   Tile* owner_tile_ = nullptr;
   std::deque<Shape> shapes_storage;
   std::deque<InnerPolyline> inner_polylines_storage;
-  std::deque<Sequence> sequences_storage;
   std::deque<Polyline> polylines_storage;
 
  public:
   Shape* acquire_shape(Polyline* outer_polyline, const std::vector<InnerPolyline*>& inner_polylines);
   InnerPolyline* acquire_inner_polyline(std::vector<Point> coords, Shape* s);
   InnerPolyline* acquire_inner_polyline(Sequence* seq);
-  Sequence* acquire_sequence();
   Polyline* acquire_polyline(Tile* tile, std::vector<Point> polygon, const std::optional<RectBounds>& bounds);
   void set_owner(Tile* tile);
   void detach_shape();
