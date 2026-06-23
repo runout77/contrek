@@ -13,34 +13,14 @@
 
 InnerPolyline::InnerPolyline(std::vector<Point> raw_coordinates, Shape* shape)
   : raw_coordinates_(std::move(raw_coordinates)),
-    shape_(shape) {}
-InnerPolyline::InnerPolyline(Sequence* sequence)
-  : sequence_(sequence) {
+    shape(shape) {}
+InnerPolyline::InnerPolyline(Sequence* sequence) {
   this->raw_coordinates_ = sequence->to_vector();
+  this->shape = sequence->shape;
 }
 
-std::vector<Point>& InnerPolyline::raw() {
-  return this->raw_coordinates_;
-}
-
-Bounds& InnerPolyline::vertical_bounds() {
-  if (sequence_ != nullptr) {
-    return(sequence_->vertical_bounds);
-  } else {
-    return(this->raw_vertical_bounds());
-  }
-}
-
-Shape* InnerPolyline::shape() {
-  if (sequence_ != nullptr) {
-    return(sequence_->shape);
-  } else {
-    return(this->shape_ ? this->shape_ : this->assigned_shape);
-  }
-}
-
-Bounds& InnerPolyline::raw_vertical_bounds() {
-  if (!raw_coordinates_.empty()) {
+void InnerPolyline::compute_vertical_bounds()
+{ if (!raw_coordinates_.empty()) {
     int min_y = raw_coordinates_[0].y;
     int max_y = raw_coordinates_[0].y;
     for (const auto& pos : raw_coordinates_) {
@@ -50,5 +30,4 @@ Bounds& InnerPolyline::raw_vertical_bounds() {
     vertical_bounds_.min = min_y;
     vertical_bounds_.max = max_y;
   }
-  return(vertical_bounds_);
 }

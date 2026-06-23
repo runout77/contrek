@@ -57,11 +57,11 @@ module Contrek
               new_inners = shape.inner_polylines
               new_inner_polylines = []
               tot_inner += Benchmark.measure do
-                new_inner_polylines = cursor.join_inners!(new_outer, treemap)
+                new_inner_polylines = cursor.join_inners!(treemap)
                 new_inners += new_inner_polylines
                 if treemap
                   new_inner_polylines.each do |inner_polyline|
-                    inner_polyline.sequence.compute_vertical_bounds!
+                    inner_polyline.compute_vertical_bounds!
                     all_new_inner_polylines += new_inner_polylines
                   end
                 end
@@ -73,7 +73,7 @@ module Contrek
               new_shapes << inserting_new_shape
               polyline.shape = inserting_new_shape
 
-              new_inner_polylines.each { |inner_polyline| inner_polyline.sequence.shape = inserting_new_shape }
+              new_inner_polylines.each { |inner_polyline| inner_polyline.shape = inserting_new_shape }
 
               if treemap
                 cursor.shapes_sequence.each do |merged_shape|
@@ -115,7 +115,7 @@ module Contrek
       private
 
       def assign_ancestry(shape, inner_polyline)
-        shape.set_parent_shape(inner_polyline.sequence.shape)
+        shape.set_parent_shape(inner_polyline.shape)
         shape.parent_inner_polyline = inner_polyline
         shape.fixed = true
       end

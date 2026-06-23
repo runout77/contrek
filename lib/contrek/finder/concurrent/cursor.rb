@@ -40,7 +40,7 @@ module Contrek
         outer_joined_polyline
       end
 
-      def join_inners!(outer_seq, treemap)
+      def join_inners!(treemap)
         return_inner_polylines = []
         shape_index = 0
 

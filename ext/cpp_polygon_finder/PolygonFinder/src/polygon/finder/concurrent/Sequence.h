@@ -22,8 +22,6 @@ class Sequence : public Queueable<Point>{
   std::string toString();
   bool is_not_vertical();
   Shape* shape = nullptr;
-  Bounds vertical_bounds;
-  void compute_vertical_bounds();
   const std::vector<Point>& get_vector_cache() {
     if (vector_cache.empty() && this->size > 0) {
       vector_cache = this->to_vector();

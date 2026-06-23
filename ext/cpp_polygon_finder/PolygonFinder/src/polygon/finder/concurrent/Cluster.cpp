@@ -92,7 +92,7 @@ Tile* Cluster::merge_tiles() {
         for (InnerPolyline* inner_polyline : new_inner_polylines) {
           new_inners.push_back(inner_polyline);
           if (treemap) {
-            inner_polyline->sequence()->compute_vertical_bounds();
+            inner_polyline->compute_vertical_bounds();
             all_new_inner_polylines.push_back(inner_polyline);
           }
         }
@@ -105,7 +105,7 @@ Tile* Cluster::merge_tiles() {
         polyline->shape = inserting_new_shape;
 
         for (InnerPolyline* inner_polyline : new_inner_polylines) {
-          inner_polyline->sequence()->shape = inserting_new_shape;
+          inner_polyline->shape = inserting_new_shape;
         }
         if (treemap) {
           for (const auto merged_shape : cursor.shapes_sequence()) {
@@ -151,7 +151,7 @@ Tile* Cluster::merge_tiles() {
 }
 
 void Cluster::assign_ancestry(Shape *shape, InnerPolyline* inner_polyline)
-{ shape->set_parent_shape(inner_polyline->sequence()->shape);
+{ shape->set_parent_shape(inner_polyline->shape);
   shape->parent_inner_polyline = inner_polyline;
   shape->fixed = true;
 }

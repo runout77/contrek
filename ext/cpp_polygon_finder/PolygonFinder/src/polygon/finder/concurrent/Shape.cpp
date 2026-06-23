@@ -17,11 +17,7 @@
 Shape::Shape(ShapePool* shape_pool, Polyline* outer_polyline, const std::vector<InnerPolyline*>& inner_polylines)
 : outer_polyline(outer_polyline),
   inner_polylines(inner_polylines),
-  shape_pool_(shape_pool) {
-  for (InnerPolyline* ip : inner_polylines) {
-    ip->assigned_shape = this;
-  }
-}
+  shape_pool_(shape_pool) {}
 
 void Shape::clear_inner() {
   inner_polylines.clear();

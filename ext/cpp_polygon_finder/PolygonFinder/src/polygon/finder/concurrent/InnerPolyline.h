@@ -16,15 +16,12 @@ class InnerPolyline {
  public:
   explicit InnerPolyline(std::vector<Point> raw_coordinates, Shape* shape);
   explicit InnerPolyline(Sequence* sequence);
-  std::vector<Point>& raw();
-  Sequence* sequence() { return this->sequence_; }
-  Bounds& vertical_bounds();
-  Shape* shape();
-  Shape* assigned_shape = nullptr;
+  std::vector<Point>& raw() { return this->raw_coordinates_; };
+  Bounds& vertical_bounds() { return this->vertical_bounds_; };
+  Shape* shape = nullptr;
+  void compute_vertical_bounds();
+
  private:
   std::vector<Point> raw_coordinates_;
-  Sequence* sequence_ = nullptr;
-  Shape* shape_;
-  Bounds& raw_vertical_bounds();
-  Bounds vertical_bounds_;
+  Bounds vertical_bounds_{0, 0};
 };

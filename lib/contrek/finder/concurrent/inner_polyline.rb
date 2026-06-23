@@ -3,37 +3,20 @@
 module Contrek
   module Concurrent
     class InnerPolyline
-      attr_reader :sequence
+      attr_reader :raw, :vertical_bounds
+      attr_accessor :shape
 
       def initialize(shape: nil, raw_coordinates: [], sequence: nil)
-        @raw = raw_coordinates if raw_coordinates
-        @sequence = sequence if sequence
-        @shape = shape
-      end
-
-      def raw
-        @sequence ? @sequence.to_a : @raw
-      end
-
-      def vertical_bounds
-        if @sequence
-          @sequence.vertical_bounds
+        if sequence
+          @shape = sequence.shape
+          @raw = sequence.to_a
         else
-          raw_vertical_bounds
+          @shape = shape
+          @raw = raw_coordinates
         end
       end
 
-      def shape
-        if @sequence
-          @sequence.shape
-        else
-          @shape
-        end
-      end
-
-      private
-
-      def raw_vertical_bounds
+      def compute_vertical_bounds!
         @vertical_bounds ||= begin
           min_y = Float::INFINITY
           max_y = 0
