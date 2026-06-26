@@ -8,16 +8,16 @@
  */
 
 #pragma once
-#include "StreamingMerger.h"
 #include <string>
+#include "StreamingMerger.h"
 
 class SvgStreamingMerger : public StreamingMerger {
-private:
+ private:
   std::string svg_css() {
       return ".out{fill:none;stroke:red;stroke-width:1;}.in{fill:none;stroke:green;stroke-width:1;}.out:hover{stroke:yellow;}";
   }
 
-protected:
+ protected:
   void write_header() override {
     *stream << "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"" << total_width
             << "\" height=\"" << total_height << "\"><style>" << svg_css() << "</style>";
@@ -37,6 +37,7 @@ protected:
   void write_inner_polygon_end() override {
     *stream << "\" class=\"in\"/>";
   }
-public:
+
+ public:
   using StreamingMerger::StreamingMerger;
 };

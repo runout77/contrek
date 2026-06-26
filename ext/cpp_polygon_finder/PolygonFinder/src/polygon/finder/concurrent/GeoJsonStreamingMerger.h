@@ -8,15 +8,16 @@
  */
 
 #pragma once
-#include "StreamingMerger.h"
 #include <vector>
+#include <string>
+#include "StreamingMerger.h"
 
 class GeoJsonStreamingMerger : public StreamingMerger {
-private:
+ private:
   unsigned int target_value;
-  bool is_first_feature = true; 
+  bool is_first_feature = true;
 
-protected:
+ protected:
   void write_header() override {
     if (stream) {
       *stream << "{\"type\":\"FeatureCollection\",\"features\":[\n";
@@ -33,7 +34,7 @@ protected:
   void write_inner_polygon_start() override {}
   void write_inner_polygon_end() override {}
 
-public:
+ public:
   GeoJsonStreamingMerger(int number_of_threads,
                          std::vector<std::string>* options,
                          std::ofstream* stream_to,
@@ -49,7 +50,7 @@ public:
     }
     is_first_feature = false;
 
-    *stream << "{\"type\":\"Feature\",\"properties\":{\"value\":" << target_value 
+    *stream << "{\"type\":\"Feature\",\"properties\":{\"value\":" << target_value
             << "},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[ [";
     const std::vector<Point>& points = shape->outer_polyline->raw();
     const size_t points_size = points.size();

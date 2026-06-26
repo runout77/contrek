@@ -18,6 +18,8 @@
 #include <cstring>
 #include <algorithm>
 #include <cstdio>
+#include <fstream>
+#include <unistd.h>
 
 #include "polygon/finder/PolygonFinder.h"
 #include "polygon/finder/concurrent/ClippedPolygonFinder.h"
@@ -35,6 +37,8 @@
 #include "polygon/finder/concurrent/HorizontalMerger.h"
 #include "polygon/finder/concurrent/VerticalMerger.h"
 #include "polygon/finder/concurrent/StreamingMerger.h"
+#include "polygon/finder/concurrent/SvgStreamingMerger.h"
+#include "polygon/finder/concurrent/GeoJsonStreamingMerger.h"
 #include "polygon/finder/concurrent/Sequence.h"
 #include "polygon/finder/concurrent/Position.h"
 #include "polygon/finder/Polygon.h"
@@ -384,6 +388,17 @@ void Tests::test_i() {
   std::cout << "Memory usage peak: " << get_peak_rss() << " MB" << std::endl;
 }
 
+double get_current_rss_mb() {
+  std::ifstream statm("/proc/self/statm");
+  uint32_t size = 0;
+  uint32_t resident = 0;
+
+  statm >> size >> resident;
+
+  uint32_t page_size = sysconf(_SC_PAGESIZE);
+  return (resident * page_size) / (1024.0 * 1024.0);
+}
+
 void stream_progressive_png_image(const std::string& filepath, uint32_t stripe_height) {
     std::vector<ProcessResult*> result_clones;
     std::vector<std::string> varguments = {"--bounds"};
@@ -422,8 +437,11 @@ void stream_progressive_png_image(const std::string& filepath, uint32_t stripe_h
     if (!shared_stream) {
       std::cerr << "Error: Unable creating output streaming file!" << std::endl;
     }
+    std::vector<char> buffer(4 * 1024 * 1024);  // Buffer (4MB)
+    shared_stream.rdbuf()->pubsetbuf(buffer.data(), buffer.size());
 
-    StreamingMerger vmerger(0, &varguments, &shared_stream, total_width, total_height);
+    SvgStreamingMerger vmerger(0, &varguments, &shared_stream, total_width, total_height);
+    // GeoJsonStreamingMerger vmerger(0, &varguments, &shared_stream, total_width, total_height, 4294901760);
     try {
       size_t row_size = static_cast<size_t>(total_width) * 4;
       int stripe_count = 0;
@@ -463,6 +481,7 @@ void stream_progressive_png_image(const std::string& filepath, uint32_t stripe_h
           std::cout << "stripe " << stripe_count << ": found polygons " << result->groups << std::endl;
           vmerger.add_tile(*result, !(current_y_offset + stripe_height < total_height));
           delete result;
+          std::cout << "-> RSS before merge: " << get_current_rss_mb() << " MB" << std::endl;
         }
         stripe_count++;
       }
@@ -479,5 +498,6 @@ void stream_progressive_png_image(const std::string& filepath, uint32_t stripe_h
 
 void Tests::test_l() {
   stream_progressive_png_image("../images/mixed_shapes_1024x1024.png", 300);
+  // stream_progressive_png_image("../images/test_20480x20480.png", 2000);
   std::cout << "Memory usage peak: " << get_peak_rss() << " MB" << std::endl;
 }

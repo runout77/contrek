@@ -174,6 +174,7 @@ module Contrek
                   if !dest_part.polyline.on?(Polyline::TRACKED_OUTER)
                     @shapes_sequence << shape
                     @orphan_inners += shape.inner_polylines
+                    shape.clear_inner!
                   end
                   dest_part.polyline.turn_on(Polyline::TRACKED_OUTER)
                   if !dest_part.touched

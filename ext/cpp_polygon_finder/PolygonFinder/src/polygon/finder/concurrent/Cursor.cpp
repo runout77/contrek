@@ -233,6 +233,7 @@ void Cursor::traverse_inner(Part* act_part, std::vector<Part*>& all_parts, Bound
                   orphan_inners_.end(),
                   shape->inner_polylines.begin(),
                   shape->inner_polylines.end());
+                shape->clear_inner();
               }
               dest_part->polyline()->turn_on(Polyline::TRACKED_OUTER);
               if (!dest_part->touched()) {

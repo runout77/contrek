@@ -11,10 +11,12 @@
 #include <vector>
 #include "InnerPolyline.h"
 
-InnerPolyline::InnerPolyline(std::vector<Point> raw_coordinates, Shape* shape)
-  : raw_coordinates_(std::move(raw_coordinates)),
+InnerPolyline::InnerPolyline(ShapePool* shape_pool, std::vector<Point> raw_coordinates, Shape* shape)
+  : shape_pool(shape_pool),
+    raw_coordinates_(std::move(raw_coordinates)),
     shape(shape) {}
-InnerPolyline::InnerPolyline(Sequence* sequence) {
+InnerPolyline::InnerPolyline(ShapePool* shape_pool, Sequence* sequence)
+  : shape_pool(shape_pool) {
   this->raw_coordinates_ = sequence->to_vector();
   this->shape = sequence->shape;
 }

@@ -1,11 +1,19 @@
 # frozen_string_literal: true
 
+require "time"
+require "json"
+require "fileutils"
+
 module PerformanceHelpers
   HISTORY_PATH = File.expand_path("../../files/performance_history.json", __dir__)
   MAX_SAMPLES = Integer(ENV.fetch("CONTREK_PERF_MAX_SAMPLES", "100"))
   MIN_SAMPLES = Integer(ENV.fetch("CONTREK_PERF_MIN_SAMPLES", "20"))
   TOLERANCE = Float(ENV.fetch("CONTREK_PERF_TOLERANCE", "1.25"))
   STDDEV_FACTOR = Float(ENV.fetch("CONTREK_PERF_STDDEV_FACTOR", "3.0"))
+
+  VERSION = 0
+  DATE = 1
+  ELAPSED = 2
 
   def expect_performance(name = nil)
     benchmark_name = name || RSpec.current_example.full_description
@@ -18,19 +26,24 @@ module PerformanceHelpers
     entry = history[benchmark_name] || {}
 
     samples = Array(entry["samples"])
-    previous_stats = stats(samples)
+    previous_stats = stats(samples.map { |sample| sample[ELAPSED] }.compact)
 
     if samples.size >= MIN_SAMPLES
       limit = performance_limit(previous_stats)
       expect(elapsed).to be <= limit
     end
 
-    samples << elapsed
+    samples << [
+      Contrek::VERSION,
+      Time.now.utc.iso8601,
+      elapsed
+    ]
+
     samples = samples.last(MAX_SAMPLES)
 
     history[benchmark_name] = {
       "samples" => samples,
-      "stats" => stats(samples)
+      "stats" => stats(samples.map { |sample| sample[ELAPSED] }.compact)
     }
     save_performance_history(history)
 
@@ -48,9 +61,16 @@ module PerformanceHelpers
   def save_performance_history(history)
     FileUtils.mkdir_p(File.dirname(HISTORY_PATH))
 
+    json = JSON.pretty_generate(history)
+
+    json.gsub!(
+      /\[\s*\n\s*("[^"]+"),\s*\n\s*(null|"[^"]+"),\s*\n\s*([0-9eE.+-]+)\s*\n\s*\]/,
+      '[\1, \2, \3]'
+    )
+
     File.write(
       HISTORY_PATH,
-      JSON.pretty_generate(history.sort.to_h)
+      json
     )
   end
 

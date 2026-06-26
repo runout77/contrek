@@ -24,6 +24,10 @@ void Shape::clear_inner() {
 }
 
 void Shape::detach_from_pool() {
+  this->outer_polyline->shape_pool->detach_polyline();
+  for (InnerPolyline* inner_polyline : this->inner_polylines) {
+    inner_polyline->shape_pool->detach_inner_polyline();
+  }
   shape_pool_->detach_shape();
 }
 

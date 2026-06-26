@@ -55,6 +55,7 @@ Tile* Cluster::merge_tiles() {
   CpuTimer timer;
 
   std::vector<Shape*> new_shapes;
+  std::vector<Shape*> detach_shapes;
   std::vector<InnerPolyline*> all_new_inner_polylines;
 
   timer.start();
@@ -97,6 +98,8 @@ Tile* Cluster::merge_tiles() {
         for (auto s : cursor.orphan_inners()) {
           new_inners.push_back(s);
         }
+        shape->clear_inner();
+
         Polyline* polyline = tile->shapes_pool->acquire_polyline(tile, new_outer.to_vector(), std::nullopt);
         Shape* inserting_new_shape = tile->shapes_pool->acquire_shape(polyline, new_inners);
         new_shapes.push_back(inserting_new_shape);
@@ -113,6 +116,9 @@ Tile* Cluster::merge_tiles() {
           if (inside_inner_polyline) {
             assign_ancestry(inserting_new_shape, inside_inner_polyline);
           }
+        }
+        for (const auto merged_shape : cursor.shapes_sequence()) {
+          detach_shapes.push_back(merged_shape);
         }
       } else {
         if (treemap) {
@@ -132,7 +138,6 @@ Tile* Cluster::merge_tiles() {
 
   double past_tot_outer = tiles_.front()->benchmarks.outer + tiles_.back()->benchmarks.outer;
   double past_tot_inner = tiles_.front()->benchmarks.inner + tiles_.back()->benchmarks.inner;
-
   Benchmarks b{
     tot_outer + past_tot_outer,
     tot_inner + past_tot_inner
@@ -142,6 +147,9 @@ Tile* Cluster::merge_tiles() {
     this->finder_, tiles_.front()->start_x(), tiles_.back()->end_x(), tiles_.front()->name() + tiles_.back()->name(), b);
 
   tile->assign_shapes(new_shapes);
+  for (const auto shape : detach_shapes) {
+    shape->detach_from_pool();
+  }
   for (Tile* old_tile : tiles_) {
     tile->adopt(old_tile);
   }

@@ -9,15 +9,26 @@
 
 #include <vector>
 #include <utility>
+#include <iostream>
 #include "Shape.h"
 #include "ShapePool.h"
 #include "Tile.h"
 
 Shape* ShapePool::acquire_shape(Polyline* outer_polyline, const std::vector<InnerPolyline*>& inner_polylines) {
-  shapes_storage.emplace_back(this, outer_polyline, inner_polylines);
-  Shape* shape = &shapes_storage.back();
-  this->shapes_count++;
+  Shape* shape = this->shapes.acquire(this, outer_polyline, inner_polylines);
   return shape;
+}
+
+Polyline* ShapePool::acquire_polyline(Tile* tile, std::vector<Point> polygon, const std::optional<RectBounds>& bounds = std::nullopt) {
+  return this->polylines.acquire(this, tile, std::move(polygon), bounds);
+}
+
+InnerPolyline* ShapePool::acquire_inner_polyline(std::vector<Point> coords, Shape* shape) {
+  return this->inner_polylines.acquire(this, std::move(coords), shape);
+}
+
+InnerPolyline* ShapePool::acquire_inner_polyline(Sequence* seq) {
+  return this->inner_polylines.acquire(this, seq);
 }
 
 void ShapePool::set_owner(Tile* tile) {
@@ -25,27 +36,27 @@ void ShapePool::set_owner(Tile* tile) {
 }
 
 void ShapePool::detach_shape() {
-  this->shapes_count--;
-  if (this->shapes_count == 0) {
-    this->owner_tile_->unregister_pool(this);
+  this->shapes.decrement();
+  this->check_destruction();
+}
+
+void ShapePool::detach_polyline() {
+  this->polylines.decrement();
+  this->check_destruction();
+}
+
+void ShapePool::detach_inner_polyline() {
+  this->inner_polylines.decrement();
+  this->check_destruction();
+}
+
+void ShapePool::check_destruction() {
+  if (this->shapes.is_released() &&
+      this->polylines.is_released() &&
+      this->inner_polylines.is_released()) {
+    if (this->owner_tile_) {
+      this->owner_tile_->unregister_pool(this);
+    }
     delete this;
   }
-}
-
-InnerPolyline* ShapePool::acquire_inner_polyline(std::vector<Point> coords, Shape* shape) {
-  inner_polylines_storage.emplace_back(std::move(coords), shape);
-  InnerPolyline* ip = &inner_polylines_storage.back();
-  return ip;
-}
-
-InnerPolyline* ShapePool::acquire_inner_polyline(Sequence* seq) {
-  inner_polylines_storage.emplace_back(seq);
-  InnerPolyline* ip = &inner_polylines_storage.back();
-  return ip;
-}
-
-Polyline* ShapePool::acquire_polyline(Tile* tile, std::vector<Point> polygon, const std::optional<RectBounds>& bounds = std::nullopt) {
-  polylines_storage.emplace_back(tile, std::move(polygon), bounds);
-  Polyline* p = &polylines_storage.back();
-  return p;
 }

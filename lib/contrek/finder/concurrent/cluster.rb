@@ -67,6 +67,7 @@ module Contrek
                 end
                 new_inners += cursor.orphan_inners
               end.real
+              shape.clear_inner!
 
               polyline = Polyline.new(tile: tile, polygon: new_outer.to_a)
               inserting_new_shape = Shape.init_by(polyline, new_inners)

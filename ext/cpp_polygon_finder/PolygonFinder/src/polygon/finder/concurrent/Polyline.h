@@ -22,13 +22,14 @@
 
 class Tile;
 class Shape;
+class ShapePool;
 class Point;
 class InnerPolyline;
 
 class Polyline : public Partitionable {
  public:
   using Partitionable::Partitionable;
-  Polyline(Tile* tile, std::vector<Point> polygon, const std::optional<RectBounds>& bounds = std::nullopt);
+  Polyline(ShapePool* shape_pool, Tile* tile, std::vector<Point> polygon, const std::optional<RectBounds>& bounds = std::nullopt);
   enum Flags : uint32_t {
     TRACKED_OUTER = 1 << 0
   };
@@ -39,6 +40,7 @@ class Polyline : public Partitionable {
   void precalc();
   int width();
   Tile *tile = nullptr;
+  ShapePool* shape_pool = nullptr;
   Shape* shape = nullptr;
   const std::vector<Point>& raw() const { return raw_; }
   const std::vector<Part*>& parts() const { return parts_; }
