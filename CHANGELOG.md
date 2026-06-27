@@ -129,3 +129,6 @@ All notable changes to this project will be documented in this file.
 
 ## [1.3.1] - 2026-06-20
 - **Streaming merger:** The progressive streaming extraction mode has now reached new heights of efficiency on the C++ side. This mode allows the data source to be processed in contiguous blocks. All isolated polygons, as well as those extending into the bottom strips, are removed from the list and streamed directly to the SVG file. This drastically reduces RAM requirements. An extreme test on an 81920×81920 pixel image containing a massive number of polygons (20,000,000) was processed using roughly 40 strips of 2000 pixels each in less than 300 seconds, peaking at a RAM usage of just 13GB.
+
+## [1.3.2] - 2026-06-27
+- **Streaming merger:** A series of optimizations have been implemented at the C++ memory pool level; using a different strategy, these are now freed as soon as possible depending on the source data content and the morphology of the containing polygons. This has allowed for a further reduction in the peak memory indicated in the previous changelog, specifically from 13GB to 4.3GB, on the same image with 20,000,000 polygons.
