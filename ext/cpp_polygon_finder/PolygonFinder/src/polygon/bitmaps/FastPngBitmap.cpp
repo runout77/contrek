@@ -32,9 +32,9 @@ FastPngBitmap::FastPngBitmap(std::string filename) : RawBitmap() {
       } else {
         spng_ctx *ctx = spng_ctx_new(0);
         spng_set_png_buffer(ctx, file_buffer.data(), file_buffer.size());
-        struct spng_ihdr ihdr;
+        struct spng_ihdr ihdr = {};
         spng_get_ihdr(ctx, &ihdr);
-        size_t out_size;
+        size_t out_size = 0;
         spng_decoded_image_size(ctx, SPNG_FMT_RGBA8, &out_size);
         this->define(ihdr.width, ihdr.height, 4, false);
         unsigned char* raw_ptr = this->image.get();

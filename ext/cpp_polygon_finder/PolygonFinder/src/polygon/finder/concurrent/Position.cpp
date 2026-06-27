@@ -32,7 +32,7 @@ Position::Position(EndPoint* end_point)
 {  this->end_point_ = end_point;
 }
 
-void Position::before_rem(Queueable<Point>* q)  {
+void Position::before_rem(Queueable<Point>*)  {
   /*if (this->end_point_ != nullptr)
   { if (q->listable())
     { auto& v = this->end_point_->queues();

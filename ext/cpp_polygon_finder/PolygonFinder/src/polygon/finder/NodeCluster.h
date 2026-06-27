@@ -14,7 +14,6 @@
 #include <map>
 #include <string>
 #include <utility>
-#include "PolygonFinder.h"
 #include "Lists.h"
 #include "RectBounds.h"
 #include "Polygon.h"
@@ -56,3 +55,5 @@ class NodeCluster {
   std::list<Node*>::iterator exam(std::list<Node*>::iterator inode, Node *node, Node *father, Node *root_node);
   std::vector<std::vector<Node*>> sequences;
 };
+
+#include "PolygonFinder.h"

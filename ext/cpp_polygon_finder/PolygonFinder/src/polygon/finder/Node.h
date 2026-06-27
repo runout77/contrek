@@ -43,7 +43,7 @@ struct SmallVec {
       ptr = np; cap = n;
   }
   void clear() { sz = 0; ptr = buf; cap = INLINE_CAP; }
-  int  size()  const { return sz; }
+  unsigned int size() const { return static_cast<unsigned int>(sz); }
   int& operator[](int i) { return ptr[i]; }
   int  operator[](int i) const { return ptr[i]; }
   int* begin() { return ptr; }

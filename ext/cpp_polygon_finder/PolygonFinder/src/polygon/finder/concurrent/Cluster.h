@@ -25,7 +25,7 @@ class Cluster {
   void is_children(Shape* shape, std::vector<InnerPolyline*> inner_polylines);
 
  public:
-  Cluster(Finder *finder, int height, int start_x, int end_x);
+  Cluster(Finder *finder, int height);
   virtual ~Cluster();
   void add(Tile* tile);
   Tile* merge_tiles();

@@ -18,9 +18,9 @@
 #include "Shape.h"
 
 Polyline::Polyline(ShapePool* shape_pool, Tile* tile, std::vector<Point> polygon, const std::optional<RectBounds>& bounds)
-: shape_pool(shape_pool),
-  raw_(std::move(polygon)),
-  tile(tile)
+: tile(tile),
+  shape_pool(shape_pool),
+  raw_(std::move(polygon))
 { if (bounds.has_value()) {
     min_x =  bounds->min_x;
     max_x_ = bounds->max_x;

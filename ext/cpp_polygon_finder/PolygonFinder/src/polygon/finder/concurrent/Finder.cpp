@@ -95,16 +95,8 @@ void Finder::process_tiles() {
 
     if (it != arriving_tiles.end()) {
       Tile* twin_tile = *it;
-      int start_x, end_x;
-      if (twin_tile->start_x() == (tile->end_x() - 1)) {
-        start_x = tile->start_x();
-        end_x = twin_tile->end_x();
-      } else {
-        start_x = twin_tile->start_x();
-        end_x = tile->end_x();
-      }
 
-      Cluster *cluster = new Cluster(this, this->height, start_x, end_x);
+      Cluster *cluster = new Cluster(this, this->height);
 
       if (twin_tile->start_x() == (tile->end_x() - 1)) {
         cluster->add(tile);

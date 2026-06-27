@@ -29,14 +29,14 @@
 
 PolygonFinder::PolygonFinder(Bitmap *bitmap,
                              Matcher *matcher,
-                             Bitmap *test_bitmap,
+                             Bitmap *,
                              std::vector<std::string> *options,
                              int start_x,
                              int end_x)
-    : source_bitmap(bitmap),
-      matcher(matcher),
-      start_x(start_x),
-      end_x(end_x == -1 ? bitmap->w() : end_x)
+    : start_x(start_x),
+      end_x(end_x == -1 ? bitmap->w() : end_x),
+      source_bitmap(bitmap),
+      matcher(matcher)
 { this->rgb_matcher = dynamic_cast<RGBMatcher*>(matcher);
   if (options != nullptr) FinderUtils::sanitize_options(this->options, options);
 

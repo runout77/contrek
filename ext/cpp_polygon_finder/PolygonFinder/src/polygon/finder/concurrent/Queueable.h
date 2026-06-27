@@ -26,8 +26,8 @@ class QNode {
   Queueable<T>* owner {nullptr};
   explicit QNode(const T& value) : payload(value) {}
   virtual ~QNode() = default;
-  virtual void before_rem(Queueable<T>* q) {}
-  virtual void after_add(Queueable<T>* q) {}
+  virtual void before_rem(Queueable<T>*) {}
+  virtual void after_add(Queueable<T>*) {}
 };
 
 

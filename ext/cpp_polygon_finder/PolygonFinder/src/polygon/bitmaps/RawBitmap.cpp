@@ -29,7 +29,7 @@ int RawBitmap::h() {
   return this->height;
 }
 
-char RawBitmap::value_at(int x, int y) {
+char RawBitmap::value_at(int, int) {
   return(0);
 }
 
@@ -48,7 +48,7 @@ unsigned int RawBitmap::rgb_value_at(int x, int y) {
 }
 
 void RawBitmap::draw_pixel(int x, int y, unsigned char r, unsigned char g, unsigned char b, unsigned char a) {
-  if (x < 0 || x >= width || y < 0 || y >= height) return;
+  if (x < 0 || x >= static_cast<int>(width) || y < 0 || y >= static_cast<int>(height)) return;
   unsigned char* p = &image[(static_cast<size_t>(y) * width + x) * bpp];
   p[0] = r;
   if (bpp > 1) p[1] = g;

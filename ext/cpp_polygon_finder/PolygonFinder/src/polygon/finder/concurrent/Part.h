@@ -48,8 +48,8 @@ class Part : public Queueable<Point> {
   void add_position(const Point& point);
   Types type;
   bool innerable();
-  const bool touched() const { return touched_; }
-  const int versus() const { return versus_; }
+  bool touched() const { return touched_; }
+  int versus() const { return versus_; }
   void touch();
   void orient();
   std::string inspect();

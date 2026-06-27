@@ -44,9 +44,9 @@ class Polyline : public Partitionable {
   Shape* shape = nullptr;
   const std::vector<Point>& raw() const { return raw_; }
   const std::vector<Part*>& parts() const { return parts_; }
-  const int max_y() const { return max_y_; }
-  const int min_y() const { return min_y_; }
-  const int max_x() const { return max_x_; }
+  int max_y() const { return max_y_; }
+  int min_y() const { return min_y_; }
+  int max_x() const { return max_x_; }
   void clear();
   bool is_empty();
   bool any_ancients = false;

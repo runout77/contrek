@@ -201,7 +201,7 @@ void Cursor::traverse_inner(Part* act_part, std::vector<Part*>& all_parts, Bound
     if (act_part->innerable()) {
       all_parts.push_back(act_part);
       bool jumped = false;
-      while (act_part = act_part->circular_next) {
+      while ((act_part = act_part->circular_next)) {
         if (act_part->innerable()) {
             all_parts.push_back(act_part);
         } else {

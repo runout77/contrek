@@ -5,7 +5,7 @@ module Contrek
     class Cluster
       attr_reader :tiles, :hub, :finder
 
-      def initialize(finder:, height:, start_x:, end_x:)
+      def initialize(finder:, height:)
         @finder = finder
         @tiles = []
         @hub = Hub.new(height:)

@@ -320,7 +320,7 @@ void stream_png_image(const std::string& filepath, uint32_t stripe_height, bool 
     int stripe_count = 0;
     // main stripes loop
     for (uint32_t current_y_offset = 0; current_y_offset < total_height; current_y_offset += stripe_height) {
-      int uncovered_height = total_height - current_y_offset;
+      uint32_t uncovered_height = total_height - current_y_offset;
 
       // copy previous last line to the next new one (each contigue stripe must share one pixel scanline)
       if (current_y_offset > 0) {
@@ -447,7 +447,7 @@ void stream_progressive_png_image(const std::string& filepath, uint32_t stripe_h
       int stripe_count = 0;
       // main stripes loop
       for (uint32_t current_y_offset = 0; current_y_offset < total_height; current_y_offset += stripe_height) {
-        int uncovered_height = total_height - current_y_offset;
+        uint32_t uncovered_height = total_height - current_y_offset;
 
         // copy previous last line to the next new one (each contigue stripe must share one pixel scanline)
         if (current_y_offset > 0) {
