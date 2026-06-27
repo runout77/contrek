@@ -62,6 +62,6 @@ class Polyline : public Partitionable {
   int min_x, max_x_, min_y_, max_y_;
   void find_boundary();
   uint32_t flags_ = 0;
-  std::string named_;
   int name;
+  std::string named_;
 };

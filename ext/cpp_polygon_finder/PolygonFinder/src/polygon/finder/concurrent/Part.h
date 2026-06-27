@@ -35,6 +35,9 @@ class Part : public Queueable<Point> {
   bool transmutation_skip = false;
   bool dead_end = false;
   bool mirror = false;
+ private:
+  bool touched_ = false;
+ public:
   Part* next = nullptr;
   Part* next_seam = nullptr;
   Part* prev = nullptr;
@@ -57,6 +60,5 @@ class Part : public Queueable<Point> {
 
  private:
   int versus_ = 0;
-  bool touched_ = false;
   Polyline* polyline_;
 };

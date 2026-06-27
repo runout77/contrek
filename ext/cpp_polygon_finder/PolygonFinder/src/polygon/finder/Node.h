@@ -88,7 +88,6 @@ class Node : public  Listable {
   int abs_x_index;
   int up_indexer, down_indexer;
   int tangs_count;
-  char name;
   int track;
   int outer_index, inner_index;
   int upper_start = std::numeric_limits<int>::max();
@@ -112,6 +111,7 @@ class Node : public  Listable {
   Node(int min_x, int max_x, int y, NodeCluster* cluster, char name);
   void precalc_tangs_sequences(NodeCluster& cluster);
   bool processed = false;
+  char name;
   int inner_left_index = -1;
   int inner_right_index = -1;
 };

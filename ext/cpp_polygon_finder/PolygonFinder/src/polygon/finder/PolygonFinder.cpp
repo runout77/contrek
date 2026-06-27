@@ -70,7 +70,7 @@ PolygonFinder::PolygonFinder(Bitmap *bitmap,
 
 std::list<ShapeLine*> *PolygonFinder::get_shapelines() {
   std::list<ShapeLine*> *sll = new std::list<ShapeLine*>();
-  for (int line = 0; line < this->node_cluster->height; line++) {
+  for (int line = 0; line < this->node_cluster->get_height(); line++) {
     for (Node& node : this->node_cluster->vert_nodes[line]) {
       ShapeLine *sl = new ShapeLine({node.min_x, node.max_x, node.y});
       sll->push_back(sl);

@@ -34,8 +34,10 @@ class NodeCluster {
   int count = 0;
   int nodes;
   int width;
+  int height;
 
  public:
+  int get_height() const { return height; }
   pf_Options *options;
   std::vector<std::pair<int, int>> treemap;  // [a,b] a = index of parent outer, b = index of inner of parent outer
   std::pair<int, int> test_in_hole_a(Node* node);
@@ -43,7 +45,6 @@ class NodeCluster {
   std::vector<std::deque<Node>> vert_nodes;
   void compress_coords(std::list<Polygon>& polygons, pf_Options options);
   List *root_nodes;
-  int height;
   std::list<Polygon> polygons;
   NodeCluster(int h, int w, pf_Options *options);
   virtual ~NodeCluster();
