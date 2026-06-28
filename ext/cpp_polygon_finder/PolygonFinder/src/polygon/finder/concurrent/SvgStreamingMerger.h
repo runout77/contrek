@@ -9,10 +9,13 @@
 
 #pragma once
 #include <string>
+#include <vector>
 #include "StreamingMerger.h"
 
 class SvgStreamingMerger : public StreamingMerger {
  private:
+  int total_width;
+  int total_height;
   std::string svg_css() {
       return ".out{fill:none;stroke:red;stroke-width:1;}.in{fill:none;stroke:green;stroke-width:1;}.out:hover{stroke:yellow;}";
   }
@@ -39,5 +42,15 @@ class SvgStreamingMerger : public StreamingMerger {
   }
 
  public:
-  using StreamingMerger::StreamingMerger;
+  SvgStreamingMerger(int number_of_threads,
+                     std::vector<std::string>* options,
+                     std::ofstream* stream_to,
+                     int total_width, int total_height)
+    : StreamingMerger(number_of_threads, options, stream_to),
+      total_width(total_width),
+      total_height(total_height) {
+    if (total_width <= 0 || total_height <= 0) {
+      throw std::invalid_argument("SVG Streaming requires valid canvas dimensions (width and height must be > 0).");
+    }
+  }
 };

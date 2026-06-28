@@ -36,19 +36,19 @@ RSpec::Matchers.define :match_expected_polygons do |label,
   end
 end
 
-RSpec::Matchers.define :match_expected_svg do |label,
-                                               number_of_tiles: 1,
-                                               store_svg: false,
-                                               additional_files_path: []|
+RSpec::Matchers.define :match_expected_stream do |label,
+                                                 extension:, number_of_tiles: 1,
+                                                 store_stream: false,
+                                                 additional_files_path: []|
   diffable
   attr_reader :expected, :actual
   match do |actual|
     @actual = actual
 
     basename = label.to_s
-    path = File.join(["spec", "files", "svg"] + additional_files_path + ["#{basename}_w#{number_of_tiles}.svg"])
-    File.write(path, @actual) if store_svg
-    raise "Expected svg file not found: #{path}" unless File.exist?(path)
+    path = File.join(["spec", "files", "streams"] + additional_files_path + ["#{basename}_w#{number_of_tiles}.#{extension}"])
+    File.write(path, @actual) if store_stream
+    raise "Expected stream file not found: #{path}" unless File.exist?(path)
 
     @expected = File.read(path)
 
@@ -56,10 +56,10 @@ RSpec::Matchers.define :match_expected_svg do |label,
   end
 
   failure_message do |_actual|
-    "expected svg to match for #{label.inspect} (number_of_tiles: #{number_of_tiles})"
+    "expected stream file to match for #{label.inspect} (number_of_tiles: #{number_of_tiles})"
   end
 
   failure_message_when_negated do |_actual|
-    "expected svg not to match for #{label.inspect}, but they are identical"
+    "expected stream file not to match for #{label.inspect}, but they are identical"
   end
 end

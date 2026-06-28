@@ -97,6 +97,7 @@
 #include "PolygonFinder/src/polygon/finder/concurrent/StreamingMerger.h"
 #include "PolygonFinder/src/polygon/finder/concurrent/StreamingMerger.cpp"
 #include "PolygonFinder/src/polygon/finder/concurrent/SvgStreamingMerger.h"
+#include "PolygonFinder/src/polygon/finder/concurrent/GeoJsonStreamingMerger.h"
 #include "PolygonFinder/src/polygon/finder/concurrent/ShapePool.h"
 #include "PolygonFinder/src/polygon/finder/concurrent/ShapePool.cpp"
 extern "C" {
@@ -309,7 +310,7 @@ struct OfstreamWrapper {
   std::ofstream& get_stream() { return stream; }
 };
 
-StreamingMerger* create_streaming_merger(Object self,
+SvgStreamingMerger* create_svg_streaming_merger(Object self,
                                          int number_of_threads,
                                          std::vector<std::string>* options,
                                          Object stream_obj,
@@ -317,6 +318,15 @@ StreamingMerger* create_streaming_merger(Object self,
                                          int total_height) {
   OfstreamWrapper* wrapper = Rice::detail::From_Ruby<OfstreamWrapper*>().convert(stream_obj.value());
   return new SvgStreamingMerger(number_of_threads, options, &wrapper->get_stream(), total_width, total_height);
+}
+
+GeoJsonStreamingMerger* create_geo_json_streaming_merger(Object self,
+                                         int number_of_threads,
+                                         std::vector<std::string>* options,
+                                         Object stream_obj,
+                                         int pixel_val) {
+  OfstreamWrapper* wrapper = Rice::detail::From_Ruby<OfstreamWrapper*>().convert(stream_obj.value());
+  return new GeoJsonStreamingMerger(number_of_threads, options, &wrapper->get_stream(),pixel_val);
 }
 
 OfstreamWrapper* create_ofstream(Object self, std::string path) {
@@ -437,7 +447,11 @@ void Init_cpp_polygon_finder() {
       ProcessResult pr = Rice::detail::ruby_result_to_process_result(rb_result);
       self.add_tile(pr, flush);
     });
-    rb_cstreaming_merger.define_singleton_method("new", &create_streaming_merger);
+
+  Data_Type<SvgStreamingMerger> rb_csvgstreaming_merger = define_class<SvgStreamingMerger, StreamingMerger>("CPPSvgStreamingMerger");
+  rb_csvgstreaming_merger.define_singleton_method("new", &create_svg_streaming_merger);
+  Data_Type<GeoJsonStreamingMerger> rb_cgeojsonstreaming_merger = define_class<GeoJsonStreamingMerger, StreamingMerger>("CPPGeoJsonStreamingMerger");
+  rb_cgeojsonstreaming_merger.define_singleton_method("new", &create_geo_json_streaming_merger);
 
   Module mContrek = define_module("Contrek");
   Module mCpp = define_module_under(mContrek, "Cpp");

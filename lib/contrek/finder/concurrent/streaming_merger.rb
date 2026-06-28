@@ -3,10 +3,8 @@
 module Contrek
   module Concurrent
     class StreamingMerger < VerticalMerger
-      def initialize(stream_to:, total_width:, total_height:, options: {})
+      def initialize(stream_to:, options: {})
         @stream = stream_to
-        @total_width = total_width
-        @total_height = total_height
         @moved = 0
         super(options: options)
       end
@@ -48,41 +46,21 @@ module Contrek
 
       def stream_raw_polygon(shape)
         outer_pts = shape.outer_polyline.raw.map { |p| "#{p[:y]},#{p[:x]}" }.join(" ")
-        @stream.write(svg_outer_polygon(outer_pts))
+        write_outer_polygon(outer_pts)
         shape.inner_polylines.map(&:raw).each do |sequence|
           inner_pts = sequence.map { |p| "#{p[:y]},#{p[:x]}" }.join(" ")
-          @stream.write(svg_inner_polygon(inner_pts))
+          write_inner_polygon(inner_pts)
         end
       end
 
       def ensure_header
         if @stream.pos == 0
-          @stream.write(svg_header)
+          write_header
         end
       end
 
       def ensure_footer
-        @stream.write(svg_footer)
-      end
-
-      def svg_footer
-        "</svg>"
-      end
-
-      def svg_header
-        "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"#{@total_width}\" height=\"#{@total_height}\"><style>#{svg_css}</style>"
-      end
-
-      def svg_outer_polygon(outer_pts)
-        "<polygon points=\"#{outer_pts}\" class=\"out\"/>"
-      end
-
-      def svg_inner_polygon(inner_pts)
-        "<polygon points=\"#{inner_pts}\" class=\"in\"/>"
-      end
-
-      def svg_css
-        ".out{fill:none;stroke:red;stroke-width:1;}.in{fill:none;stroke:green;stroke-width:1;}.out:hover{stroke:yellow;}"
+        write_footer
       end
     end
   end

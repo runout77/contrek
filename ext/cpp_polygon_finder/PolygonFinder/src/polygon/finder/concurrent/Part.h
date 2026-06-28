@@ -35,8 +35,10 @@ class Part : public Queueable<Point> {
   bool transmutation_skip = false;
   bool dead_end = false;
   bool mirror = false;
+
  private:
   bool touched_ = false;
+
  public:
   Part* next = nullptr;
   Part* next_seam = nullptr;

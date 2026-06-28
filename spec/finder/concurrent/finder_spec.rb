@@ -13,7 +13,8 @@ RSpec.describe Contrek::Concurrent::Finder, type: :class do
     @simple_polygon_finder = Contrek::Finder::PolygonFinder
     @merger = Contrek::Concurrent::HorizontalMerger
     @vertical_merger = Contrek::Concurrent::VerticalMerger
-    @streaming_merger = Contrek::Concurrent::StreamingMerger
+    @svg_streaming_merger = Contrek::Concurrent::SvgStreamingMerger
+    @geo_json_streaming_merger = Contrek::Concurrent::GeoJsonStreamingMerger
     @result = Contrek::Finder::Result
     @streaming_file = Tempfile
   end

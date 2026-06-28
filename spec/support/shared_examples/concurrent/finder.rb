@@ -2851,7 +2851,7 @@ RSpec.shared_examples "finder" do
       height = result.metadata[:height]
       shared_stream = @streaming_file.new("output.svg")
       v_merger_options = {bounds: true, compress: {uniq: true, linear: true}}
-      step_finder = @streaming_merger.new(
+      step_finder = @svg_streaming_merger.new(
         options: v_merger_options,
         stream_to: shared_stream,
         total_width: width,
@@ -2871,7 +2871,31 @@ RSpec.shared_examples "finder" do
       expect(result.metadata[:height]).to eq(23)
       expect(result.points).to be_empty # all polygons are on file
       shared_stream.rewind
-      expect(shared_stream.read).to match_expected_svg("test_#{width}x#{height}", number_of_tiles: stripes.count)
+      expect(shared_stream.read).to match_expected_stream("test_#{width}x#{height}", extension: "svg", number_of_tiles: stripes.count)
+
+      # streaming to geojson file pattern
+      shared_stream = @streaming_file.new("output.geojson")
+      v_merger_options = {bounds: true, compress: {uniq: true, linear: true}}
+      step_finder = @geo_json_streaming_merger.new(
+        options: v_merger_options,
+        stream_to: shared_stream,
+        pixel_val: 34
+      )
+      stripes.each do |stripe|
+        stripe_result = @simple_polygon_finder.new(@bitmap_class.new(stripe, 16),
+          @matcher,
+          nil,
+          {versus: :o, bounds: true, strict_bounds: true, compress: {uniq: true, linear: true}}).process_info
+        last = stripes.last == stripe
+        step_finder.add_tile(stripe_result, last)
+      end
+      result = step_finder.process_info
+      expect(result.metadata[:groups]).to eq(4)
+      expect(result.metadata[:width]).to eq(16)
+      expect(result.metadata[:height]).to eq(23)
+      expect(result.points).to be_empty # all polygons are on file
+      shared_stream.rewind
+      expect(shared_stream.read).to match_expected_stream("test_#{width}x#{height}", extension: "geojson", number_of_tiles: stripes.count)
     end
   end
 end

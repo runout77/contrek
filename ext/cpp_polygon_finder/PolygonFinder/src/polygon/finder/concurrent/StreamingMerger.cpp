@@ -15,14 +15,10 @@
 
 StreamingMerger::StreamingMerger(int number_of_threads,
                                  std::vector<std::string>* options,
-                                 std::ofstream* stream_to,
-                                 int total_width, int total_height)
-  : VerticalMerger(number_of_threads, options), stream(stream_to), total_width(total_width), total_height(total_height) {
+                                 std::ofstream* stream_to)
+  : VerticalMerger(number_of_threads, options), stream(stream_to) {
   if (!stream) {
     throw std::invalid_argument("Streaming requires a valid destination output. stream_to cannot be null.");
-  }
-  if (total_width <= 0 || total_height <= 0) {
-    throw std::invalid_argument("Streaming requires valid canvas dimensions (width and height must be > 0).");
   }
 }
 

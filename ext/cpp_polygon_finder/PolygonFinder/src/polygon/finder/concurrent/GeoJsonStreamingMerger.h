@@ -20,13 +20,13 @@ class GeoJsonStreamingMerger : public StreamingMerger {
  protected:
   void write_header() override {
     if (stream) {
-      *stream << "{\"type\":\"FeatureCollection\",\"features\":[\n";
+      *stream << "{\"type\":\"FeatureCollection\",\"features\":[";
     }
   }
 
   void write_footer() override {
     if (stream) {
-      *stream << "\n]}";
+      *stream << "]}";
     }
   }
   void write_outer_polygon_start() override {}
@@ -38,20 +38,19 @@ class GeoJsonStreamingMerger : public StreamingMerger {
   GeoJsonStreamingMerger(int number_of_threads,
                          std::vector<std::string>* options,
                          std::ofstream* stream_to,
-                         int total_width, int total_height,
                          unsigned int pixel_value)
-      : StreamingMerger(number_of_threads, options, stream_to, total_width, total_height),
+      : StreamingMerger(number_of_threads, options, stream_to),
         target_value(pixel_value) {}
 
   void stream_raw_polygon(const Shape* shape) override {
     if (!stream) return;
     if (!is_first_feature) {
-      *stream << ",\n";
+      *stream << ",";
     }
     is_first_feature = false;
 
-    *stream << "{\"type\":\"Feature\",\"properties\":{\"value\":" << target_value
-            << "},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[ [";
+    *stream << "{\"type\":\"Feature\",\"properties\":{\"PixelVal\":" << target_value
+            << "},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[";
     const std::vector<Point>& points = shape->outer_polyline->raw();
     const size_t points_size = points.size();
     if (points_size > 0) {

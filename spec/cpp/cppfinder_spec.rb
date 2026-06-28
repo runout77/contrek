@@ -13,7 +13,8 @@ RSpec.describe Contrek::Cpp::CPPConcurrentFinder, type: :class do
     @simple_polygon_finder = CPPPolygonFinder
     @merger = Contrek::Cpp::CPPConcurrentHorizontalMerger
     @vertical_merger = Contrek::Cpp::CPPConcurrentVerticalMerger
-    @streaming_merger = Contrek::Cpp::CPPConcurrentStreamingMerger
+    @svg_streaming_merger = Contrek::Cpp::CPPSvgConcurrentStreamingMerger
+    @geo_json_streaming_merger = Contrek::Cpp::CPPGeoJsonConcurrentStreamingMerger
     @result = Contrek::Cpp::CPPResult
     @streaming_file = Contrek::Cpp::CPPTempfile
   end

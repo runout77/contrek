@@ -10,6 +10,7 @@
 #include "Tests.h"
 #include <sys/resource.h>
 #include <string.h>
+#include <unistd.h>
 #include <iostream>
 #include <list>
 #include <map>
@@ -19,7 +20,6 @@
 #include <algorithm>
 #include <cstdio>
 #include <fstream>
-#include <unistd.h>
 
 #include "polygon/finder/PolygonFinder.h"
 #include "polygon/finder/concurrent/ClippedPolygonFinder.h"
@@ -441,7 +441,7 @@ void stream_progressive_png_image(const std::string& filepath, uint32_t stripe_h
     shared_stream.rdbuf()->pubsetbuf(buffer.data(), buffer.size());
 
     SvgStreamingMerger vmerger(0, &varguments, &shared_stream, total_width, total_height);
-    // GeoJsonStreamingMerger vmerger(0, &varguments, &shared_stream, total_width, total_height, 4294901760);
+    // GeoJsonStreamingMerger vmerger(0, &varguments, &shared_stream, 4294901760);
     try {
       size_t row_size = static_cast<size_t>(total_width) * 4;
       int stripe_count = 0;
