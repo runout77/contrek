@@ -155,7 +155,7 @@ You can process from a raw stream
   result = CPPPolygonFinder.new(raw_bitmap, not_matcher, nil,{compress: {uniq: true, linear: true}}).process_info
   puts result.points.inspect
   =>
-  [{:outer=>[{:x=>5, :y=>4}, {:x=>5, :y=>5}, {:x=>8, :y=>5}, {:x=>8, :y=>4}], :inner=>[]}]
+  [{:outer=>[{x: 5, y: 4}, {x: 5, y: 6}, {x: 9, y: 6}, {x: 9, y: 4}], :inner=>[]}]
 ```
 
 Multithreaded contour processing is supported by both the native C++ and pure Ruby implementations. When using the C++ engine (default), multithreading works as expected and fully utilizes all available cores.
@@ -183,7 +183,7 @@ Regarding multithreading:
 
 - The algorithm splits the contour-detection workflow into multiple phases that can be executed in parallel. The initial contour extraction on each band and the subsequent merging of coordinates between adjacent bands—performed pairwise, recursively, and in a non-deterministic order—results in a final output that is not idempotent. Idempotence is guaranteed only when the exact same merging sequence is repeated.
 
-By not declaring native option CPP Multithreading optimized code is used. In the above example a [105 MP image](spec/files/images/sample_10240x10240.png) is examined by 4 threads working on 4 tiles (total compute time about 0.816 secs with image load (0.37 secs)).
+By not declaring native option CPP Multithreading optimized code is used. In the above example a [105 MP image](spec/files/images/sample_10240x10240.png) is examined by 4 threads working on 4 tiles (total compute time about 0.328 secs with image load).
 
 ```ruby
 result = Contrek.contour!(
@@ -197,12 +197,33 @@ result = Contrek.contour!(
 )
 puts result.metadata[:benchmarks].inspect
 
-{ compress: 23.83,
-  init: 313.179,
-  inner: 6.16,
-  outer: 78.791,
-  total: 337.013
+{ compress: 5.3933,
+  init: 322.749,
+  inner: 4.795,
+  outer: 81.546,
+  total: 328.142
 }
+
+```
+
+## Tracking & Topology Schema
+
+Contrek utilizes a **Dual-Grid / Cell-Based Topology** instead of a classic point-pixel model. Each pixel is treated as a solid 2D cell defined by **4 distinct vertices** (nodes). 
+
+
+### Pixel-Cell Geometry
+
+```text
+    (x, y)          Top Edge         (x+1, y)
+       O--------------------------------O
+       |                                |
+       |                                |
+  Left |             PIXEL              | Right
+  Edge |            (x, y)              | Edge
+       |                                |
+       |                                |
+       O--------------------------------O
+   (x, y+1)        Bottom Edge       (x+1, y+1)
 
 ```
 
@@ -232,27 +253,6 @@ result = Contrek.contour!(
   }
 )
 ```
-
-## Tracing Modes
-
-Contrek provides two levels of precision for polygon generation to balance data density and topological accuracy.
-
-### **Standard Mode** (Default)
-Optimized for **speed** and **lightweight** output.
-* **Behavior:** Traces outer boundaries while simplifying collinear segments.
-* **Result:** Fewer vertices and smaller memory footprint.
-
-### **Strict Mode** (`strict_bounds: true`)
-Engineered for **Pixel-Perfect** precision.
-* **Behavior:** Preserves every junction and internal connectivity change.
-* **Result:** 100% topologically faithful geometry with no micro-gaps between adjacent polygons.
-
-Below are two images illustrating the difference in tracing modes. In the first case, with **strict_bounds ON**, the anti-clockwise sequence includes two additional points, **H** and **I**, which trace the shape more accurately. In the second case, the transition between **G** and **H** is approximated, omitting the indentation.
-
-| Strict Bounds ON | Strict Bounds OFF |
-|:---:|:---:|
-| <img src="./docs/images/strict_bounds_on.png" alt="Originale" width="60%"/> | <img src="./docs/images/strict_bounds_off.png" alt="Poligoni" width="60%"/> |
-
 
 ## Result
 

@@ -11,7 +11,7 @@ RSpec.describe Contrek, type: :class do
           finder: {compress: {uniq: true, linear: true}}
         }
       )
-      expect(result.points[0][:outer]).to eq([{x: 0, y: 0}, {x: 0, y: 259}, {x: 259, y: 259}, {x: 259, y: 0}])
+      expect(result.points[0][:outer]).to eq([{x: 0, y: 0}, {x: 0, y: 260}, {x: 260, y: 260}, {x: 260, y: 0}])
     end
 
     it "trace contour by ruby code" do
@@ -24,7 +24,7 @@ RSpec.describe Contrek, type: :class do
           finder: {compress: {uniq: true, linear: true}}
         }
       )
-      expect(result.points[0][:outer]).to eq([{x: 0, y: 0}, {x: 0, y: 259}, {x: 259, y: 259}, {x: 259, y: 0}])
+      expect(result.points[0][:outer]).to eq([{x: 0, y: 0}, {x: 0, y: 260}, {x: 260, y: 260}, {x: 260, y: 0}])
     end
 
     it "trace contour by ruby code clockwise" do
@@ -34,10 +34,10 @@ RSpec.describe Contrek, type: :class do
           native: false,
           class: "value_not_matcher",
           color: {r: 255, g: 255, b: 255, a: 255},
-          finder: {versus: :o}
+          finder: {versus: :o, compress: {linear: true}}
         }
       )
-      expect(result.points[0][:outer]).to eq([{x: 6, y: 1}, {x: 6, y: 2}, {x: 6, y: 3}, {x: 6, y: 4}, {x: 6, y: 5}, {x: 6, y: 6}, {x: 1, y: 6}, {x: 1, y: 5}, {x: 1, y: 4}, {x: 1, y: 3}, {x: 1, y: 2}, {x: 1, y: 1}])
+      expect(result.points[0][:outer]).to eq([{x: 7, y: 1}, {x: 7, y: 7}, {x: 1, y: 7}, {x: 1, y: 1}])
     end
 
     it "trace contour by multithread ruby code" do
@@ -51,10 +51,8 @@ RSpec.describe Contrek, type: :class do
           finder: {number_of_tiles: 2, compress: {uniq: true, linear: true}}
         }
       )
-      expect(result.points).to eq([{
-        outer: [{x: 1, y: 1}, {x: 1, y: 6}, {x: 3, y: 6}, {x: 6, y: 6}, {x: 6, y: 1}, {x: 3, y: 1}],
-        inner: [[{x: 1, y: 5}, {x: 1, y: 2}, {x: 6, y: 2}, {x: 6, y: 5}]]
-      }])
+      expect(result.points).to eq([{inner: [[{x: 2, y: 6}, {x: 2, y: 2}, {x: 6, y: 2}, {x: 6, y: 6}]],
+                                    outer: [{x: 1, y: 1}, {x: 1, y: 7}, {x: 7, y: 7}, {x: 7, y: 1}]}])
     end
 
     it "trace contour by multithread native code" do
@@ -67,10 +65,8 @@ RSpec.describe Contrek, type: :class do
           finder: {number_of_tiles: 2, compress: {uniq: true, linear: true}}
         }
       )
-      expect(result.points).to eq([{
-        outer: [{x: 1, y: 1}, {x: 1, y: 6}, {x: 3, y: 6}, {x: 6, y: 6}, {x: 6, y: 1}, {x: 3, y: 1}],
-        inner: [[{x: 1, y: 5}, {x: 1, y: 2}, {x: 6, y: 2}, {x: 6, y: 5}]]
-      }])
+      expect(result.points).to eq([{inner: [[{x: 2, y: 6}, {x: 2, y: 2}, {x: 6, y: 2}, {x: 6, y: 6}]],
+                                    outer: [{x: 1, y: 1}, {x: 1, y: 7}, {x: 7, y: 7}, {x: 7, y: 1}]}])
     end
   end
 end

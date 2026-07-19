@@ -342,7 +342,6 @@ void stream_png_image(const std::string& filepath, uint32_t stripe_height, bool 
       // stripe contour tracing
       std::vector<std::string> finder_arguments = {
         "--versus=a",
-        "--strict_bounds"  // <- this option is strictly needed when working with vertical merger
       };
       PolygonFinder polygon_finder(&stripe_bitmap, &not_matcher, nullptr, &finder_arguments);
       ProcessResult *result = polygon_finder.process_info();
@@ -470,7 +469,6 @@ void stream_progressive_png_image(const std::string& filepath, uint32_t stripe_h
         std::vector<std::string> finder_arguments = {
           "--versus=a",
           "--bounds",
-          "--strict_bounds",  // <- this option is strictly needed when working with vertical merger
           "--compress_uniq",
           "--compress_linear"
         };

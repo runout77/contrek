@@ -24,25 +24,17 @@ class Part : public Queueable<Point> {
  public:
   enum Types : uint32_t {
     SEAM = 1,
-    EXCLUSIVE = 0,
-    ADDED = 2
+    EXCLUSIVE = 0
   };
   explicit Part(Types type, Polyline* polyline);
   bool listable() const override { return true; }
   bool is(Types type);
-  bool inverts = false;
-  bool trasmuted = false;
-  bool transmutation_skip = false;
-  bool dead_end = false;
-  bool mirror = false;
 
  private:
   bool touched_ = false;
 
  public:
   Part* next = nullptr;
-  Part* next_seam = nullptr;
-  Part* prev = nullptr;
   Part* circular_next = nullptr;
   std::string toString() const { return "Part type = " + std::to_string(static_cast<uint32_t>(type)); }
   Polyline* polyline() { return polyline_; }
@@ -55,10 +47,6 @@ class Part : public Queueable<Point> {
   void touch();
   void orient();
   std::string inspect();
-  std::vector<EndPoint*> continuum_to(const Part& other_part) const;
-  bool within(Part* other);
-  bool same_length(Part* other);
-  void try_transmutation();
 
  private:
   int versus_ = 0;

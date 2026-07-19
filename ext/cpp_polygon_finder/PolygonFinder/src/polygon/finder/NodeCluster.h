@@ -25,7 +25,7 @@ struct pf_Options;
 class NodeCluster {
  private:
   void plot_node(std::vector<Point>& sequence_coords, Node *node, Node *start_node, int versus, RectBounds& bounds);
-  void plot_inner_node(std::vector<Point>& sequence_coords, Node *node, int versus, Node *stop_at, Node *start_node);
+  Node* plot_inner_node(std::vector<Point>& sequence_coords, Node *node, int versus, Node *stop_at, Node *start_node);
   std::vector<Node*> plot_sequence;
   List *inner_plot;
   List *inner_new;

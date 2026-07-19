@@ -37,6 +37,8 @@ struct Config {
   int tiles = 2;
   bool compress_unique = false;
   bool compress_linear = false;
+  bool compress_raster = false;
+  bool compress_douglas_peucker = false;
   bool compress_visvalingam = false;
   bool treemap = false;
   int32_t target_color = -1;

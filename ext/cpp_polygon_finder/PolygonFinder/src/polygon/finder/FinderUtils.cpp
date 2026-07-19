@@ -24,18 +24,19 @@ void FinderUtils::sanitize_options(pf_Options& options, std::vector<std::string>
 
   enum  optionIndex { COMPRESS_UNIQ, VERSUS, COMPRESS_VISVALINGAM, COMPRESS_LINEAR, NUMBER_OF_TILES,
                       COMPRESS_VISVALINGAM_TOLERANCE, TREEMAP, NAMED_SEQUENCES, BOUNDS, CONNECTIVITY,
-                      STRICT_BOUNDS };
+                      COMPRESS_RASTER, COMPRESS_DOUGLAS_PEUCKER };
   const option::Descriptor usage[] = {
      //  {UNKNOWN, 0,"" , ""    ,option::Arg::None, 0},
      {COMPRESS_VISVALINGAM, 0, "" , "compress_visvalingam", option::Arg::None, 0},
      {COMPRESS_LINEAR, 0, "" , "compress_linear", option::Arg::None, 0},
      {COMPRESS_VISVALINGAM_TOLERANCE, 0, "" , "compress_visvalingam_tolerance", option::Arg::Optional, 0},
      {COMPRESS_UNIQ, 0, "", "compress_uniq", option::Arg::None, 0},
+     {COMPRESS_RASTER, 0, "", "compress_raster", option::Arg::None, 0},
+     {COMPRESS_DOUGLAS_PEUCKER, 0, "", "compress_douglas_peucker", option::Arg::None, 0},
      {NUMBER_OF_TILES, 0, "", "number_of_tiles", option::Arg::Optional, 0},
      {TREEMAP, 0, "", "treemap", option::Arg::None, 0},
      {NAMED_SEQUENCES, 0, "", "named_sequences", option::Arg::None, 0},
      {BOUNDS, 0, "", "bounds", option::Arg::None, 0},
-     {STRICT_BOUNDS, 0, "", "strict_bounds", option::Arg::None, 0},
      {VERSUS, 0, "v", "versus", option::Arg::Optional, 0},
      {CONNECTIVITY, 0, "c", "connectivity", option::Arg::Optional, 0},
      {0, 0, 0, 0, 0, 0}
@@ -89,9 +90,6 @@ void FinderUtils::sanitize_options(pf_Options& options, std::vector<std::string>
   if (ioptions[BOUNDS].count() > 0)
   { options.bounds = true;
   }
-  if (ioptions[STRICT_BOUNDS].count() > 0)
-  { options.strict_bounds = true;
-  }
   // COMPRESS LINEAR
   if (ioptions[COMPRESS_LINEAR].count() > 0)
   { options.compress_linear = true;
@@ -107,6 +105,14 @@ void FinderUtils::sanitize_options(pf_Options& options, std::vector<std::string>
       options.compress_visvalingam_tolerance = strtof(opt->arg, 0);
       break;
     }
+  }
+  // COMPRESS RASTER
+  if (ioptions[COMPRESS_RASTER].count() > 0)
+  { options.compress_raster = true;
+  }
+  // COMPRESS DOUGLAS PEUCKER
+  if (ioptions[COMPRESS_DOUGLAS_PEUCKER].count() > 0)
+  { options.compress_douglas_peucker = true;
   }
   /* std::cout << "-----------" << std::endl;
   std::cout << "versus " << options.versus << std::endl;

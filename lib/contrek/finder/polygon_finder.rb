@@ -6,7 +6,7 @@ module Contrek
   module Finder
     class PolygonFinder
       def initialize(bitmap, matcher, test_bitmap = nil, options = {})
-        @options = {versus: :a, strict_bounds: false}.merge(options)
+        @options = {versus: :a}.merge(options)
         sanitize_options
         @source_bitmap = bitmap
         @matcher = matcher

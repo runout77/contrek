@@ -135,3 +135,6 @@ All notable changes to this project will be documented in this file.
 
 ## [1.3.3] - 2026-06-28
 - **GeoJsonStreamingMerger:** Fixes both Ruby and CPP side.
+
+## [1.3.4] - 2026-07-19
+- Refactored core topology from a top-left point model to a 4-vertex pixel-cell model, natively eliminating diagonal ambiguities and rewriting part of the stripe-merging algorithm to ensure perfect geometric stitching on shared nodes. Removed Strict Bounds mode. Added a Douglas-Peucker and a custom raster-compression algorithm that shifts top/right pixel boundaries by 1px to ensure flawless surface rendering as bitmap image.

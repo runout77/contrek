@@ -20,6 +20,8 @@
 #include "RectBounds.h"
 #include "../reducers/UniqReducer.h"
 #include "../reducers/LinearReducer.h"
+#include "../reducers/RasterReducer.h"
+#include "../reducers/DouglasPeuckerReducer.h"
 #include "../reducers/VisvalingamReducer.h"
 
 NodeCluster::NodeCluster(int h, int w, pf_Options *options) {
@@ -41,7 +43,8 @@ NodeCluster::~NodeCluster() {
 }
 
 void NodeCluster::compress_coords(std::list<Polygon>& polygons, pf_Options options) {
-  if (!(options.compress_linear || options.compress_uniq || options.compress_visvalingam)) return;
+  if (!(options.compress_linear || options.compress_uniq || options.compress_raster ||
+        options.compress_douglas_peucker || options.compress_visvalingam)) return;
 
   auto compress_sequence = [&](std::vector<Point>& points_vec) {
     if (points_vec.empty()) return;
@@ -54,9 +57,17 @@ void NodeCluster::compress_coords(std::list<Polygon>& polygons, pf_Options optio
       LinearReducer linear_reducer(points_vec);
       linear_reducer.reduce();
     }
+    if (options.compress_raster) {
+      RasterReducer raster_reducer(points_vec, this->options->versus);
+      raster_reducer.reduce();
+    }
     if (options.compress_visvalingam) {
       VisvalingamReducer vis_reducer(points_vec, options.compress_visvalingam_tolerance);
       vis_reducer.reduce();
+    }
+    if (options.compress_douglas_peucker) {
+      DouglasPeuckerReducer douglas_peucker_reducer(points_vec);
+      douglas_peucker_reducer.reduce();
     }
   };
   for (auto &poly : polygons) {
@@ -68,7 +79,7 @@ void NodeCluster::compress_coords(std::list<Polygon>& polygons, pf_Options optio
 }
 
 void NodeCluster::build_tangs_sequence() {
-  for (int y = 0; y < (int)vert_nodes.size(); y++) {
+  for (int y = 0; y < static_cast<int>(vert_nodes.size()); y++) {
     for (Node& node : vert_nodes[y]) {
       node.precalc_tangs_sequences(*this);
     }
@@ -89,11 +100,11 @@ Node* NodeCluster::add_node(int min_x, int max_x, int y, char name, int offset) 
     if (!up_nodes.empty()) {
       auto it = std::lower_bound(up_nodes.begin(), up_nodes.end(), node.min_x,
         [&](const Node& a, int val) {
-          return ((a.max_x + offset) < val);
+          return ((a.max_x - 1 + offset) < val);
         });
 
       while (it != up_nodes.end()) {
-        if ((it->min_x - offset) > node.max_x) break;
+        if ((it->min_x - offset) > (node.max_x - 1)) break;
         node.add_intersection(*it, it->abs_x_index);
         it->add_intersection(node, node.abs_x_index);
         ++it;
@@ -106,7 +117,6 @@ Node* NodeCluster::add_node(int min_x, int max_x, int y, char name, int offset) 
 void NodeCluster::plot(int versus) {
   int inner_v = versus_inverter[versus];
   int index_order = 0;
-  Node *next_node;
 
   while (root_nodes->size() > 0)
   { Node *root_node = reinterpret_cast<Node*>(root_nodes->shift());
@@ -114,22 +124,50 @@ void NodeCluster::plot(int versus) {
     this->plot_sequence.clear();
     this->plot_sequence.push_back(root_node);
     Polygon poly;
-
-    if ((root_node)->tangs_sequence.size() > 0)  // front() or back() on empty list is undefined
-    { versus == Node::A ?
-        next_node = root_node->get_tangent_node_by_virtual_index(root_node->tangs_sequence.back()) :
-        next_node = root_node->get_tangent_node_by_virtual_index(root_node->tangs_sequence.front());
-
+      Node *next_node = nullptr;
+      if ((root_node)->tangs_sequence.size() > 0)  // front() or back() on empty list is undefined
+      { versus == Node::A ?
+          next_node = root_node->get_tangent_node_by_virtual_index(root_node->tangs_sequence.back()) :
+          next_node = root_node->get_tangent_node_by_virtual_index(root_node->tangs_sequence.front());
+      }
       if (next_node != nullptr)
-      { Point p = next_node->coords_entering_to(root_node, versus_inverter[versus], Node::OUTER);
+      { Point beginning_point;
+        beginning_point = versus == Node::A ? root_node->nw_point() : root_node->ne_point();
+        poly.bounds.expand(beginning_point.x, beginning_point.y);
+        poly.outer.push_back(beginning_point);
+
+        Point p = next_node->coords_entering_to(root_node, versus_inverter[versus], Node::OUTER);
         poly.bounds.expand(p.x, p.y);
         poly.outer.push_back(p);
       }
+
       if ((this->nodes > 0) && (next_node != nullptr))
       { plot_node(poly.outer, next_node, root_node, versus, poly.bounds);
       }
 
-      if (poly.outer.size() >= 2)
+      if (next_node == nullptr) {
+        if (versus == Node::A) {
+          Point nw_point = root_node->nw_point();
+          poly.bounds.expand(nw_point.x, nw_point.y);
+          poly.outer.push_back(nw_point);
+          poly.outer.push_back(root_node->sw_point());
+          Point se_point = root_node->se_point();
+          poly.bounds.expand(se_point.x, se_point.y);
+          poly.outer.push_back(se_point);
+          poly.outer.push_back(root_node->ne_point());
+        } else {
+          Point ne_point = root_node->ne_point();
+          poly.bounds.expand(ne_point.x, ne_point.y);
+          poly.outer.push_back(ne_point);
+          poly.outer.push_back(root_node->se_point());
+          Point sw_point = root_node->sw_point();
+          poly.bounds.expand(sw_point.x, sw_point.y);
+          poly.outer.push_back(sw_point);
+          poly.outer.push_back(root_node->nw_point());
+        }
+      }
+
+      if (poly.outer.size() > 0)
       { this->polygons.push_back(poly);
         this->sequences.push_back(std::move(this->plot_sequence));
 
@@ -174,7 +212,11 @@ void NodeCluster::plot(int versus) {
 
           if (next_node != nullptr)
           { inner_sequence.push_back(next_node->coords_entering_to(first, inner_v, Node::INNER));
-            plot_inner_node(inner_sequence, next_node, inner_v, first, root_node);
+            Node* last_node = plot_inner_node(inner_sequence, next_node, inner_v, first, root_node);
+            Point last_coord = last_node->coords_entering_to(first, versus_inverter[inner_v], Node::INNER);
+            if (inner_sequence.back() != last_coord) {
+              inner_sequence.push_back(last_coord);
+            }
           }
           this->polygons.back().inner.push_back(inner_sequence);
           this->inner_plot->grab(this->inner_new);
@@ -187,9 +229,6 @@ void NodeCluster::plot(int versus) {
       { this->treemap.push_back(versus == Node::A ? this->test_in_hole_a(root_node) : this->test_in_hole_o(root_node));
       }
       index_order++;
-    } else {
-      this->plot_sequence.clear();
-    }
   }
 }
 
@@ -242,9 +281,9 @@ std::pair<int, int> NodeCluster::test_in_hole_o(Node* node)
   return {-1, -1};
 }
 
-void NodeCluster::plot_inner_node(std::vector<Point>& sequence_coords, Node *node, int versus, Node *stop_at, Node *start_node) {
+Node* NodeCluster::plot_inner_node(std::vector<Point>& sequence_coords, Node *node, int versus, Node *stop_at, Node *start_node) {
   Node *current_node = node;
-  bool strict_bounds = this->options->strict_bounds;
+
   while (current_node != nullptr) {
     current_node->outer_index = start_node->outer_index;
     root_nodes->remove(current_node);
@@ -271,16 +310,29 @@ void NodeCluster::plot_inner_node(std::vector<Point>& sequence_coords, Node *nod
       plot = (n == next_node);
     }
     if (plot) {
-      sequence_coords.push_back(last_node->coords_entering_to(current_node, versus_inverter[versus], Node::INNER));
-      if (current_node != start_node) {
-        if (last_node->y == next_node->y) {
-          sequence_coords.push_back(next_node->coords_entering_to(current_node, versus, Node::INNER));
+      Point first_point = last_node->coords_entering_to(current_node, versus_inverter[versus], Node::INNER);
+      if (sequence_coords.back() != first_point) {
+        sequence_coords.push_back(first_point);
+      }
+      if (next_node->y == last_node->y) {
+        Point pt_a, pt_b;
+        if (next_node->y < current_node->y) {
+          pt_a = current_node->sw_point();
+          pt_b = current_node->se_point();
+        } else {
+          pt_a = current_node->ne_point();
+          pt_b = current_node->nw_point();
+        }
+        if (versus == Node::O) {
+          sequence_coords.push_back(pt_a);
+          sequence_coords.push_back(pt_b);
+        } else {
+          sequence_coords.push_back(pt_b);
+          sequence_coords.push_back(pt_a);
         }
       }
-    } else if (strict_bounds) {
-        sequence_coords.push_back(Point{(first_is_max ? last_node->max_x : last_node->min_x), current_node->y});
-        sequence_coords.push_back(Point{(first_is_max ? next_node->min_x : next_node->max_x), current_node->y});
-      }
+      sequence_coords.push_back(next_node->coords_entering_to(current_node, versus, Node::INNER));
+    }
 
     if (current_node->track_uncomplete()) {
       this->inner_new->push_back(current_node);
@@ -290,11 +342,11 @@ void NodeCluster::plot_inner_node(std::vector<Point>& sequence_coords, Node *nod
     if (next_node == stop_at) break;
     current_node = next_node;
   }
+  return current_node;
 }
 
 void NodeCluster::plot_node(std::vector<Point>& sequence_coords, Node *node, Node *start_node, int versus, RectBounds& bounds) {
   Node *current_node = node;
-  bool strict_bounds = this->options->strict_bounds;
 
   while (current_node != nullptr) {
     root_nodes->remove(current_node);
@@ -314,27 +366,47 @@ void NodeCluster::plot_node(std::vector<Point>& sequence_coords, Node *node, Nod
       plot = (n == next_node);
     }
     if (plot) {
-      Point p = last_node->coords_entering_to(current_node, versus, Node::OUTER);
-      bounds.expand(p.x, p.y);
-      sequence_coords.push_back(p);
+      Point start_coord = last_node->coords_entering_to(current_node, versus, Node::OUTER);
+      if (sequence_coords.back() != start_coord) {
+        bounds.expand(start_coord.x, start_coord.y);
+        sequence_coords.push_back(start_coord);
+      }
+      bool final_step = current_node == start_node && current_node->track_complete();
+      if (next_node->y == last_node->y) {
+        Point pt_a, pt_b;
+        if (next_node->y < current_node->y) {
+          pt_a = current_node->se_point();
+          pt_b = current_node->sw_point();
+        } else {
+          pt_a = current_node->nw_point();
+          pt_b = current_node->ne_point();
+        }
+        Point first = (versus == Node::O) ? pt_a : pt_b;
+        Point second = (versus == Node::O) ? pt_b : pt_a;
+        sequence_coords.push_back(first);
+        bounds.expand(first.x, first.y);
+        if (!final_step) {
+          sequence_coords.push_back(second);
+          bounds.expand(second.x, second.y);
+        }
+      }
+
+      if (!final_step) {
+        Point end_coord = next_node->coords_entering_to(current_node, versus_inverter[versus], Node::OUTER);
+        sequence_coords.push_back(end_coord);
+        bounds.expand(end_coord.x, end_coord.y);
+      }
+
       if (current_node != start_node) {
         inner_plot->contains(current_node) ? inner_plot->remove(current_node) : inner_plot->push_back(current_node);
         if (last_node->y == next_node->y) {
-          Point p1 = next_node->coords_entering_to(current_node, versus_inverter[versus], Node::OUTER);
-          bounds.expand(p1.x, p1.y);
-          sequence_coords.push_back(p1);
           inner_plot->contains(current_node) ? inner_plot->remove(current_node) : inner_plot->push_back(current_node);
         }
       }
-    } else if (strict_bounds) {
-        bool is_down = current_node->y > last_node->y;
-        bool is_a = (versus == Node::A);
-        sequence_coords.push_back(Point{(is_down == is_a ? last_node->min_x : last_node->max_x), current_node->y});
-        sequence_coords.push_back(Point{(is_down == is_a ? next_node->max_x : next_node->min_x), current_node->y});
-      }
+    }
 
-    if (current_node == start_node) {
-      if (current_node->track_complete()) break;
+    if (current_node == start_node && current_node->track_complete()) {
+      break;
     }
     current_node = next_node;
   }

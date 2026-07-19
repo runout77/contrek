@@ -2,43 +2,32 @@
 
 RSpec.shared_examples "heavy" do
   describe "simple cases" do
-    it "scans poly 1160x772", sample_1160x772: true do
-      filename = "sample_1160x772.png"
-      png_bitmap = @png_bitmap_class.new("./spec/files/images/#{filename}")
+    it "scans poly 1160x772" do
+      filename = "sample_1160x772"
+      png_bitmap = @png_bitmap_class.new("./spec/files/images/#{filename}.png")
       rgb_matcher = @png_not_matcher.new(@png_not_matcher_color)
       polygonfinder = @polygon_finder_class.new(png_bitmap, rgb_matcher, nil, {versus: :a})
       result = polygonfinder.process_info
-      # store_sample(polygonfinder,filename,result,png_bitmap)
-      saved_poly = YAML.load_file("./spec/files/coordinates/#{filename}.yml")
-      expect(result.points).to eq(saved_poly)
+      # puts result.metadata[:benchmarks].inspect
+      expect(result.points).to match_expected_polygons(filename, number_of_tiles: 1)
     end
-    it "scans poly 1200x800", sample_1200x800: true do
-      filename = "sample_1200x800.png"
-      png_bitmap = @png_bitmap_class.new("./spec/files/images/#{filename}")
+    it "scans poly 1200x800" do
+      filename = "sample_1200x800"
+      png_bitmap = @png_bitmap_class.new("./spec/files/images/#{filename}.png")
       rgb_matcher = @png_not_matcher.new(png_bitmap.rgb_value_at(0, 0))
       polygonfinder = @polygon_finder_class.new(png_bitmap, rgb_matcher, nil, {versus: :a})
       result = polygonfinder.process_info
       # puts result.metadata[:benchmarks].inspect
-      # store_sample(polygonfinder,filename,result,png_bitmap)
-      saved_poly = YAML.load_file("./spec/files/coordinates/#{filename}.yml")
-      expect(result.points).to eq(saved_poly)
+      expect(result.points).to match_expected_polygons(filename, number_of_tiles: 1)
     end
-    it "scans poly 1200x1192", sample_1200x1192: true do
-      filename = "sample_1200x1192.png"
-      png_bitmap = @png_bitmap_class.new("./spec/files/images/#{filename}")
+    it "scans poly 1200x1192" do
+      filename = "sample_1200x1192"
+      png_bitmap = @png_bitmap_class.new("./spec/files/images/#{filename}.png")
       rgb_matcher = @png_not_matcher.new(png_bitmap.rgb_value_at(0, 0))
       polygonfinder = @polygon_finder_class.new(png_bitmap, rgb_matcher, nil, {versus: :a})
       result = polygonfinder.process_info
-      # store_sample(polygonfinder,filename,result,png_bitmap)
-      saved_poly = YAML.load_file("./spec/files/coordinates/#{filename}.yml")
-      expect(result.points).to eq(saved_poly)
+      # puts result.metadata[:benchmarks].inspect
+      expect(result.points).to match_expected_polygons(filename, number_of_tiles: 1)
     end
-  end
-
-  def store_sample(polygonfinder, filename, result, bitmap)
-    test_bitmap = Contrek::Bitmaps::RawBitmap.new(w: bitmap.w, h: bitmap.h, color: ChunkyPNG::Color::WHITE)
-    Contrek::Bitmaps::Painting.direct_draw_polygons(result.points, test_bitmap)
-    test_bitmap.save("./spec/files/stored_samples/#{filename}")
-    File.write("./spec/coordinates/#{filename}.yml", @result.points.to_yaml)
   end
 end

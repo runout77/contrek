@@ -20,13 +20,11 @@
 static const int TURNER[2][2] = {{Node::OMAX, Node::OMIN}, {Node::TURN_MAX, Node::TURN_MIN}};
 
 Node::Node(int min_x, int max_x, int y, NodeCluster* cluster, char name)
-: start_point(min_x, y),
-  end_point(max_x, y),
-  cluster(cluster) {
-  this->name = name;
-  this->min_x = min_x;
-  this->max_x = max_x;
+: cluster(cluster),
+  min_x(min_x),
+  max_x(max_x + 1) {
   this->y = y;
+  this->name = name;
   this->tangs_count = 0;
   this->abs_x_index = 0;
   this->down_indexer = 0;
@@ -110,19 +108,19 @@ Point Node::coords_entering_to(Node *enter_to, int mode, int tracking) {
     Node& node_up = cluster->vert_nodes[y + T_UP][-(tg_index + 1)];
     if (mode == Node::A) {
       enter_to->track |= TURNER[tracking][OMAX - 1];
-      return node_up.end_point;
+      return node_up.se_point();
     } else {
       enter_to->track |= TURNER[tracking][OMIN - 1];
-      return node_up.start_point;
+      return node_up.sw_point();
     }
   } else {
     Node& node_down = cluster->vert_nodes[y + T_DOWN][tg_index];
     if (mode == Node::A) {
       enter_to->track |= TURNER[tracking][OMIN - 1];
-      return node_down.start_point;
+      return node_down.nw_point();
     } else {
       enter_to->track |= TURNER[tracking][OMAX - 1];
-      return node_down.end_point;
+      return node_down.ne_point();
     }
   }
 }

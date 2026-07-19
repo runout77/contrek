@@ -16,7 +16,6 @@ Part* PartPool::acquire(uint32_t type, Polyline* poly) {
 
   Part* p = &storage.back();
   p->next = nullptr;
-  p->prev = nullptr;
   return p;
 }
 

@@ -94,7 +94,7 @@ void Tile::assign_shapes(std::vector<Shape*>& shapes) {
 }
 
 bool Tile::tg_border(const Point& coord) {
-  return( coord.x == (this->next == nullptr ? start_x_ : (end_x_ - 1)));
+  return( coord.x == (this->next == nullptr ? start_x_ : (end_x_)));
 }
 
 void Tile::info() {

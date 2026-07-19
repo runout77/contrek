@@ -29,8 +29,8 @@ Position* Part::next_position(Position* force_position) {
   if (force_position != nullptr)
   { QNode<Point>* move_to_this = nullptr;
     this->reverse_each([&](QNode<Point>* pos) -> bool {
+      move_to_this = pos;
       if (pos->payload == force_position->payload) {
-        move_to_this = pos;
         return false;
       }
       return true;
@@ -62,12 +62,11 @@ void Part::touch()
 }
 
 void Part::orient()
-{ if (this->size <= 1 || (this->size == 2 && this->inverts)) {
+{ if (this->size <= 1) {
     this->versus_ = 0;
   } else {
     int diff = this->tail->payload.y - this->head->payload.y;
     if (diff == 0) {
-      this->mirror = true;
       this->versus_ = 0;
     } else {
       this->versus_ = diff > 0 ? 1 : -1;
@@ -75,52 +74,10 @@ void Part::orient()
   }
 }
 
-void Part::try_transmutation() {
-  auto& head_queues = static_cast<Position*>(this->head)->end_point()->queues();
-  if (head_queues.size() == 1) {
-    return;
-  }
-
-  auto other_head_it = std::find_if(head_queues.begin(), head_queues.end(), [this](auto* queueable_ptr) {
-    Part* part = static_cast<Part*>(queueable_ptr);
-    return part != this && part->polyline()->tile == this->polyline()->tile;
-  });
-
-  if (other_head_it != head_queues.end()) {
-    Part* other_head_part = static_cast<Part*>(*other_head_it);
-    auto& tail_queues = static_cast<Position*>(this->tail)->end_point()->queues();
-    auto found_in_tail = std::find(tail_queues.begin(), tail_queues.end(), other_head_part);
-    if (found_in_tail != tail_queues.end()) {
-      if ( (other_head_part->tail->payload.y == tail->payload.y && other_head_part->head->payload.y == head->payload.y) ||
-           (other_head_part->tail->payload.y == head->payload.y && other_head_part->head->payload.y == tail->payload.y)) {
-        if (this->next == nullptr && other_head_part->prev == nullptr) {
-            this->mirror = true;
-        }
-      } else {
-          this->type = Part::EXCLUSIVE;
-          this->trasmuted = true;
-          other_head_part->transmutation_skip = true;
-      }
-    }
-  }
-}
-
-bool Part::within(Part* other) {
-  const auto [self_min, self_max] = std::minmax(this->head->payload.y, this->tail->payload.y);
-  const auto [other_min, other_max] = std::minmax(other->head->payload.y, other->tail->payload.y);
-  return (self_min >= other_min) && (self_max <= other_max);
-}
-
-bool Part::same_length(Part* other) {
-  return( std::abs(this->head->payload.y - this->tail->payload.y) ==
-          std::abs(other->head->payload.y - other->tail->payload.y));
-}
-
 constexpr std::string_view typeToString(Part::Types t) noexcept {
   switch (t) {
     case Part::SEAM:      return "SEAM";
     case Part::EXCLUSIVE: return "EXCLUSIVE";
-    case Part::ADDED:     return "ADDED";
     default:        return "UNKNOWN";
   }
 }
@@ -134,11 +91,7 @@ std::string Part::inspect() {
   std::stringstream ss;
   ss << "part " << part_index
   << " (versus=" << this->versus_
-  << " mirror=" << this->mirror
-  << " inv=" << this->inverts
-  << " trm=" << this->trasmuted
   << " touched=" << this->touched_
-  << " dead_end=" << this->dead_end
   << ", " << this->size << "x) of " << this->polyline()->tile->name() << " " << this->polyline()->named()
   << " (" << typeToString(type) << ") (";
   this->each([&](QNode<Point>* pos) -> bool {
@@ -147,42 +100,4 @@ std::string Part::inspect() {
   });
   ss << ")";
   return ss.str();
-}
-
-std::vector<EndPoint*> Part::continuum_to(const Part& other_part) const {
-  if (this->size <= 2 && this->inverts && other_part.size <= 2 && other_part.inverts) return {};
-
-  const Point& target = other_part.head->payload;
-  QNode<Point>* cursor = this->tail;
-
-  while (cursor != nullptr) {
-    if (cursor->payload == target) {
-      QNode<Point>* s = cursor;
-      QNode<Point>* o = other_part.head;
-      bool match = true;
-      int count = 0;
-
-      while (s != nullptr && o != nullptr) {
-        if (!(s->payload == o->payload)) {
-          match = false;
-          break;
-        }
-        s = s->next;
-        o = o->next;
-        count++;
-      }
-      if (match && s == nullptr) {
-        std::vector<EndPoint*> res;
-        res.reserve(count);
-        s = cursor;
-        for (int i = 0; i < count; ++i) {
-          res.push_back(static_cast<Position*>(s)->end_point());
-          s = s->next;
-        }
-        return res;
-      }
-    }
-    cursor = cursor->prev;
-  }
-  return {};
 }

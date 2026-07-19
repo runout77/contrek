@@ -93,7 +93,8 @@ module Contrek
             compress: ((compress_time * 1000).round(3) if @options.has_key?(:compress))
           }.compact,
           width: @maximum_width,
-          height: @height
+          height: @height,
+          versus: options[:versus]
         }
         metadata[:treemap] = @whole_tile.compute_treemap if options[:treemap]
         Contrek::Finder::Result.new(raw_polygons, metadata)

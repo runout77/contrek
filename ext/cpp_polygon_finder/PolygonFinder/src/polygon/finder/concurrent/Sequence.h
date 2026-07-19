@@ -20,14 +20,5 @@ class Sequence : public Queueable<Point>{
  public:
   Sequence() {}
   std::string toString();
-  bool is_not_vertical();
   Shape* shape = nullptr;
-  const std::vector<Point>& get_vector_cache() {
-    if (vector_cache.empty() && this->size > 0) {
-      vector_cache = this->to_vector();
-    }
-    return vector_cache;
-  }
- private:
-  std::vector<Point> vector_cache;
 };

@@ -139,6 +139,7 @@ ProcessResult* Finder::process_info() {
   pr->width = this->maximum_width_;
   pr->height = this->height;
   pr->has_bounds = this->options_.bounds;
+  pr->versus = this->options_.versus;
   FakeCluster fake_cluster(pr->polygons, this->options_);
   cpu_timer.start();
   fake_cluster.compress_coords(pr->polygons, this->options_);

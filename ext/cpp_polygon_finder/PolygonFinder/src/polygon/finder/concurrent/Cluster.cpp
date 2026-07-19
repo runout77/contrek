@@ -20,7 +20,7 @@
 Cluster::Cluster(Finder *finder, int height)
   : finder_(finder)
 { tiles_.reserve(2);  // only two (left|right)
-  this->hub_ = new Hub(height);
+  this->hub_ = new Hub(height + 1);
 }
 
 Cluster::~Cluster() {

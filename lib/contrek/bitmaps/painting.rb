@@ -21,22 +21,39 @@ module Contrek
         colors.sort_by { |color, count| -color }
       end
 
-      def self.direct_draw_polygons(polygons, png_image)
+      def self.direct_draw_polygons(polygons, png_image, zoom: 1)
         polygons.compact.each do |poly|
-          color = ChunkyPNG::Color("red @ 1.0")
-          poly[:outer].each_cons(2) do |coords|
-            png_image.draw_line(coords[0][:x], coords[0][:y], coords[1][:x], coords[1][:y], color)
+          if (bounds = poly[:bounds])
+            b_factor = 3.to_f / zoom
+            bounds_polygon = [
+              {x: bounds[:min_x] - b_factor, y: bounds[:min_y] - b_factor},
+              {x: bounds[:max_x] + b_factor, y: bounds[:min_y] - b_factor},
+              {x: (bounds[:max_x] + b_factor), y: bounds[:max_y] + b_factor},
+              {x: (bounds[:min_x] - b_factor), y: bounds[:max_y] + b_factor}
+            ]
+            draw_polygon(bounds_polygon, png_image, ChunkyPNG::Color("blue @ 1.0"), zoom)
           end
-          png_image.draw_line(poly[:outer][0][:x], poly[:outer][0][:y], poly[:outer][-1][:x], poly[:outer][-1][:y], color)
+          color = ChunkyPNG::Color("red @ 1.0")
+          draw_polygon(poly[:outer], png_image, color, zoom)
           color = ChunkyPNG::Color("green @ 1.0")
           poly[:inner].each do |sequence|
-            next if sequence.empty?
-            sequence.each_cons(2) do |coords|
-              png_image.draw_line(coords[0][:x], coords[0][:y], coords[1][:x], coords[1][:y], color)
-            end
-            png_image.draw_line(sequence[0][:x], sequence[0][:y], sequence[-1][:x], sequence[-1][:y], color)
+            draw_polygon(sequence, png_image, color, zoom)
           end
         end
+      end
+
+      def self.draw_polygon(sequence, png_image, color, zoom, margin = 0)
+        return if sequence.empty?
+        sequence.each_cons(2) do |coords|
+          png_image.draw_line(coords[0][:x] * zoom,
+            coords[0][:y] * zoom,
+            coords[1][:x] * zoom,
+            coords[1][:y] * zoom, color)
+        end
+        png_image.draw_line(sequence[0][:x] * zoom,
+          sequence[0][:y] * zoom,
+          sequence[-1][:x] * zoom,
+          sequence[-1][:y] * zoom, color)
       end
     end
   end

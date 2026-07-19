@@ -25,7 +25,12 @@ class VisvalingamReducer : public Reducer {
   class Triangle {
    public:
     static int area(const Point& a, const Point& b, const Point& c) {
-      return std::abs(((c.x - a.x) * (b.y - a.y) - (b.x - a.x) * (c.y - a.y)) / 2);
+      const int cross = (c.x - a.x) * (b.y - a.y) - (b.x - a.x) * (c.y - a.y);
+      int half = cross / 2;
+      if (cross < 0 && cross % 2 != 0) {
+        --half;
+      }
+      return std::abs(half);
     }
   };
 

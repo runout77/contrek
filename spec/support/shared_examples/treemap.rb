@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.shared_examples "treemap" do
-  describe "simple cases" do
+  describe "treemap" do
     it "scans 3 level 1" do
       chunk = "AAAAAAAAAAAAAAA       " \
               "B             C       " \
@@ -19,6 +19,7 @@ RSpec.shared_examples "treemap" do
         [0, 0],
         [1, 0]])
     end
+
     it "scans 3 level 2" do
       chunk = "AAAAAAAAAAAAAAA       " \
               "B             C       " \
@@ -39,6 +40,7 @@ RSpec.shared_examples "treemap" do
         [1, 0],
         [1, 0]])
     end
+
     it "scans 3 level 3" do
       chunk = "AAAAAAAAA             " \
               "B       C    22       " \
@@ -57,6 +59,7 @@ RSpec.shared_examples "treemap" do
         [0, 0],
         [2, 0]])
     end
+
     it "scans 3 level 4" do
       chunk = "AAAAAAAAA    22       " \
               "B       C    22       " \
@@ -77,6 +80,7 @@ RSpec.shared_examples "treemap" do
         [2, 0],
         [3, 0]])
     end
+
     it "scans 3 level 5" do
       chunk = "AAAAAAAAA    22       " \
               "B       C    22       " \
@@ -138,6 +142,7 @@ RSpec.shared_examples "treemap" do
       expect(result.metadata[:treemap]).to eq([[-1, -1],
         [-1, -1]])
     end
+
     it "scans 3 level 9" do
       chunk = "AAAAAAAAAAAAAAAAAAAAAA" \
               "X                    A" \
@@ -153,6 +158,7 @@ RSpec.shared_examples "treemap" do
         [-1, -1],
         [-1, -1]])
     end
+
     it "scans 3 level 10" do
       chunk = "AAAAAAAAAAAAAAAAAAAAAA" \
               "X                    A" \
@@ -171,6 +177,7 @@ RSpec.shared_examples "treemap" do
         [-1, -1],
         [0, 0]])
     end
+
     it "scans 3 level 11" do
       chunk = "AAAAAAAAAAAAAAAAAAAAAA" \
               "X                    A" \
@@ -191,6 +198,7 @@ RSpec.shared_examples "treemap" do
         [-1, -1],
         [4, 0]])
     end
+
     it "scans 3 level 12" do
       chunk = "AAAAAAAAAAAAAAAAAAAAAA" \
               "B                    P" \
@@ -208,6 +216,7 @@ RSpec.shared_examples "treemap" do
         [0, 0],
         [1, 0]])
     end
+
     it "scans 3 level 13" do
       chunk = "AAAAAAAAAAAAAAAAAAAAAA" \
               "A                    A" \
@@ -235,6 +244,7 @@ RSpec.shared_examples "treemap" do
         [1, 0], # G
         [1, 0]]) # H
     end
+
     it "scans 3 level 14" do
       chunk = "AAAAAAAAAAAAAAAAAAAAAA" \
               "A                    A" \
@@ -257,6 +267,7 @@ RSpec.shared_examples "treemap" do
         [1, 0],
         [1, 1]])
     end
+
     it "scans 3 level 15" do
       chunk = "AAAAAAAAAAAAAAAAAAAAAA" \
               "A                    A" \
@@ -279,6 +290,7 @@ RSpec.shared_examples "treemap" do
         [1, 1],
         [1, 0]])
     end
+
     it "scans 3 level 16" do
       chunk = "AAAAAAAAAAAAAAAAAAAAAA" \
               "A                    A" \
@@ -300,6 +312,7 @@ RSpec.shared_examples "treemap" do
         [0, 0],
         [1, 0]])
     end
+
     it "scans 3 level 17" do
       chunk = "AAAAAAAAAAAAAAAAAAAAAA" \
               "A                    A" \
@@ -316,7 +329,8 @@ RSpec.shared_examples "treemap" do
               "A BBBBBBBBBBBBBBBBBB A" \
               "A                    A" \
               "AAAAAAAAAAAAAAAAAAAAAA"
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 22), @matcher, nil, {treemap: true}).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 22), @matcher, nil, {treemap: true, compress: {linear: true}}).process_info
+      expect(result.points).to match_expected_json
       expect(result.metadata[:groups]).to eq(8)
       expect(result.metadata[:treemap]).to eq([[-1, -1],
         [0, 0],
@@ -327,6 +341,7 @@ RSpec.shared_examples "treemap" do
         [1, 0],
         [4, 0]])
     end
+
     it "scans 3 level 18" do
       chunk =
         "A0000000000000000000" \
@@ -338,17 +353,7 @@ RSpec.shared_examples "treemap" do
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 20), @matcher, nil, {treemap: true, compress: {uniq: true, linear: true}}).process_info
       # ABFMTYXSLEA-GNG-IPI-KRK
       expect(result.metadata[:groups]).to eq(4)
-      expect(result.points).to eq(
-        [{outer: [{x: 0, y: 0}, {x: 0, y: 5}, {x: 19, y: 5}, {x: 19, y: 0}],
-          inner: [
-            [{x: 1, y: 1}, {x: 6, y: 1}, {x: 6, y: 4}, {x: 1, y: 4}, {x: 1, y: 2}], # G inside
-            [{x: 18, y: 4}, {x: 13, y: 4}, {x: 13, y: 1}, {x: 18, y: 1}, {x: 18, y: 3}], # K inside
-            [{x: 7, y: 1}, {x: 12, y: 1}, {x: 12, y: 4}, {x: 7, y: 4}, {x: 7, y: 2}]
-          ]}, # I inside
-          {outer: [{x: 3, y: 2}, {x: 3, y: 3}, {x: 4, y: 3}, {x: 4, y: 2}], inner: []}, # G
-          {outer: [{x: 9, y: 2}, {x: 9, y: 3}, {x: 10, y: 3}, {x: 10, y: 2}], inner: []}, # I
-          {outer: [{x: 15, y: 2}, {x: 15, y: 3}, {x: 16, y: 3}, {x: 16, y: 2}], inner: []}] # K
-      )
+      expect(result.points).to match_expected_json
       expect(result.metadata[:treemap]).to eq([
         [-1, -1], # A
         [0, 0],   # G
@@ -358,15 +363,7 @@ RSpec.shared_examples "treemap" do
 
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 20), @matcher, nil, {versus: :o, treemap: true, compress: {uniq: true, linear: true}}).process_info
       expect(result.metadata[:groups]).to eq(4)
-      expect(result.points).to eq(
-        [{outer: [{x: 19, y: 0}, {x: 19, y: 5}, {x: 0, y: 5}, {x: 0, y: 0}],
-          inner: [[{x: 18, y: 1}, {x: 13, y: 1}, {x: 13, y: 4}, {x: 18, y: 4}, {x: 18, y: 2}], # K inside
-            [{x: 1, y: 4}, {x: 6, y: 4}, {x: 6, y: 1}, {x: 1, y: 1}, {x: 1, y: 3}], # G inside
-            [{x: 12, y: 1}, {x: 7, y: 1}, {x: 7, y: 4}, {x: 12, y: 4}, {x: 12, y: 2}]]}, # I inside
-          {outer: [{x: 4, y: 2}, {x: 4, y: 3}, {x: 3, y: 3}, {x: 3, y: 2}], inner: []}, # G
-          {outer: [{x: 10, y: 2}, {x: 10, y: 3}, {x: 9, y: 3}, {x: 9, y: 2}], inner: []},  # I
-          {outer: [{x: 16, y: 2}, {x: 16, y: 3}, {x: 15, y: 3}, {x: 15, y: 2}], inner: []}] # K
-      )
+      expect(result.points).to match_expected_json(addons: [:o])
       expect(result.metadata[:treemap]).to eq([
         [-1, -1], # A
         [0, 1],   # G
@@ -385,16 +382,7 @@ RSpec.shared_examples "treemap" do
               "0000000000000000000000"
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 22), @matcher, nil, {treemap: true, compress: {uniq: true, linear: true}}).process_info
       expect(result.metadata[:groups]).to eq(4)
-      expect(result.points).to eq([
-        {outer: [{x: 0, y: 0}, {x: 0, y: 6}, {x: 21, y: 6}, {x: 21, y: 0}, {x: 18, y: 0}, {x: 18, y: 3},
-          {x: 13, y: 3}, {x: 13, y: 1}, {x: 8, y: 1}, {x: 8, y: 3}, {x: 3, y: 3}, {x: 3, y: 0}],
-         inner: [[{x: 0, y: 1}, {x: 3, y: 1}, {x: 3, y: 4}, {x: 8, y: 4}, {x: 8, y: 2}, {x: 13, y: 2},
-           {x: 13, y: 4}, {x: 18, y: 4}, {x: 18, y: 1}, {x: 21, y: 1}, {x: 21, y: 5},
-           {x: 0, y: 5}, {x: 0, y: 2}]]},
-        {outer: [{x: 5, y: 1}, {x: 5, y: 2}, {x: 6, y: 2}, {x: 6, y: 1}], inner: []}, # 1
-        {outer: [{x: 15, y: 1}, {x: 15, y: 2}, {x: 16, y: 2}, {x: 16, y: 1}], inner: []}, # 3
-        {outer: [{x: 10, y: 3}, {x: 10, y: 4}, {x: 11, y: 4}, {x: 11, y: 3}], inner: []} # 2
-      ])
+      expect(result.points).to match_expected_json
       expect(result.metadata[:treemap]).to eq([
         [-1, -1], [-1, -1],
         [-1, -1], [0, 0]
@@ -402,16 +390,7 @@ RSpec.shared_examples "treemap" do
 
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 22), @matcher, nil, {versus: :o, treemap: true, compress: {uniq: true, linear: true}}).process_info
       expect(result.metadata[:groups]).to eq(4)
-      expect(result.points).to eq(
-        [{outer: [{x: 3, y: 0}, {x: 3, y: 3}, {x: 8, y: 3}, {x: 8, y: 1}, {x: 13, y: 1}, {x: 13, y: 3},
-          {x: 18, y: 3}, {x: 18, y: 0}, {x: 21, y: 0}, {x: 21, y: 6}, {x: 0, y: 6}, {x: 0, y: 0}],
-          inner: [[{x: 3, y: 1}, {x: 0, y: 1}, {x: 0, y: 5}, {x: 21, y: 5}, {x: 21, y: 1}, {x: 18, y: 1},
-            {x: 18, y: 4}, {x: 13, y: 4}, {x: 13, y: 2}, {x: 8, y: 2},
-            {x: 8, y: 4}, {x: 3, y: 4}, {x: 3, y: 2}]]},
-          {outer: [{x: 6, y: 1}, {x: 6, y: 2}, {x: 5, y: 2}, {x: 5, y: 1}], inner: []}, # 1
-          {outer: [{x: 16, y: 1}, {x: 16, y: 2}, {x: 15, y: 2}, {x: 15, y: 1}], inner: []}, # 3
-          {outer: [{x: 11, y: 3}, {x: 11, y: 4}, {x: 10, y: 4}, {x: 10, y: 3}], inner: []}] # 2
-      )
+      expect(result.points).to match_expected_json(addons: [:o])
       expect(result.metadata[:treemap]).to eq([
         [-1, -1], [-1, -1],
         [-1, -1], [0, 0]
@@ -485,9 +464,10 @@ RSpec.shared_examples "treemap" do
               "A                A" \
               "AAAAAAAAAAAAAAAAAA"
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 18), @matcher, nil, {treemap: true, compress: {uniq: true, linear: true}}).process_info
-      expect(result.metadata[:groups]).to eq(1)
-      expect(result.points.size).to eq(1)
-      expect(result.metadata[:treemap]).to eq([[-1, -1]])
+      expect(result.metadata[:groups]).to eq(2)
+      expect(result.points.size).to eq(2)
+      expect(result.points).to match_expected_json
+      expect(result.metadata[:treemap]).to eq([[-1, -1], [0, 0]])
     end
 
     it "scans 3 level 24" do
@@ -503,7 +483,7 @@ RSpec.shared_examples "treemap" do
               "0000000000000000000000"
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 22), @matcher, nil, {treemap: true, compress: {uniq: true, linear: true}}).process_info
       expect(result.metadata[:groups]).to eq(3)
-      expect(result.points).to eq([{outer: [{x: 11, y: 0}, {x: 11, y: 2}, {x: 8, y: 3}, {x: 0, y: 4}, {x: 0, y: 9}, {x: 21, y: 9}, {x: 21, y: 0}], inner: [[{x: 11, y: 1}, {x: 21, y: 1}, {x: 21, y: 8}, {x: 12, y: 8}, {x: 12, y: 3}, {x: 11, y: 2}], [{x: 8, y: 4}, {x: 12, y: 4}, {x: 12, y: 8}, {x: 0, y: 8}, {x: 0, y: 5}]]}, {outer: [{x: 16, y: 3}, {x: 16, y: 6}, {x: 17, y: 6}, {x: 17, y: 3}], inner: []}, {outer: [{x: 5, y: 6}, {x: 5, y: 7}, {x: 6, y: 7}, {x: 6, y: 6}], inner: []}])
+      expect(result.points).to match_expected_json
       expect(result.metadata[:treemap]).to eq([
         [-1, -1], # 0 (left hole pos 1 right hole pos 0)
         [0, 0],   # 1
@@ -524,7 +504,7 @@ RSpec.shared_examples "treemap" do
               "0000000000000000000000"
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 22), @matcher, nil, {treemap: true, compress: {uniq: true, linear: true}}).process_info
       expect(result.metadata[:groups]).to eq(4)
-      expect(result.points).to eq([{outer: [{x: 13, y: 0}, {x: 13, y: 1}, {x: 8, y: 2}, {x: 8, y: 3}, {x: 0, y: 4}, {x: 0, y: 9}, {x: 21, y: 9}, {x: 21, y: 0}], inner: [[{x: 13, y: 1}, {x: 21, y: 1}, {x: 21, y: 8}, {x: 14, y: 8}, {x: 14, y: 2}], [{x: 8, y: 3}, {x: 14, y: 3}, {x: 14, y: 8}, {x: 9, y: 8}, {x: 9, y: 4}], [{x: 0, y: 5}, {x: 9, y: 5}, {x: 9, y: 8}, {x: 0, y: 8}, {x: 0, y: 6}]]}, {outer: [{x: 17, y: 2}, {x: 17, y: 5}, {x: 18, y: 5}, {x: 18, y: 2}], inner: []}, {outer: [{x: 11, y: 4}, {x: 11, y: 5}, {x: 12, y: 5}, {x: 12, y: 4}], inner: []}, {outer: [{x: 3, y: 6}, {x: 3, y: 7}, {x: 6, y: 7}, {x: 6, y: 6}], inner: []}])
+      expect(result.points).to match_expected_json
       expect(result.metadata[:treemap]).to eq([
         [-1, -1], # 0 (left hole pos 2 mid pos 1, right hole pos 0)
         [0, 0],   # 1
@@ -544,13 +524,34 @@ RSpec.shared_examples "treemap" do
               "0000000000000000000000"
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 22), @matcher, nil, {treemap: true, compress: {uniq: true, linear: true}}).process_info
       expect(result.metadata[:groups]).to eq(4)
-      expect(result.points).to eq([{outer: [{x: 0, y: 0}, {x: 0, y: 7}, {x: 21, y: 7}, {x: 21, y: 0}, {x: 13, y: 0}, {x: 13, y: 1}, {x: 9, y: 1}, {x: 9, y: 0}], inner: [[{x: 0, y: 1}, {x: 9, y: 1}, {x: 8, y: 2}, {x: 8, y: 6}, {x: 0, y: 6}, {x: 0, y: 2}], [{x: 21, y: 6}, {x: 14, y: 6}, {x: 14, y: 2}, {x: 13, y: 1}, {x: 21, y: 1}, {x: 21, y: 5}], [{x: 8, y: 3}, {x: 14, y: 3}, {x: 14, y: 6}, {x: 8, y: 6}, {x: 8, y: 4}]]}, {outer: [{x: 3, y: 2}, {x: 3, y: 3}, {x: 5, y: 3}, {x: 5, y: 2}], inner: []}, {outer: [{x: 17, y: 2}, {x: 17, y: 5}, {x: 18, y: 5}, {x: 18, y: 2}], inner: []}, {outer: [{x: 10, y: 4}, {x: 10, y: 5}, {x: 12, y: 5}, {x: 12, y: 4}], inner: []}])
+      expect(result.points).to match_expected_json
       expect(result.metadata[:treemap]).to eq([
         [-1, -1], # 0 (left hole pos 0 mid hole pos 2, right hole pos 1)
         [0, 0],   # 3
         [0, 1], # 1
         [0, 2]
       ])  # 2
+    end
+
+    it "scans 3 level 27" do
+      skip
+      chunk = "0000000000000000000000" \
+              "0                    0" \
+              "0         000000000  0" \
+              "0         0       0  0" \
+              "0         0       0  0" \
+              "00000000000       0  0" \
+              "0         0  222  0  0" \
+              "0         0       0  0" \
+              "0         0       0  0" \
+              "0         000000000  0" \
+              "0                    0" \
+              "0000000000000000000000"
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 22),
+        @matcher, nil, {versus: :a, treemap: true, compress: {uniq: true, linear: true}}).process_info
+      expect(result.metadata[:groups]).to eq(2)
+      verify_treemap(result)
+      expect(result.metadata[:treemap]).to eq([[-1, -1], [0, 1]])
     end
   end
 end

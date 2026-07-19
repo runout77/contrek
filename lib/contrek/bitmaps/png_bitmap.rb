@@ -5,6 +5,9 @@ require "chunky_png"
 module Contrek
   module Bitmaps
     class PngBitmap < Bitmap
+      include Rendering
+
+      attr_reader :image
       def initialize(file_path)
         @image = ChunkyPNG::Image.from_file(file_path)
       end

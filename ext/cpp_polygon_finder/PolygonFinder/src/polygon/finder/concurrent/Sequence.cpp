@@ -18,19 +18,3 @@ std::string Sequence::toString() {
   });
   return(retme);
 }
-
-bool Sequence::is_not_vertical()
-{ if (this->size < 2) {
-    return false;
-  }
-  int x0 = head->payload.x;
-  this->rewind();
-
-  while (QNode<Point>* position = this->iterator())
-  { if (position->payload.x != x0) {
-      return true;
-    }
-    this->forward();
-  }
-  return false;
-}

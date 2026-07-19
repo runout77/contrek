@@ -84,7 +84,7 @@ module Contrek
       end
 
       def tg_border?(coord)
-        coord[:x] == (@next.nil? ? @start_x : (@end_x - 1))
+        coord[:x] == (@next.nil? ? @start_x : (@end_x))
       end
 
       def inspect

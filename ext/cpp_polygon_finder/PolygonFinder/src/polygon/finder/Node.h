@@ -94,7 +94,6 @@ class Node : public  Listable {
   int upper_end   = -1;
   int lower_start = std::numeric_limits<int>::max();
   int lower_end   = -1;
-  Point start_point, end_point;
   NodeCluster* cluster;
   void add_intersection(Node& other_node, int other_node_index);
   SmallVec tangs_sequence;
@@ -105,6 +104,10 @@ class Node : public  Listable {
   bool track_uncomplete();
   bool track_complete();
   bool get_trackmax();
+  Point nw_point() { return {min_x, y}; }
+  Point ne_point() { return {max_x, y}; }
+  Point se_point() { return {max_x, y + 1}; }
+  Point sw_point() { return {min_x, y + 1}; }
 
  public:
   int min_x, max_x;

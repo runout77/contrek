@@ -47,9 +47,10 @@ struct pf_Options {
   bool compress_uniq = false;
   bool compress_linear = false;
   bool compress_visvalingam = false;
+  bool compress_raster = false;
+  bool compress_douglas_peucker = false;
   bool named_sequences = false;
   bool bounds = false;
-  bool strict_bounds = false;
   int connectivity_offset = 0;
   float compress_visvalingam_tolerance = 10.0;
   int number_of_tiles = 1;

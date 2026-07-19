@@ -120,15 +120,6 @@ class Queueable {
     }
   }
 
-  template<typename Func>
-  void move_from(Queueable<T>& queueable, Func func) {
-    queueable.rewind();
-    while (QNode<T>* node = queueable.iterator())
-    { queueable.forward();
-      if (func(node)) add(node);
-    }
-  }
-
   std::vector<T> to_vector() const {
     std::vector<T> out;
     out.reserve(this->size);
@@ -140,16 +131,39 @@ class Queueable {
     return out;
   }
 
-  std::vector<T> map(std::function<T(QNode<T>*)> fn) {
-      std::vector<T> out;
-      each([&](QNode<T>* n){
-          out.push_back(fn(n));
-      });
-      return out;
-  }
-
   QNode<T>* pop() {
     if (!tail) return nullptr;
     return rem(tail);
+  }
+
+  void reset() {
+    head = nullptr;
+    tail = nullptr;
+    _iterator = nullptr;
+    _started = false;
+    size = 0;
+  }
+
+  void append(Queueable<T>& q) {
+    if (q.size == 0) return;
+    QNode<T>* current = q.head;
+    while (current) {
+      current->before_rem(&q);
+      current->owner = this;
+      current = current->next;
+    }
+    if (tail) {
+      tail->next = q.head;
+      q.head->prev = tail;
+    } else {
+      head = q.head;
+    }
+    tail = q.tail;
+    size += q.size;
+    q.reset();
+    each([&](QNode<T>* n) -> bool {
+      n->after_add(this);
+      return(true);
+    });
   }
 };

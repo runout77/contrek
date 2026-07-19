@@ -29,6 +29,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "standard", "~> 1.51"
   s.add_development_dependency "curses", "~> 1.5", ">= 1.5.3"
   s.add_development_dependency "ruby-prof", "~> 1.7", ">= 1.7.2"
+  s.add_development_dependency "ruby2d", "~> 0.12"
 
   s.add_dependency "chunky_png", "~> 1.4"
   s.add_dependency "concurrent-ruby", "~> 1.3.5"

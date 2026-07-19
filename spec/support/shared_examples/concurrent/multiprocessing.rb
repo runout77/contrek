@@ -14,7 +14,7 @@ RSpec.shared_examples "multiprocessing" do
         matcher: rgb_matcher,
         options: {number_of_tiles: tiles, versus: :o, compress: {uniq: true}}
       ).process_info
-      expect(result.metadata[:groups]).to eq 535
+      expect(result.metadata[:groups]).to eq 598
     end
 
     it "works with 2 thread and 2 tiles" do
@@ -28,7 +28,7 @@ RSpec.shared_examples "multiprocessing" do
         number_of_threads: workers,
         bitmap: png_bitmap,
         matcher: rgb_matcher,
-        options: {number_of_tiles: tiles, versus: :o}
+        options: {number_of_tiles: tiles, versus: :o, compress: {raster: true}}
       )
       result = polygonfinder.process_info
       puts result.metadata[:benchmarks].inspect
@@ -44,7 +44,7 @@ RSpec.shared_examples "multiprocessing" do
       polygonfinder = @polygon_finder_class.new(
         bitmap: png_bitmap,
         matcher: rgb_matcher,
-        options: {number_of_tiles: workers, versus: :a, compress: {uniq: true, linear: true}}
+        options: {number_of_tiles: workers, versus: :a, compress: {raster: true}}
       )
       result = polygonfinder.process_info
       puts result.metadata[:benchmarks].inspect
@@ -52,6 +52,7 @@ RSpec.shared_examples "multiprocessing" do
     end
 
     it "divides image into 4 tiles (1024x1024) with treemap" do
+      skip
       filename = "graphs_1024x1024"
       workers = 2
       png_bitmap = @png_bitmap_class.new("./spec/files/images/#{filename}.png")

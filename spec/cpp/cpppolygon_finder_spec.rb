@@ -10,7 +10,7 @@ RSpec.describe CPPPolygonFinder, type: :class do
     @png_not_matcher_color = Contrek::Bitmaps::RgbCppColor.new(r: 255, g: 255, b: 255, a: 255).raw
   end
 
-  describe "base tests", base: true do
+  describe "base tests" do
     it "verify costants difference" do
       chunk = "                " \
                   "                " \
@@ -28,27 +28,27 @@ RSpec.describe CPPPolygonFinder, type: :class do
     end
   end
 
-  describe "shared_test", simples: true do
+  describe "polygon_finder", base: true do
+    include_examples "base"
+  end
+
+  describe "polygon_finder", simples: true do
     include_examples "simples"
   end
 
-  describe "shared_test", complex: true do
+  describe "polygon_finder", complex: true do
     include_examples "complex"
   end
 
-  describe "shared_test", treemap: true do
+  describe "polygon_finder", treemap: true do
     include_examples "treemap"
   end
 
-  describe "shared_test", heavy: true do
+  describe "polygon_finder", heavy: true do
     include_examples "heavy"
   end
 
-  describe "shared_test", connections: true do
+  describe "polygon_finder", connections: true do
     include_examples "connections"
-  end
-
-  describe "shared_test", strict_bounds: true do
-    include_examples "strict_bounds"
   end
 end

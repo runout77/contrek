@@ -7,14 +7,12 @@ RSpec.shared_examples "finder_img_bis" do
       workers = 120
 
       png_bitmap = @png_bitmap_class.new("./spec/files/images/#{filename}.png")
-      color = @color_class.new(r: 251, g: 251, b: 251, a: 255)
-      rgb_matcher = @png_not_matcher.new(color.raw)
+      rgb_matcher = @png_not_matcher.new(png_bitmap.rgb_value_at(0, 0))
       result = @polygon_finder_class.new(
         bitmap: png_bitmap,
         matcher: rgb_matcher,
-        options: {number_of_tiles: workers, versus: :o, compress: {uniq: true, linear: true}}
+        options: {number_of_tiles: workers, versus: :o}
       ).process_info
-
       puts result.metadata[:benchmarks].inspect
       expect(result.points).to match_expected_polygons(filename + "_o", number_of_tiles: workers)
     end
@@ -28,10 +26,9 @@ RSpec.shared_examples "finder_img_bis" do
       result = @polygon_finder_class.new(
         bitmap: png_bitmap,
         matcher: rgb_matcher,
-        options: {number_of_tiles: workers, versus: :o, compress: {uniq: true, linear: true}}
+        options: {number_of_tiles: workers, versus: :o}
       ).process_info
       puts result.metadata[:benchmarks].inspect
-
       expect(result.points).to match_expected_polygons(filename + "_o", number_of_tiles: workers)
     end
 
@@ -44,10 +41,9 @@ RSpec.shared_examples "finder_img_bis" do
       result = @polygon_finder_class.new(
         bitmap: png_bitmap,
         matcher: rgb_matcher,
-        options: {number_of_tiles: workers, versus: :o, compress: {uniq: true, linear: true}}
+        options: {number_of_tiles: workers, versus: :o}
       ).process_info
       puts result.metadata[:benchmarks].inspect
-
       expect(result.points).to match_expected_polygons(filename + "_o", number_of_tiles: workers)
     end
 
@@ -76,7 +72,7 @@ RSpec.shared_examples "finder_img_bis" do
       result = @polygon_finder_class.new(
         bitmap: png_bitmap,
         matcher: rgb_matcher,
-        options: {number_of_tiles: workers, versus: :a, compress: {uniq: true, linear: true}}
+        options: {number_of_tiles: workers, versus: :a}
       ).process_info
       puts result.metadata[:benchmarks].inspect
 

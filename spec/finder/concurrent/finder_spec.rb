@@ -31,46 +31,47 @@ RSpec.describe Contrek::Concurrent::Finder, type: :class do
         matcher: @matcher,
         options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
       ).process_info
-      expect(result.points).to eq(
-        [{outer: [{x: 7, y: 0}, {x: 12, y: 0}, {x: 12, y: 4}, {x: 2, y: 4}, {x: 2, y: 0}],
-          inner: [[{x: 3, y: 1}, {x: 3, y: 3}, {x: 11, y: 3}, {x: 11, y: 1}]]}]
-      )
+      expect(result.points).to eq([{outer: [{x: 13, y: 0}, {x: 13, y: 5}, {x: 2, y: 5}, {x: 2, y: 0}], inner: [[{x: 4, y: 1}, {x: 4, y: 4}, {x: 11, y: 4}, {x: 11, y: 1}]]}])
     end
   end
 
-  describe "shared_test" do
+  describe "concurrent" do
     include_examples "finder"
   end
 
-  describe "shared_test" do
+  describe "concurrent" do
     include_examples "finder_extension"
   end
 
-  describe "shared_test" do
+  describe "concurrent" do
     include_examples "connectivity"
   end
 
-  describe "shared_test" do
+  describe "concurrent" do
     include_examples "finder_img"
   end
 
-  describe "shared_test" do
+  describe "concurrent" do
     include_examples "finder_img_bis"
   end
 
-  describe "shared_test" do
+  describe "concurrent" do
     include_examples "multiprocessing"
   end
 
-  describe "shared_test" do
+  describe "concurrent" do
     include_examples "concurrent_treemap"
   end
 
-  describe "shared_test" do
+  describe "concurrent" do
     include_examples "generic"
   end
 
-  describe "shared_test" do
+  describe "concurrent" do
+    include_examples "merging"
+  end
+
+  describe "concurrent" do
     include_examples "performances"
   end
 end

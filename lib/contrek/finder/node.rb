@@ -6,7 +6,7 @@ module Contrek
       include Listable
 
       attr_reader :min_x, :max_x, :y, :name, :tangs_sequence, :tangs_count, :data_pointer,
-        :upper_start, :upper_end, :lower_start, :lower_end, :start_point, :end_point
+        :upper_start, :upper_end, :lower_start, :lower_end
       attr_accessor :track, :abs_x_index, :outer_index, :inner_index, :inner_left_index, :inner_right_index
 
       T_UP = -1
@@ -30,7 +30,7 @@ module Contrek
       def initialize(cluster, min_x, max_x, y, name, connectivity_offset = 0)
         @name = name
         @min_x = min_x
-        @max_x = max_x
+        @max_x = max_x + 1
         @y = y
         @tangs_sequence = nil
         @tangs_count = 0
@@ -47,10 +47,12 @@ module Contrek
         @upper_end = -1
         @lower_start = Float::INFINITY
         @lower_end = -1
-        @start_point = {x: min_x, y: y}
-        @end_point = {x: max_x, y: y}
         @cluster = cluster
         cluster.add_node(self, connectivity_offset)
+      end
+
+      def inspect
+        "#<#{self.class} id:#{@id} name:\"#{@name}\">"
       end
 
       def get_tangent_node_by_virtual_index(virtual_index)
@@ -60,6 +62,22 @@ module Contrek
         else
           @cluster.vert_nodes[y + T_DOWN][virtual_index]
         end
+      end
+
+      def nw_point
+        {x: min_x, y: y}
+      end
+
+      def ne_point
+        {x: max_x, y: y}
+      end
+
+      def se_point
+        {x: max_x, y: y + 1}
+      end
+
+      def sw_point
+        {x: min_x, y: y + 1}
       end
 
       def my_next(last, versus, mode)
@@ -99,19 +117,19 @@ module Contrek
           node_up = @cluster.vert_nodes[y + T_UP][-(tg_index + 1)]
           if enter_mode == :a
             enter_to.track |= TURNER[tracking][OMAX - 1]
-            point = node_up.end_point
+            point = node_up.se_point
           else
             enter_to.track |= TURNER[tracking][OMIN - 1]
-            point = node_up.start_point
+            point = node_up.sw_point
           end
         else
           node_down = @cluster.vert_nodes[y + T_DOWN][tg_index]
           if enter_mode == :a
             enter_to.track |= TURNER[tracking][OMIN - 1]
-            point = node_down.start_point
+            point = node_down.nw_point
           else
             enter_to.track |= TURNER[tracking][OMAX - 1]
-            point = node_down.end_point
+            point = node_down.ne_point
           end
         end
         point
