@@ -9,6 +9,7 @@ module Contrek
 
       module ClassMethods
         def to_window(result, zoom: 100, coords: true, window_w: 2000, window_h: 1200, font_h: 20)
+          require "ruby2d"
           ubuntu_purple = ChunkyPNG::Color.from_hex("#77216F")
           bm = RawBitmap.new(w: window_w, h: window_h, color: ubuntu_purple)
           # grid

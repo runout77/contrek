@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require "ruby2d"
 module Contrek
   module Bitmaps
     class RawBitmap < PngBitmap
