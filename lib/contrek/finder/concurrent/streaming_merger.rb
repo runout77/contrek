@@ -30,21 +30,26 @@ module Contrek
       def stream_polygons!(tile, flush = false)
         ensure_header
 
+        safe_boundary_x = tile.end_x - 1
+        polygons_to_stream = []
+
         tile.shapes.select! do |shape|
           bounds = shape.outer_polyline.get_bounds
-          if flush || bounds[:max_x] < tile.end_x - 1
+          if flush || bounds[:max_x] < safe_boundary_x
             @moved += 1
             polygon = shape.to_raw_polygon
-            if @options.has_key?(:compress)
-              FakeCluster.new([polygon], @options).compress_coords
-            end
-            stream_raw_polygon(polygon)
+            polygons_to_stream << polygon
             false
           else
             true
           end
         end
-
+        if @options.has_key?(:compress) && polygons_to_stream.any?
+          FakeCluster.new(polygons_to_stream, @options).compress_coords
+        end
+        polygons_to_stream.each do |polygon|
+          stream_raw_polygon(polygon)
+        end
         ensure_footer if flush
       end
 

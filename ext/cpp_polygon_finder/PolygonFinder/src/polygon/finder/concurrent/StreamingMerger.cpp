@@ -43,28 +43,33 @@ ProcessResult* StreamingMerger::process_info() {
 
 void StreamingMerger::stream_polygons(Tile* tile, bool flush) {
   ensure_header();
-  if (int tile_end_x = tile->end_x(); true) {
-    tile->shapes().erase(
-      std::remove_if(tile->shapes().begin(), tile->shapes().end(), [this, flush, tile_end_x](Shape* shape) {
-        if (flush || shape->outer_polyline->max_x() < (tile_end_x - 1)) {
-          this->moved++;
-          Polygon polygon = shape->to_raw_polygon();
-          if (this->options().any_compression()) {
-            std::list<Polygon> polygons;
-            polygons.push_back(polygon);
-            FakeCluster fake_cluster(polygons, this->options());
-            fake_cluster.compress_coords(polygons, this->options());
-            polygon = std::move(polygons.front());
-          }
-          this->stream_raw_polygon(polygon);
-          shape->detach_from_pool();
-          return true;
-        }
-        return false;
-      }),
-      tile->shapes().end());
+
+  const int safe_boundary_x = tile->end_x() - 1;
+  auto& shapes = tile->shapes();
+  std::list<Polygon> polygons_to_stream;
+  shapes.erase(
+    std::remove_if(shapes.begin(), shapes.end(), [this, flush, safe_boundary_x, &polygons_to_stream](Shape* shape) {
+      const bool is_ready = flush || (shape->outer_polyline->max_x() < safe_boundary_x);
+      if (is_ready) {
+        this->moved++;
+        polygons_to_stream.push_back(std::move(shape->to_raw_polygon()));
+        shape->detach_from_pool();
+        return true;
+      }
+      return false;
+    }),
+    shapes.end()
+  );
+  if (this->options().any_compression() && !polygons_to_stream.empty()) {
+    FakeCluster fake_cluster(polygons_to_stream, this->options());
+    fake_cluster.compress_coords(polygons_to_stream, this->options());
   }
+  for (Polygon& polygon : polygons_to_stream) {
+    this->stream_raw_polygon(std::move(polygon));
+  }
+
   stream->flush();
+
   if (flush) {
     ensure_footer();
   }
