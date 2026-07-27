@@ -13,6 +13,7 @@
 #include <vector>
 #include <string>
 #include "InnerPolyline.h"
+#include "../Polygon.h"
 
 class Point;
 class Polyline;
@@ -31,6 +32,7 @@ class Shape {
   void set_parent_shape(Shape*);
   std::string name();
   void detach_from_pool();
+  Polygon to_raw_polygon(bool bounds = false);
  private:
   Shape* parent_shape_ = nullptr;
   ShapePool* shape_pool_ = nullptr;

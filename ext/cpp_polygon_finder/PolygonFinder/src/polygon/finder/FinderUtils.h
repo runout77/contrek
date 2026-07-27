@@ -10,8 +10,9 @@
 #pragma once
 #include <string>
 #include <vector>
+#include "Options.h"
 
 class FinderUtils {
  public:
-  static void sanitize_options(pf_Options& options, std::vector<std::string> *incoming_options);
+  static void sanitize_options(pf_Options& options, const Options& incoming_options);
 };

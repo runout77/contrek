@@ -128,7 +128,7 @@ rgb_matcher = CPPRGBNotMatcher.new(png_bitmap.rgb_value_at(0, 0))
 polygonfinder = CPPPolygonFinder.new(png_bitmap,
   rgb_matcher,
   nil,
-  {versus: :a, compress: {visvalingam: {tolerance: 1.5}}})
+  {versus: :a, compress: {visvalingam: true, visvalingam_tolerance: 1.5}})
 result = polygonfinder.process_info
 # draws the polygons found
 Contrek::Bitmaps::Painting.direct_draw_polygons(result.points, png_image)
@@ -312,8 +312,11 @@ result.metadata
                "total"=>0.05208},
  :groups=>1,
  :named_sequence=>"AFEDCBA",
- :treemap=>[]}
+ :treemap=>[],
+ :options=>{versus: :a, compress: {visvalingam: true, visvalingam_tolerance: 1.5}}
+}
 ```
+The options are the original options passed by user.
 
 ## Treemap
 

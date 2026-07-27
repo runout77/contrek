@@ -28,7 +28,7 @@ RSpec.describe Contrek::Cpp::CPPConcurrentFinder, type: :class do
               "  XXXXXXXXXXX   "
       bitmap = CPPBitMap.new(chunk, 16)
       matcher = CPPValueNotMatcher.new(" ")
-      polygonfinder = CPPFinder.new(1, bitmap, matcher, {versus: "o", number_of_tiles: 3, compress: {linear: true, visvalingam: {tolerance: 1}}})
+      polygonfinder = CPPFinder.new(1, bitmap, matcher, {versus: :o, number_of_tiles: 3, compress: {linear: true, visvalingam: {tolerance: 1}}})
       result = polygonfinder.process_info
       expect(result.points).to eq([{outer: [{x: 13, y: 0}, {x: 13, y: 5}, {x: 2, y: 5}, {x: 2, y: 0}], inner: [[{x: 4, y: 1}, {x: 4, y: 4}, {x: 11, y: 4}, {x: 11, y: 1}]]}])
     end
@@ -94,6 +94,10 @@ RSpec.describe Contrek::Cpp::CPPConcurrentFinder, type: :class do
 
   describe "concurrent" do
     include_examples "generic"
+  end
+
+  describe "concurrent" do
+    include_examples "merging"
   end
 
   describe "concurrent" do

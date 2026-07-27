@@ -43,7 +43,7 @@ class SvgStreamingMerger : public StreamingMerger {
 
  public:
   SvgStreamingMerger(int number_of_threads,
-                     std::vector<std::string>* options,
+                     const Options& options,
                      std::ofstream* stream_to,
                      int total_width, int total_height)
     : StreamingMerger(number_of_threads, options, stream_to),

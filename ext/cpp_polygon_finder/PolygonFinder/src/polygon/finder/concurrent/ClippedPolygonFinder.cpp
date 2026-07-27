@@ -10,6 +10,6 @@
 #include <vector>
 #include "ClippedPolygonFinder.h"
 
-ClippedPolygonFinder::ClippedPolygonFinder(Bitmap *bitmap, Matcher *matcher, int bitmap_start_x, int bitmap_end_x, std::vector<std::string> *options)
+ClippedPolygonFinder::ClippedPolygonFinder(Bitmap *bitmap, Matcher *matcher, int bitmap_start_x, int bitmap_end_x, const Options& options)
 : PolygonFinder(bitmap, matcher, nullptr, options, bitmap_start_x, bitmap_end_x) {
 }

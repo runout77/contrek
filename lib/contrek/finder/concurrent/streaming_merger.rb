@@ -34,7 +34,11 @@ module Contrek
           bounds = shape.outer_polyline.get_bounds
           if flush || bounds[:max_x] < tile.end_x - 1
             @moved += 1
-            stream_raw_polygon(shape)
+            polygon = shape.to_raw_polygon
+            if @options.has_key?(:compress)
+              FakeCluster.new([polygon], @options).compress_coords
+            end
+            stream_raw_polygon(polygon)
             false
           else
             true
@@ -44,10 +48,10 @@ module Contrek
         ensure_footer if flush
       end
 
-      def stream_raw_polygon(shape)
-        outer_pts = shape.outer_polyline.raw.map { |p| "#{p[:y]},#{p[:x]}" }.join(" ")
+      def stream_raw_polygon(polygon)
+        outer_pts = polygon[:outer].map { |p| "#{p[:y]},#{p[:x]}" }.join(" ")
         write_outer_polygon(outer_pts)
-        shape.inner_polylines.map(&:raw).each do |sequence|
+        polygon[:inner].each do |sequence|
           inner_pts = sequence.map { |p| "#{p[:y]},#{p[:x]}" }.join(" ")
           write_inner_polygon(inner_pts)
         end

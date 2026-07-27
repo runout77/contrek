@@ -27,6 +27,7 @@
 #include "Node.h"
 #include "Polygon.h"
 #include "Node.h"
+#include "Options.h"
 #include "../CpuTimer.h"
 
 class Bitmap;
@@ -50,12 +51,16 @@ struct pf_Options {
   bool compress_raster = false;
   bool compress_douglas_peucker = false;
   bool named_sequences = false;
+  bool unsafe_mode = false;
   bool bounds = false;
   int connectivity_offset = 0;
   float compress_visvalingam_tolerance = 10.0;
   int number_of_tiles = 1;
   std::string get_alpha_versus() {
     return(versus == Node::A ? "a" : "o");
+  }
+  bool any_compression() const {
+    return(compress_linear || compress_uniq || compress_raster || compress_douglas_peucker || compress_visvalingam);
   }
 };
 
@@ -68,21 +73,23 @@ struct ProcessResult {
   std::list<Polygon> polygons;
   std::string named_sequence;
   std::vector<std::pair<int, int>> treemap;
+  Options options;
 
   void draw_on_bitmap(RawBitmap& canvas) const;
 
   void print_polygons() {
     int counter = 0;
     for (const auto& polygon : polygons) {
-      std::cout << counter << " - " << "outer" << "\n";
+      std::cout << "Polygon " << counter << std::endl;
+      std::cout << "outer=";
       for (const Point& p : polygon.outer) std::cout << p.toString();
-      bool first = true;
+      std::cout << std::endl;
       for (const auto& seq : polygon.inner) {
-        if (!first) std::cout << "\n";
-        first = false;
+        std::cout << "inner=";
         for (const Point& p : seq) std::cout << p.toString();
+        std::cout << std::endl;
       }
-      std::cout << "\n" << polygon.bounds.to_string() <<"\n";
+      std::cout << polygon.bounds.to_string() << std::endl;
       counter++;
     }
   }
@@ -150,6 +157,7 @@ class PolygonFinder {
  protected:
   int start_x;
   int end_x;
+  Options incoming_options_;
 
  private:
   Bitmap *source_bitmap;
@@ -262,7 +270,7 @@ class PolygonFinder {
   PolygonFinder(Bitmap *bitmap,
                 Matcher *matcher,
                 Bitmap *test_bitmap,
-                std::vector<std::string> *options = nullptr,
+                const Options& options,
                 int start_x = 0,
                 int end_x = -1);
   ProcessResult* process_info();

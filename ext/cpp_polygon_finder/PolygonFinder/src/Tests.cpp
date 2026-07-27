@@ -32,7 +32,7 @@
 #include "polygon/matchers/RGBMatcher.h"
 #include "polygon/matchers/RGBNotMatcher.h"
 #include "polygon/matchers/ValueNotMatcher.h"
-#include "polygon/finder/optionparser.h"
+#include "polygon/finder/Options.h"
 #include "polygon/finder/concurrent/Finder.h"
 #include "polygon/finder/concurrent/HorizontalMerger.h"
 #include "polygon/finder/concurrent/VerticalMerger.h"
@@ -53,14 +53,22 @@ void Tests::test_a()
       "000000DDDDDD0000"\
       "0000000000000000";
 
-  std::vector<std::string> arguments = {"--versus=a", "--compress_uniq", "--treemap"};
+  Options options = {
+    {"versus", Identifier{"a"}},
+    {"compress", Options{
+      {"uniq", true},
+      {"linear", true},
+    }},
+    {"treemap", true}
+  };
+
   ValueNotMatcher matcher('0');
   Bitmap b(chunk, 16);
-  PolygonFinder pl(&b, &matcher, nullptr, &arguments);
+  PolygonFinder pl(&b, &matcher, nullptr, options);
   ProcessResult *o = pl.process_info();
   // o->print_polygons();
-  std::vector<int> outer_array{11, 1, 6, 2, 6, 3, 6, 4, 6, 5, 11, 5, 11, 4, 11, 3, 11, 2, 11, 1};
-  std::vector<int> inner_array{7, 3, 10, 3, 10, 4, 7, 4};
+  std::vector<int> outer_array{11, 1, 11, 2, 6, 2, 6, 6, 12, 6, 12, 1 };
+  std::vector<int> inner_array{8, 3, 10, 3, 10, 5, 8, 5, 8, 4};
   std::vector<int> array_compare;
 
   for (const auto& x : o->polygons)
@@ -90,10 +98,19 @@ void Tests::test_b()
       "  XX       XX   "\
       "  XXXXXXXXXXX   ";
 
-  std::vector<std::string> arguments = {"--versus=o", "--number_of_tiles=2", "--compress_uniq", "--compress_linear", "--treemap"};
+  Options options = {
+    {"versus", Identifier{"o"}},
+    {"number_of_tiles",2},
+    {"compress", Options{
+      {"uniq", true},
+      {"linear", true},
+    }},
+    {"treemap", true}
+  };
+
   ValueNotMatcher matcher(' ');
   Bitmap b(chunk, 16);
-  Finder concurrentFinder(2, &b, &matcher, &arguments);
+  Finder concurrentFinder(2, &b, &matcher, options);
   ProcessResult *pro = concurrentFinder.process_info();
   pro->print_polygons();
   delete pro;
@@ -152,14 +169,21 @@ void Tests::test_d()
   FastPngBitmap png_bitmap("../images/sample_10240x10240.png");
   // FastPngBitmap png_bitmap("images/labyrinth.png");
   std::cout << "image_w=" << png_bitmap.w() << " image_h=" << png_bitmap.h() << std::endl;
-  std::cout << "image reading time =" << cpu_timer.stop() << std::endl;
+  std::cout << "image reading time=" << cpu_timer.stop() << std::endl;
 
   int color = png_bitmap.value_at(0, 0);
-  std::cout << "color =" << color << std::endl;
+  std::cout << "color = " << color << std::endl;
   RGBNotMatcher not_matcher(color);
 
-  std::vector<std::string> arguments = {"--versus=a", "--compress_uniq", "--treemap"};
-  PolygonFinder pl(&png_bitmap, &not_matcher, nullptr, &arguments);
+  Options options = {
+    {"versus", Identifier{"a"}},
+    {"compress", Options{
+      {"uniq", true},
+    }},
+    {"treemap", true}
+  };
+
+  PolygonFinder pl(&png_bitmap, &not_matcher, nullptr, options);
   ProcessResult *o = pl.process_info();
   o->print_info();
   delete o;
@@ -176,8 +200,14 @@ void Tests::test_e()
   std::cout << "color = " << color << std::endl;
   RGBNotMatcher not_matcher(color);
 
-  std::vector<std::string> arguments = {"--versus=a", "--compress_uniq", "--number_of_tiles=2"};
-  Finder pl(2, &png_bitmap, &not_matcher, &arguments);
+  Options options = {
+    {"versus", Identifier{"a"}},
+    {"number_of_tiles",2},
+    {"compress", Options{
+      {"uniq", true},
+    }},
+  };
+  Finder pl(2, &png_bitmap, &not_matcher, options);
   ProcessResult *o = pl.process_info();
   o->print_info();
   std::cout << "polygons = " << o->groups << std::endl;
@@ -211,8 +241,14 @@ void Tests::test_g()
   std::cout << "color = " << color << std::endl;
   RGBNotMatcher not_matcher(color);
 
-  std::vector<std::string> arguments = {"--versus=a", "--compress_uniq", "--number_of_tiles=2"};
-  Finder pl(2, &raw_bitmap, &not_matcher, &arguments);
+  Options options = {
+    {"versus", Identifier{"a"}},
+    {"number_of_tiles",2},
+    {"compress", Options{
+      {"uniq", true},
+    }},
+  };
+  Finder pl(2, &raw_bitmap, &not_matcher, options);
   ProcessResult *o = pl.process_info();
   // o->print_info();
   // o->print_polygons();
@@ -231,10 +267,15 @@ void Tests::test_h()
               "00        " \
               "0000000000" \
               "0000000000";
-  std::vector<std::string> arguments = {"--versus=a", "--compress_uniq"};
+  Options options = {
+    {"versus", Identifier{"a"}},
+    {"compress", Options{
+      {"uniq", true},
+    }},
+  };
   ValueNotMatcher matcher(' ');
   Bitmap b_left(left, 10);
-  PolygonFinder pl_left(&b_left, &matcher, nullptr, &arguments);
+  PolygonFinder pl_left(&b_left, &matcher, nullptr, options);
   ProcessResult *left_result = pl_left.process_info();
 
   std::string right =
@@ -248,11 +289,11 @@ void Tests::test_h()
               "0000000000" \
               "0000000000";
   Bitmap b_right(right, 10);
-  PolygonFinder pl_right(&b_right, &matcher, nullptr, &arguments);
+  PolygonFinder pl_right(&b_right, &matcher, nullptr, options);
   ProcessResult *right_result = pl_right.process_info();
 
-  std::vector<std::string> merger_arguments = {};
-  HorizontalMerger hmerger(1, &arguments);
+  Options merger_options = {};
+  HorizontalMerger hmerger(1, merger_options);
   hmerger.add_tile(*left_result);
   hmerger.add_tile(*right_result);
   ProcessResult *merged_result = hmerger.process_info();
@@ -282,8 +323,8 @@ double get_peak_rss() {
 */
 void stream_png_image(const std::string& filepath, uint32_t stripe_height, bool generate_svg = false, bool generate_png = false) {
     std::vector<ProcessResult*> result_clones;
-    std::vector<std::string> varguments = {};
-    VerticalMerger vmerger(0, &varguments);
+    Options options = {};
+    VerticalMerger vmerger(0, options);
 
     // opens image to stream
     FILE* fp = fopen(filepath.c_str(), "rb");
@@ -340,10 +381,10 @@ void stream_png_image(const std::string& filepath, uint32_t stripe_height, bool 
         if (ret != 0 && ret != SPNG_EOI) break;
       }
       // stripe contour tracing
-      std::vector<std::string> finder_arguments = {
-        "--versus=a",
+      Options options = {
+        {"versus", Identifier{"a"}},
       };
-      PolygonFinder polygon_finder(&stripe_bitmap, &not_matcher, nullptr, &finder_arguments);
+      PolygonFinder polygon_finder(&stripe_bitmap, &not_matcher, nullptr, options);
       ProcessResult *result = polygon_finder.process_info();
       if (result) {
         std::cout << "stripe " << stripe_count << ": found polygons " << result->groups << std::endl;
@@ -400,7 +441,9 @@ double get_current_rss_mb() {
 
 void stream_progressive_png_image(const std::string& filepath, uint32_t stripe_height) {
     std::vector<ProcessResult*> result_clones;
-    std::vector<std::string> varguments = {"--bounds"};
+    Options voptions = {
+        {"bounds", true},
+      };
     // opens image to stream
     FILE* fp = fopen(filepath.c_str(), "rb");
     if (!fp) {
@@ -439,7 +482,7 @@ void stream_progressive_png_image(const std::string& filepath, uint32_t stripe_h
     std::vector<char> buffer(4 * 1024 * 1024);  // Buffer (4MB)
     shared_stream.rdbuf()->pubsetbuf(buffer.data(), buffer.size());
 
-    SvgStreamingMerger vmerger(0, &varguments, &shared_stream, total_width, total_height);
+    SvgStreamingMerger vmerger(0, voptions, &shared_stream, total_width, total_height);
     // GeoJsonStreamingMerger vmerger(0, &varguments, &shared_stream, 4294901760);
     try {
       size_t row_size = static_cast<size_t>(total_width) * 4;
@@ -466,14 +509,16 @@ void stream_progressive_png_image(const std::string& filepath, uint32_t stripe_h
           if (ret != 0 && ret != SPNG_EOI) break;
         }
         // stripe contour tracing
-        std::vector<std::string> finder_arguments = {
-          "--versus=a",
-          "--bounds",
-          "--compress_uniq",
-          "--compress_linear"
+        Options options = {
+          {"versus", Identifier{"a"}},
+          {"bounds", true},
+          {"compress", Options{
+            {"uniq", true},
+            {"linear", true},
+          }},
         };
 
-        PolygonFinder polygon_finder(&stripe_bitmap, &not_matcher, nullptr, &finder_arguments);
+        PolygonFinder polygon_finder(&stripe_bitmap, &not_matcher, nullptr, options);
         ProcessResult *result = polygon_finder.process_info();
         if (result) {
           std::cout << "stripe " << stripe_count << ": found polygons " << result->groups << std::endl;

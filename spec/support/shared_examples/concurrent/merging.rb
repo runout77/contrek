@@ -39,6 +39,7 @@ RSpec.shared_examples "merging" do
       step_finder.add_tile(result_right)
       result = step_finder.process_info
       expect(result.points).to match_expected_json
+      expect(result.metadata[:versus]).to eq(:a)
     end
 
     it "merge mode (example 2)" do
@@ -568,6 +569,10 @@ RSpec.shared_examples "merging" do
     # This test demonstrates how join polygons by their coordinates. Youn need to build some results from scratch by
     # defining polygons each one composed by the outer polyline and a list of inners ones including its bounding box.
     # Finally you need to declare the width and the height of the whole area (tile) inside the metadata hash.
+    #
+    # Pay attention to the format of the data you pass. You must account for versus conventions and ensure coordinates
+    # start from the correct origin in the shape. To bypass safety checks, all controls must be explicitly disabled
+    # using the `unsafe_mode: true` option.
     it "merge mode from existing polygons" do
       result_up = @result.new
       polygons_up = [{
@@ -589,7 +594,7 @@ RSpec.shared_examples "merging" do
       result_down.polygons = polygons_down
       result_down.metadata = {width: 12, height: 5}
 
-      step_finder = @vertical_merger.new
+      step_finder = @vertical_merger.new(options: {unsafe_mode: true})
       step_finder.add_tile(result_up)
       step_finder.add_tile(result_down)
       result = step_finder.process_info
@@ -718,7 +723,7 @@ RSpec.shared_examples "merging" do
       width = result.metadata[:width]
       height = result.metadata[:height]
       shared_stream = @streaming_file.new("output.svg")
-      v_merger_options = {bounds: true, compress: {uniq: true, linear: true}}
+      v_merger_options = {bounds: true}
       step_finder = @svg_streaming_merger.new(
         options: v_merger_options,
         stream_to: shared_stream,
@@ -739,12 +744,11 @@ RSpec.shared_examples "merging" do
       expect(result.metadata[:height]).to eq(23)
       expect(result.points).to be_empty # all polygons are on file
       shared_stream.rewind
-
-      expect(shared_stream.read).to match_expected_stream("test_#{width}x#{height}", store_stream: true, extension: "svg", number_of_tiles: stripes.count)
+      expect(shared_stream.read).to match_expected_stream("test_#{width}x#{height}", extension: "svg", number_of_tiles: stripes.count)
 
       # streaming to geojson file pattern
       shared_stream = @streaming_file.new("output.geojson")
-      v_merger_options = {bounds: true, compress: {uniq: true, linear: true}}
+      v_merger_options = {bounds: true}
       step_finder = @geo_json_streaming_merger.new(
         options: v_merger_options,
         stream_to: shared_stream,
@@ -764,7 +768,135 @@ RSpec.shared_examples "merging" do
       expect(result.metadata[:height]).to eq(23)
       expect(result.points).to be_empty # all polygons are on file
       shared_stream.rewind
-      expect(shared_stream.read).to match_expected_stream("test_#{width}x#{height}", store_stream: true, extension: "geojson", number_of_tiles: stripes.count)
+      expect(shared_stream.read).to match_expected_stream("test_#{width}x#{height}", extension: "geojson", number_of_tiles: stripes.count)
+    end
+
+    it "progressive merging on disk with compression" do
+      stripe1 = "     000       000" \
+                "    00 00     00 0" \
+                "   00   00   00  0" \
+                "    00 00   00   0" \
+                "     000   00    0" \
+                "          00     0"
+
+      stripe2 = "          00     0" \
+                " 000     00      0" \
+                "00 00   00       0" \
+                " 000   00        0" \
+                "      00         0" \
+                "     0000000000000"
+      # streaming to svg file pattern
+      stripes = [stripe1, stripe2]
+      width = 18
+      height = 11
+      shared_stream = @streaming_file.new("output.svg")
+      v_merger_options = {bounds: true, compress: {uniq: true, linear: true, douglas_peucker: true}}
+      step_finder = @svg_streaming_merger.new(
+        options: v_merger_options,
+        stream_to: shared_stream,
+        total_width: width,
+        total_height: height
+      )
+      stripes.each do |stripe|
+        stripe_result = @simple_polygon_finder.new(@bitmap_class.new(stripe, 18),
+          @matcher,
+          nil,
+          {versus: :a, bounds: true}).process_info
+        last = stripes.last == stripe
+        step_finder.add_tile(stripe_result, last)
+      end
+      result = step_finder.process_info
+      expect(result.metadata[:versus]).to eq(:a)
+      expect(result.metadata[:groups]).to eq(3)
+      expect(result.metadata[:width]).to eq(18)
+      expect(result.metadata[:height]).to eq(11)
+      expect(result.points).to be_empty # all polygons are on file
+      shared_stream.rewind
+
+      expect(shared_stream.read).to match_expected_stream("test_#{width}x#{height}", extension: "svg", number_of_tiles: stripes.count)
+
+      # streaming to geojson file pattern
+      shared_stream = @streaming_file.new("output.geojson")
+      v_merger_options = {bounds: true, compress: {uniq: true, linear: true, douglas_peucker: true}}
+      step_finder = @geo_json_streaming_merger.new(
+        options: v_merger_options,
+        stream_to: shared_stream,
+        pixel_val: 34
+      )
+      stripes.each do |stripe|
+        stripe_result = @simple_polygon_finder.new(@bitmap_class.new(stripe, 18),
+          @matcher,
+          nil,
+          {versus: :o, bounds: true}).process_info
+        last = stripes.last == stripe
+        step_finder.add_tile(stripe_result, last)
+      end
+      result = step_finder.process_info
+      expect(result.metadata[:groups]).to eq(3)
+      expect(result.metadata[:width]).to eq(18)
+      expect(result.metadata[:height]).to eq(11)
+      expect(result.points).to be_empty # all polygons are on file
+      shared_stream.rewind
+      expect(shared_stream.read).to match_expected_stream("test_#{width}x#{height}", extension: "geojson", number_of_tiles: stripes.count)
+    end
+
+    it "horizontal merger exceptions" do
+      left = "0000000000" \
+              "0         " \
+              "0         " \
+              "0000000000"
+      right = "0000000000" \
+              "         0" \
+              "         0" \
+              "0000000000"
+
+      right_higher = "0000000000" \
+                      "         0" \
+                      "         0" \
+                      "         0" \
+                      "0000000000"
+      opts = {versus: :a, bounds: true, compress: {uniq: true, linear: true}}
+      result_left = @simple_polygon_finder.new(@bitmap_class.new(left, 10),
+        @matcher,
+        nil,
+        opts).process_info
+      expect(result_left.metadata[:options]).to eq(opts)
+      expect(result_left.metadata[:versus]).to eq(:a)
+
+      opts_o = {versus: :o, bounds: true, compress: {uniq: true, linear: true}}
+      result_right = @simple_polygon_finder.new(@bitmap_class.new(right, 10),
+        @matcher,
+        nil,
+        opts_o).process_info
+      expect(result_right.metadata[:options]).to eq(opts_o)
+      expect(result_right.metadata[:versus]).to eq(:o)
+
+      step_finder = @merger.new
+      step_finder.add_tile(result_left)
+      expect {
+        step_finder.add_tile(result_right)
+      }.to raise_error(ArgumentError, "All results must have the same versus option")
+      step_finder.process_info
+
+      result_higher = @simple_polygon_finder.new(@bitmap_class.new(right_higher, 10),
+        @matcher,
+        nil,
+        opts).process_info
+      expect(result_higher.metadata[:options]).to eq(opts)
+      expect(result_higher.metadata[:height]).to eq(5)
+      expect {
+        step_finder.add_tile(result_higher)
+      }.to raise_error(ArgumentError, "All results must have the same height")
+
+      result_compressed = @simple_polygon_finder.new(@bitmap_class.new(right, 10),
+        @matcher,
+        nil,
+        {versus: :a, bounds: true, compress: {visvalingam: true, visvalingam_tolerance: 1.5}}).process_info
+      expect(result_compressed.metadata[:height]).to eq(4)
+      expect(result_compressed.metadata[:options][:compress][:visvalingam_tolerance]).to eq(1.5)
+      expect {
+        step_finder.add_tile(result_compressed)
+      }.to raise_error(ArgumentError, "Result with not supported postprocessing compression mode")
     end
   end
 end

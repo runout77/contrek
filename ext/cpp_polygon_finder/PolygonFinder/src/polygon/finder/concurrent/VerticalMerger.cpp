@@ -14,7 +14,7 @@
 #include <utility>
 #include "VerticalMerger.h"
 
-VerticalMerger::VerticalMerger(int number_of_threads, std::vector<std::string> *options)
+VerticalMerger::VerticalMerger(int number_of_threads, const Options& options)
 : Merger(number_of_threads, options) {
 }
 

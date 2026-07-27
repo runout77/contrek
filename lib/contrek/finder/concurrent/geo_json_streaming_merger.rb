@@ -17,16 +17,16 @@ module Contrek
         @stream.write("]}")
       end
 
-      def stream_raw_polygon(shape)
+      def stream_raw_polygon(polygon)
         if @first_feature
           @first_feature = false
         else
           @stream.write(",")
         end
-        outer_ring = shape.outer_polyline.raw.map { |p| [p[:y], p[:x]] }
+        outer_ring = polygon[:outer].map { |p| [p[:y], p[:x]] }
         outer_ring << outer_ring.first if outer_ring.first != outer_ring.last
         polygon_coordinates = [outer_ring]
-        shape.inner_polylines.map(&:raw).each do |sequence|
+        polygon[:inner].each do |sequence|
           inner_ring = sequence.map { |p| [p[:y], p[:x]] }
           inner_ring << inner_ring.first if inner_ring.first != inner_ring.last
           polygon_coordinates << inner_ring

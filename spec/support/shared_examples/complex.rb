@@ -403,10 +403,14 @@ RSpec.shared_examples "complex" do
                "   HHHH  LLLL   " \
                "    II    MM    " \
                "                "
-      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true, compress: {visvalingam: {tolerance: 1.5}}}).process_info
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true, compress: {visvalingam: true, visvalingam_tolerance: 1.5}}).process_info
       expect(result.metadata[:named_sequence]).to eq("ABCDEFEDGHIHGLMLGDCBA")
       expect(result.metadata[:groups]).to eq(1)
       expect(result.points).to match_expected_json
+      expect(result.metadata[:options]).to eq({compress: {visvalingam: true, visvalingam_tolerance: 1.5}, named_sequences: true})
+      # tolerance is default 1.0
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 16), @matcher, nil, {named_sequences: true, compress: {visvalingam: true}}).process_info
+      expect(result.points).to match_expected_json(addons: [:tolerance])
     end
 
     it "scans butterfly 3" do

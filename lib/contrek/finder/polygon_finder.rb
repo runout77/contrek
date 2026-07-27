@@ -6,6 +6,7 @@ module Contrek
   module Finder
     class PolygonFinder
       def initialize(bitmap, matcher, test_bitmap = nil, options = {})
+        @ori_options = options
         @options = {versus: :a}.merge(options)
         sanitize_options
         @source_bitmap = bitmap
@@ -52,6 +53,7 @@ module Contrek
           width: @source_bitmap.w,
           height: @source_bitmap.h,
           treemap: (@node_cluster.treemap if @options.has_key?(:treemap)),
+          options: @ori_options,
           versus: @options[:versus]
         }
         Result.new(@node_cluster.polygons, metadata)

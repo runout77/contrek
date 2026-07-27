@@ -45,3 +45,15 @@ void Shape::set_parent_shape(Shape* shape) {
 std::string Shape::name() {
   return(this->outer_polyline->named());
 }
+
+Polygon Shape::to_raw_polygon(bool bounds) {
+  Polygon poly;
+  poly.outer = this->outer_polyline->raw();
+  if (bounds) {
+    this->outer_polyline->fill_bounds(poly.bounds);
+  }
+  for (auto inner : this->inner_polylines) {
+    poly.inner.push_back(inner->raw());
+  }
+  return(poly);
+}

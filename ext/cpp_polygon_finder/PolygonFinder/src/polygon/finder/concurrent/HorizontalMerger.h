@@ -14,6 +14,6 @@
 
 class HorizontalMerger : public Merger {
  public:
-  HorizontalMerger(int number_of_threads, std::vector<std::string> *options);
+  HorizontalMerger(int number_of_threads, const Options& options);
   void add_tile(ProcessResult& result) override;
 };

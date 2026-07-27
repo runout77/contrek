@@ -54,13 +54,8 @@ module Contrek
       end
 
       def to_raw_polygons
-        @shapes.filter_map do |shape|
-          unless shape.outer_polyline.empty?
-            {bounds: (shape.outer_polyline.get_bounds if @finder.options[:bounds]),
-             outer: shape.outer_polyline.raw,
-             inner: shape.inner_polylines.map(&:raw)}.compact
-          end
-        end
+        bounds = @finder.options[:bounds]
+        @shapes.map { |s| s.to_raw_polygon(bounds:) }
       end
 
       def compute_treemap

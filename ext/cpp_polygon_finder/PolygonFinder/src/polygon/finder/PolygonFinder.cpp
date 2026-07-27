@@ -22,7 +22,6 @@
 #include "../matchers/Matcher.h"
 #include "../matchers/RGBMatcher.h"
 #include "../matchers/RGBNotMatcher.h"
-#include "optionparser.h"
 #include "NodeCluster.h"
 #include "Node.h"
 #include "FinderUtils.h"
@@ -30,15 +29,16 @@
 PolygonFinder::PolygonFinder(Bitmap *bitmap,
                              Matcher *matcher,
                              Bitmap *,
-                             std::vector<std::string> *options,
+                             const Options& options,
                              int start_x,
                              int end_x)
     : start_x(start_x),
       end_x(end_x == -1 ? bitmap->w() : end_x),
+      incoming_options_(options),
       source_bitmap(bitmap),
       matcher(matcher)
 { this->rgb_matcher = dynamic_cast<RGBMatcher*>(matcher);
-  if (options != nullptr) FinderUtils::sanitize_options(this->options, options);
+  FinderUtils::sanitize_options(this->options, options);
 
   this->node_cluster = new NodeCluster(source_bitmap->h(), source_bitmap->w(), &this->options);
 
@@ -109,6 +109,7 @@ ProcessResult* PolygonFinder::process_info() {
   pr->height = this->source_bitmap->h();
   pr->has_bounds = this->node_cluster->options->bounds;
   pr->versus = this->options.versus;
+  pr->options = this->incoming_options_;
 
   if (this->node_cluster->options->named_sequences && typeid(*this->source_bitmap) == typeid(Bitmap))
   { std::string sequence;

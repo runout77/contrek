@@ -43,8 +43,7 @@ NodeCluster::~NodeCluster() {
 }
 
 void NodeCluster::compress_coords(std::list<Polygon>& polygons, pf_Options options) {
-  if (!(options.compress_linear || options.compress_uniq || options.compress_raster ||
-        options.compress_douglas_peucker || options.compress_visvalingam)) return;
+  if (!(options.any_compression())) return;
 
   auto compress_sequence = [&](std::vector<Point>& points_vec) {
     if (points_vec.empty()) return;

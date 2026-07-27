@@ -11,12 +11,14 @@
 #include <string>
 #include <vector>
 #include "Finder.h"
+#include "../Options.h"
 
 class Merger : public Finder {
  public:
-  Merger(int number_of_threads, std::vector<std::string> *options);
+  Merger(int number_of_threads, const Options& options);
   virtual void add_tile(ProcessResult& result);
   ProcessResult* process_info() override;
+  bool safe();
 
  protected:
   void translate(ProcessResult& result, int offset);

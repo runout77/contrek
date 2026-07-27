@@ -76,7 +76,6 @@ module Contrek
 
       def process_info
         raw_polygons = @whole_tile.to_raw_polygons
-
         compress_time = Benchmark.measure do
           if @options.has_key?(:compress)
             FakeCluster.new(raw_polygons, @options).compress_coords
@@ -94,7 +93,8 @@ module Contrek
           }.compact,
           width: @maximum_width,
           height: @height,
-          versus: options[:versus]
+          versus: options[:versus],
+          options: options
         }
         metadata[:treemap] = @whole_tile.compute_treemap if options[:treemap]
         Contrek::Finder::Result.new(raw_polygons, metadata)

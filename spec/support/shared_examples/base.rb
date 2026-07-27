@@ -17,6 +17,7 @@ RSpec.shared_examples "base" do
       expect(result.metadata[:groups]).to eq(1)
       expect(result.metadata[:width]).to eq(16)
       expect(result.metadata[:height]).to eq(3)
+      expect(result.metadata[:options]).to eq({bounds: true, named_sequences: true})
       expect(result.points).to match_expected_json
 
       result = @polygon_finder_class.new(

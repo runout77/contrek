@@ -21,7 +21,7 @@ class StreamingMerger : public VerticalMerger {
   int moved = 0;
 
   void stream_polygons(Tile* tile, bool flush = false);
-  virtual void stream_raw_polygon(const Shape* shape);
+  virtual void stream_raw_polygon(const Polygon& polygon);
   virtual void write_header() = 0;
   virtual void write_footer() = 0;
   virtual void write_outer_polygon_start() = 0;
@@ -33,7 +33,7 @@ class StreamingMerger : public VerticalMerger {
 
  public:
   StreamingMerger(int number_of_threads,
-                  std::vector<std::string>* options,
+                  const Options& options,
                   std::ofstream* stream_to);
   void add_tile(ProcessResult& result, bool flush = false);
   ProcessResult* process_info() override;

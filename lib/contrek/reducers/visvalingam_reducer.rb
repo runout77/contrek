@@ -8,7 +8,8 @@ module Contrek
     class VisvalingamReducer < Reducer
       def initialize(points: list_of_points, options: {})
         @pts = points
-        @tolerance = options[:tolerance] * options[:tolerance]
+        given_tolerance = options[:visvalingam_tolerance] || 10.0
+        @tolerance = given_tolerance * given_tolerance
       end
 
       def reduce!

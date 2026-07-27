@@ -8,17 +8,16 @@
  */
 
 #pragma once
-
 #include <string>
 #include <vector>
 #include <memory>
 #include <cstdint>
 #include <string_view>
-
 #include "Finder.h"
 #include "FastPngBitmap.h"
 #include "RGBNotMatcher.h"
 #include "RGBMatcher.h"
+#include "Options.h"
 
 namespace Contrek {
 
@@ -49,7 +48,7 @@ struct Config {
 struct TraceContext {
   std::unique_ptr<FastPngBitmap> bitmap;
   std::unique_ptr<Matcher> matcher;
-  std::vector<std::string> internal_args;
+  Options internal_args;
   std::unique_ptr<Finder> finder;
   std::unique_ptr<ProcessResult> result;
 
@@ -82,23 +81,20 @@ inline TraceContext trace(const std::string& image_path, const Config& cfg = Con
     ctx.matcher = std::make_unique<RGBMatcher>(color_to_match);
   }
 
-  ctx.internal_args = {"--versus=a"};
-
-  struct Mapping { bool flag; std::string_view arg; };
-  const Mapping mappings[] = {
-    {cfg.compress_unique,      "--compress_uniq"},
-    {cfg.compress_linear,      "--compress_linear"},
-    {cfg.compress_visvalingam, "--compress_visvalingam"},
-    {cfg.treemap,              "--treemap"}
+  ctx.internal_args = {
+    {"versus", Identifier{"a"}},
   };
-  for (const auto& m : mappings) {
-    if (m.flag) ctx.internal_args.emplace_back(m.arg);
-  }
-  ctx.internal_args.push_back("--number_of_tiles=" + std::to_string(cfg.tiles));
+  Options compression_opts;
+
+  if (cfg.compress_unique) compression_opts["uniq"] = true;
+  if (cfg.compress_linear) compression_opts["linear"] = true;
+  if (cfg.compress_visvalingam) compression_opts["visvalingam"] = true;
+  if (cfg.compress_unique || cfg.compress_linear || cfg.compress_visvalingam) ctx.internal_args["compression"] = compression_opts;
+  ctx.internal_args["number_of_tiles"] = cfg.tiles;
   if (cfg.connectivity_mode == Connectivity::OMNIDIRECTIONAL) {
-    ctx.internal_args.push_back("--connectivity=" + std::to_string(8));
+    ctx.internal_args["connectivity"] = 8;
   }
-  ctx.finder = std::make_unique<Finder>(cfg.threads, ctx.bitmap.get(), ctx.matcher.get(), &ctx.internal_args);
+  ctx.finder = std::make_unique<Finder>(cfg.threads, ctx.bitmap.get(), ctx.matcher.get(), ctx.internal_args);
   ctx.result = std::unique_ptr<ProcessResult>(ctx.finder->process_info());
 
   return ctx;

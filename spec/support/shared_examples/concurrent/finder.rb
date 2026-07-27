@@ -34,20 +34,24 @@ RSpec.shared_examples "finder" do
               "  11111  " \
               "  11111  " \
               "         "
+      opts = {versus: :o, compress: {uniq: true, linear: true}}
       result = Contrek::Finder::PolygonFinder.new(
         @ruby_bitmap_class.new(chunk, 9),
         @ruby_matcher,
         nil,
-        {versus: :o, compress: {uniq: true, linear: true}}
+        opts
       ).process_info
       expect(result.points).to eq([{outer: [{x: 7, y: 1}, {x: 7, y: 4}, {x: 2, y: 4}, {x: 2, y: 1}], inner: []}])
+      expect(result.metadata[:options]).to eq(opts)
 
+      opts = {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
       result = @polygon_finder_class.new(
         bitmap: @bitmap_class.new(chunk, 9),
         matcher: @matcher,
-        options: {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
+        options: opts
       ).process_info
       expect(result.points).to match_expected_json(addons: [:o])
+      expect(result.metadata[:options]).to eq(opts)
     end
 
     it "2 workers left border" do

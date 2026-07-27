@@ -12,7 +12,7 @@
 #include <vector>
 #include "HorizontalMerger.h"
 
-HorizontalMerger::HorizontalMerger(int number_of_threads, std::vector<std::string> *options)
+HorizontalMerger::HorizontalMerger(int number_of_threads, const Options& options)
 : Merger(number_of_threads, options) {
 }
 

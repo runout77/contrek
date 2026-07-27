@@ -138,3 +138,9 @@ All notable changes to this project will be documented in this file.
 
 ## [1.3.4] - 2026-07-19
 - Refactored core topology from a top-left point model to a 4-vertex pixel-cell model, natively eliminating diagonal ambiguities and rewriting part of the stripe-merging algorithm to ensure perfect geometric stitching on shared nodes. Removed Strict Bounds mode. Added a Douglas-Peucker and a custom raster-compression algorithm that shifts top/right pixel boundaries by 1px to ensure flawless surface rendering as bitmap image.
+
+## [1.3.6] - 2026-07-27
+- Removed optionparser.h and the legacy options argument mechanism, replacing them with the new OptionValue.h and Options.h
+- Added polygon compression to the progressive streaming pipeline (StreamingMerger).
+- Added strict validation in progressive streaming. Results passed to add_tile() are now validated to ensure they contain compatible settings (such as versus conventions and compression options).
+- Added unsafe_mode flag to streaming mergers. This allows bypassing compatibility checks when using custom or arbitrary input data.

@@ -110,19 +110,7 @@ std::list<Polygon> Tile::to_raw_polygons()
 { std::list<Polygon> retme;
   bool bounds = this->finder->options().bounds;
   for (Shape* s : shapes_)
-  { if (s->outer_polyline && !s->outer_polyline->is_empty())
-    { Polygon poly;
-      poly.outer = s->outer_polyline->raw();
-      if (bounds) {
-        s->outer_polyline->fill_bounds(poly.bounds);
-      }
-      if (!s->inner_polylines.empty()) {
-        for (auto inner : s->inner_polylines) {
-          poly.inner.push_back(inner->raw());
-        }
-      }
-      retme.push_back(std::move(poly));
-    }
+  { retme.push_back(std::move(s->to_raw_polygon(bounds)));
   }
   return(retme);
 }

@@ -10,6 +10,7 @@
 #include <gperftools/malloc_extension.h>
 #endif
 #include <iostream>
+#include <cstdint>
 #include <list>
 #include <vector>
 #include <map>
@@ -61,6 +62,7 @@
 #include "PolygonFinder/src/polygon/finder/concurrent/Poolable.h"
 #include "PolygonFinder/src/polygon/finder/concurrent/Poolable.cpp"
 #include "PolygonFinder/src/polygon/finder/FinderUtils.h"
+#include "PolygonFinder/src/polygon/finder/Options.h"
 #include "PolygonFinder/src/polygon/finder/FinderUtils.cpp"
 #include "PolygonFinder/src/polygon/finder/concurrent/ClippedPolygonFinder.h"
 #include "PolygonFinder/src/polygon/finder/concurrent/ClippedPolygonFinder.cpp"
@@ -119,55 +121,93 @@ using namespace Rice;
 namespace Rice::detail {
 
 template<>
-class From_Ruby<std::vector<std::string>*>
+class From_Ruby<Options>
 { public:
   Convertible is_convertible(VALUE value)
   { switch (rb_type(value))
     { case RUBY_T_HASH:
+      case RUBY_T_NIL:
         return Convertible::Cast;
         break;
       default:
         return Convertible::None;
     }
   }
-  std::vector<std::string>* convert(VALUE value)
-  { std::vector<std::string> *arguments = new std::vector<std::string>();
-    if (rb_type(value) == RUBY_T_NIL) return(arguments);
+  Options convert(VALUE value)
+  { Options options;
+    if (rb_type(value) == RUBY_T_NIL) return(options);
     Rice::Hash hash = (Rice::Hash) value;
     for (Rice::Hash::iterator it = hash.begin(); it != hash.end(); ++it) {
       Rice::String keyString = it->key.to_s();
       Rice::Object value = it->value;
       switch (value.rb_type()) {
         case T_STRING:
-          arguments->push_back("--" + keyString.str()+"="+((Rice::String) value).str());
+          options[keyString.str()] = ((Rice::String) value).str();
           break;
         case T_SYMBOL:
-          arguments->push_back("--" + keyString.str()+"="+((Rice::Symbol) value).str());
+          options[keyString.str()] = ::Identifier(((Rice::Symbol) value).str());
           break;
         case T_FLOAT:
-          arguments->push_back("--" + keyString.str()+"="+std::to_string(NUM2DBL(value.value())));
+          options[keyString.str()] = NUM2DBL(value.value());
           break;
         case T_FIXNUM:
-          arguments->push_back("--" + keyString.str()+"="+std::to_string(NUM2INT(value.value())));
+        case T_BIGNUM:
+          options[keyString.str()] = static_cast<std::int64_t>(NUM2LL(value.value()));
           break;
         case T_TRUE:
-          arguments->push_back("--" + keyString.str()+"=true");
+          options[keyString.str()] = true;
           break;
         case T_FALSE:
-          arguments->push_back("--" + keyString.str()+"=false");
+          options[keyString.str()] = false;
           break;
         case T_HASH:
-          std::vector<std::string>* iv = From_Ruby<std::vector<std::string>*>::convert(value);
-          for (std::vector<std::string>::iterator it_iv = iv->begin() ; it_iv != iv->end(); ++it_iv)
-          { (*it_iv).replace(0, 2, "_");
-            arguments->push_back("--" + keyString.str() + *it_iv);
-          }
+          options[keyString.str()] = From_Ruby<Options>().convert(value.value());
+          break;
+        case T_NIL:
+          options[keyString.str()] = OptionValue();
+          break;
+        default:
+          rb_raise(rb_eTypeError,
+                   "Unsupported option value type for '%s': %s",
+                   keyString.str().c_str(),
+                   rb_obj_classname(value.value()));
           break;
        }
     }
-    return arguments;
+    return options;
   }
 };
+
+Rice::Object option_value_to_ruby(const OptionValue& option_value);
+Rice::Hash options_to_ruby(const Options& options) {
+  Rice::Hash hash;
+  for (const auto& [key, value] : options.values()) {
+    hash[Rice::Symbol(key)] = option_value_to_ruby(value);
+  }
+  return hash;
+}
+
+Rice::Object option_value_to_ruby(const OptionValue& option_value) {
+  if (option_value.is_bool()) {
+    return Rice::Object(option_value.as_bool() ? Qtrue : Qfalse);
+  }
+  if (option_value.is_integer()) {
+    return Rice::Object(LL2NUM(option_value.as_integer()));
+  }
+  if (option_value.is_double()) {
+    return Rice::Object(DBL2NUM(option_value.as_double()));
+  }
+  if (option_value.is_string()) {
+    return Rice::String(option_value.as_string());
+  }
+  if (option_value.is_identifier()) {
+    return Rice::Symbol(option_value.as_identifier().value);
+  }
+  if (option_value.is_options()) {
+    return options_to_ruby(option_value.as_options());
+  }
+  return Rice::Object(Qnil);
+}
 
 template<>
 class To_Ruby<ProcessResult*>
@@ -191,6 +231,7 @@ class To_Ruby<ProcessResult*>
     return_me[Symbol("width")] = pr->width;
     return_me[Symbol("height")] = pr->height;
     return_me[Symbol("versus")] = Symbol(pr->versus == Node::O ? "o" : "a");
+    return_me[Symbol("options")] = options_to_ruby(pr->options);
 
     Rice::Array out;
     for (Polygon& x : pr->polygons)
@@ -257,6 +298,7 @@ ProcessResult ruby_result_to_process_result(Rice::Object rb_result) {
   pr.width = detail::From_Ruby<int>().convert(metadata[Symbol("width")].value());
   pr.height = detail::From_Ruby<int>().convert(metadata[Symbol("height")].value());
   pr.versus = metadata[Symbol("versus")] == Symbol("o") ? Node::O : Node::A;
+  pr.options = detail::From_Ruby<Options>().convert(metadata[Symbol("options")].value());
 
   Rice::Array rb_polygons = rb_result.iv_get("@polygons_storage");
   for (size_t i = 0; i < rb_polygons.size(); ++i) {
@@ -316,7 +358,7 @@ struct OfstreamWrapper {
 
 SvgStreamingMerger* create_svg_streaming_merger(Object self,
                                          int number_of_threads,
-                                         std::vector<std::string>* options,
+                                         Options options,
                                          Object stream_obj,
                                          int total_width,
                                          int total_height) {
@@ -326,11 +368,11 @@ SvgStreamingMerger* create_svg_streaming_merger(Object self,
 
 GeoJsonStreamingMerger* create_geo_json_streaming_merger(Object self,
                                          int number_of_threads,
-                                         std::vector<std::string>* options,
+                                         Options options,
                                          Object stream_obj,
                                          int pixel_val) {
   OfstreamWrapper* wrapper = Rice::detail::From_Ruby<OfstreamWrapper*>().convert(stream_obj.value());
-  return new GeoJsonStreamingMerger(number_of_threads, options, &wrapper->get_stream(),pixel_val);
+  return new GeoJsonStreamingMerger(number_of_threads, options, &wrapper->get_stream(), pixel_val);
 }
 
 OfstreamWrapper* create_ofstream(Object self, std::string path) {
@@ -409,18 +451,18 @@ void Init_cpp_polygon_finder() {
 
   Data_Type<PolygonFinder> rb_cPolygonFinder =
     define_class<PolygonFinder>("CPPPolygonFinder")
-    .define_constructor(Constructor<PolygonFinder, Bitmap*, Matcher*, Bitmap*, std::vector<std::string>*>(), Arg("bitmap"), Arg("matcher"), Arg("test_bitmap") = nullptr, Arg("options") = nullptr, Rice::Arg("yield_gvl") = true)
+    .define_constructor(Constructor<PolygonFinder, Bitmap*, Matcher*, Bitmap*, Options>(), Arg("bitmap"), Arg("matcher"), Arg("test_bitmap") = nullptr, Arg("options") = Rice::Hash(), Rice::Arg("yield_gvl") = true)
     .define_method("get_shapelines", &PolygonFinder::get_shapelines)
     .define_method("process_info", &PolygonFinder::process_info, Rice::Arg("yield_gvl") = true);
 
   Data_Type<Finder> rb_cFinder =
     define_class<Finder>("CPPFinder")
-    .define_constructor(Constructor<Finder, int, Bitmap*, Matcher*, std::vector<std::string>*>(), Arg("number_of_threads"), Arg("bitmap"), Arg("matcher"), Arg("options") = nullptr, Rice::Arg("yield_gvl") = true)
+    .define_constructor(Constructor<Finder, int, Bitmap*, Matcher*, Options>(), Arg("number_of_threads"), Arg("bitmap"), Arg("matcher"), Arg("options") = Rice::Hash(), Rice::Arg("yield_gvl") = true)
     .define_method("process_info", &Finder::process_info, Rice::Arg("yield_gvl") = true);
 
   Data_Type<Merger> rb_cMerger =
     define_class<Merger, Finder>("CPPMerger")
-    .define_constructor(Constructor<Merger, int, std::vector<std::string>*>(), Arg("number_of_threads"), Arg("options") = nullptr, Rice::Arg("yield_gvl") = true)
+    .define_constructor(Constructor<Merger, int, Options>(), Arg("number_of_threads"), Arg("options") = Rice::Hash(), Rice::Arg("yield_gvl") = true)
     .define_method("add_tile", [](Merger& self, Object rb_result) {
       ProcessResult pr = Rice::detail::ruby_result_to_process_result(rb_result);
       self.add_tile(pr);
@@ -429,11 +471,11 @@ void Init_cpp_polygon_finder() {
 
   Data_Type<HorizontalMerger> rb_cHorizontalMerger =
     define_class<HorizontalMerger, Merger>("CPPHorizontalMerger")
-    .define_constructor(Constructor<HorizontalMerger, int, std::vector<std::string>*>(), Arg("number_of_threads"), Arg("options") = nullptr, Arg("yield_gvl") = true);
+    .define_constructor(Constructor<HorizontalMerger, int, Options>(), Arg("number_of_threads"), Arg("options") = Rice::Hash(), Arg("yield_gvl") = true);
 
   Data_Type<VerticalMerger> rb_cVerticalMerger =
     define_class<VerticalMerger, Merger>("CPPVerticalMerger")
-    .define_constructor(Constructor<VerticalMerger, int, std::vector<std::string>*>(), Arg("number_of_threads"), Arg("options") = nullptr, Arg("yield_gvl") = true)
+    .define_constructor(Constructor<VerticalMerger, int, Options>(), Arg("number_of_threads"), Arg("options") = Rice::Hash(), Arg("yield_gvl") = true)
     .define_method("add_tile", [](VerticalMerger& self, Object rb_result) {
       ProcessResult pr = Rice::detail::ruby_result_to_process_result(rb_result);
       self.add_tile(pr);

@@ -15,6 +15,7 @@
 #include <vector>
 #include "Poolable.h"
 #include "../PolygonFinder.h"
+#include "../Options.h"
 #include "Queue.h"
 #include "Tile.h"
 
@@ -34,7 +35,7 @@ class Finder : public Poolable {
   Bitmap *bitmap;
   Matcher *matcher;
   pf_Options options_;
-  std::vector<std::string> input_options;
+  Options input_options;
   std::queue<ClippedPolygonFinder*> finders;
   std::mutex finders_mutex;
   std::map<std::string, double> reports;
@@ -49,13 +50,13 @@ class Finder : public Poolable {
 
  public:
   using Poolable::Poolable;
-  Finder(int number_of_threads, Bitmap *bitmap, Matcher *matcher, std::vector<std::string> *options);
-  Finder(int number_of_threads, std::vector<std::string> *options);
+  Finder(int number_of_threads, Bitmap *bitmap, Matcher *matcher, const Options& options);
+  Finder(int number_of_threads, const Options& options);
   virtual ~Finder();
   int maximum_width() const { return maximum_width_; }
   virtual ProcessResult* process_info();
   const pf_Options& options() const { return options_; }
   Queue<Tile*>& tiles() { return tiles_; }
   virtual bool transpose() const { return false; }
-  int versus;
+  int versus = -1;
 };

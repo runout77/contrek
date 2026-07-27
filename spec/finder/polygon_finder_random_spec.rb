@@ -18,7 +18,7 @@ RSpec.describe Contrek::Finder::PolygonFinder, type: :class do
             Contrek::Finder::PolygonFinder.new(bitmap,
               @matcher,
               nil,
-              {versus: "a", compress: {linear: true, visvalingam: {tolerance: 1}}}).process_info
+              {versus: "a", compress: {linear: true, visvalingam: true, visvalingam_tolerance: 1}}).process_info
           end
         rescue => e
           puts chunk.inspect
@@ -46,7 +46,7 @@ RSpec.describe Contrek::Finder::PolygonFinder, type: :class do
             Contrek::Finder::PolygonFinder.new(bitmap,
               @matcher,
               nil,
-              {versus: versus, compress: {linear: true, visvalingam: {tolerance: 1}}}).process_info
+              {versus: versus, compress: {linear: true, visvalingam: true, visvalingam_tolerance: 1}}).process_info
           end
         rescue => e
           puts gen.to_chunk.inspect

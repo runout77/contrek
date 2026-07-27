@@ -11,8 +11,9 @@
 #include <string>
 #include <vector>
 #include "../PolygonFinder.h"
+#include "../Options.h"
 
 class ClippedPolygonFinder : public PolygonFinder {
  public:
-  ClippedPolygonFinder(Bitmap *bitmap, Matcher *matcher, int bm_start_x, int bm_end_x, std::vector<std::string>* options = nullptr);
+  ClippedPolygonFinder(Bitmap *bitmap, Matcher *matcher, int bm_start_x, int bm_end_x, const Options& options);
 };

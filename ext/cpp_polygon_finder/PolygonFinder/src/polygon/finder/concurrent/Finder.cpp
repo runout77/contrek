@@ -14,7 +14,6 @@
 #include "../../bitmaps/Bitmap.h"
 #include "../../matchers/Matcher.h"
 #include "../../matchers/RGBMatcher.h"
-#include "../optionparser.h"
 #include "../FinderUtils.h"
 #include "ClippedPolygonFinder.h"
 #include "Tile.h"
@@ -22,15 +21,15 @@
 #include "Cluster.h"
 #include "FakeCluster.h"
 
-Finder::Finder(int number_of_threads, Bitmap *bitmap, Matcher *matcher, std::vector<std::string> *options)
+Finder::Finder(int number_of_threads, Bitmap *bitmap, Matcher *matcher, const Options& options)
 : Poolable(number_of_threads),
   bitmap(bitmap),
   matcher(matcher),
-  input_options(*options),
+  input_options(options),
   maximum_width_(bitmap->w()),
   height(bitmap->h())
 { cpu_timer.start();
-  if (options != nullptr) FinderUtils::sanitize_options(this->options_, options);
+  FinderUtils::sanitize_options(this->options_, options);
 
   double cw = static_cast<double>(this->maximum_width_) / this->options_.number_of_tiles;
   if (cw < 1.0) {
@@ -41,9 +40,17 @@ Finder::Finder(int number_of_threads, Bitmap *bitmap, Matcher *matcher, std::vec
   { int tile_end_x = static_cast<int>(cw * (tile_index + 1));
     TilePayload p { tile_index, x, tile_end_x };
     enqueue(p, [this](const TilePayload& payload) {
-      std::vector<std::string> base_arguments = {"--bounds", "--versus=" + this->options_.get_alpha_versus()};
-      if (this->options_.connectivity_offset == 1) base_arguments.push_back("--connectivity=8");
-      if (this->options_.treemap) base_arguments.push_back("--treemap");
+      Options base_arguments = {
+        {"bounds", true},
+        {"versus", Identifier{this->options_.get_alpha_versus()}},
+      };
+      if (this->options_.connectivity_offset == 1) {
+        base_arguments["connectivity"] = 8;
+      }
+      if (this->options_.treemap) {
+        base_arguments["treemap"] = true;
+      }
+
       CpuTimer t;
       t.start();
       auto* finder = new ClippedPolygonFinder(
@@ -51,7 +58,7 @@ Finder::Finder(int number_of_threads, Bitmap *bitmap, Matcher *matcher, std::vec
         this->matcher,
         payload.tile_start_x,
         payload.tile_end_x,
-        &base_arguments);
+        base_arguments);
       {
         std::lock_guard<std::mutex> lock(finders_mutex);
         finders.push(finder);
@@ -69,9 +76,9 @@ Finder::Finder(int number_of_threads, Bitmap *bitmap, Matcher *matcher, std::vec
   reports["init"] = cpu_timer.stop();
 }
 
-Finder::Finder(int number_of_threads, std::vector<std::string> *options)
-: Poolable(number_of_threads), bitmap(nullptr), matcher(nullptr), input_options(*options), maximum_width_(0) {
-  if (options != nullptr) FinderUtils::sanitize_options(this->options_, options);
+Finder::Finder(int number_of_threads, const Options& options)
+: Poolable(number_of_threads), bitmap(nullptr), matcher(nullptr), input_options(options), maximum_width_(0) {
+  FinderUtils::sanitize_options(this->options_, options);
   reports["init"] = 0;
 }
 
@@ -140,6 +147,7 @@ ProcessResult* Finder::process_info() {
   pr->height = this->height;
   pr->has_bounds = this->options_.bounds;
   pr->versus = this->options_.versus;
+  pr->options = this->input_options;
   FakeCluster fake_cluster(pr->polygons, this->options_);
   cpu_timer.start();
   fake_cluster.compress_coords(pr->polygons, this->options_);

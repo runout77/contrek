@@ -33,7 +33,7 @@ module Contrek
           Contrek::Reducers::UniqReducer.new(points: seq).reduce! if @options[:compress].has_key?(:uniq)
           Contrek::Reducers::LinearReducer.new(points: seq, options: @options[:compress][:linear]).reduce! if @options[:compress].has_key?(:linear)
           Contrek::Reducers::RasterReducer.new(points: seq, options: @options).reduce! if @options[:compress].has_key?(:raster)
-          Contrek::Reducers::VisvalingamReducer.new(points: seq, options: @options[:compress][:visvalingam]).reduce! if @options[:compress].has_key?(:visvalingam)
+          Contrek::Reducers::VisvalingamReducer.new(points: seq, options: @options[:compress]).reduce! if @options[:compress].has_key?(:visvalingam)
           Contrek::Reducers::DouglasPeuckerReducer.new(points: seq).reduce! if @options[:compress].has_key?(:douglas_peucker)
         end
       end
