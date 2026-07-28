@@ -19,31 +19,32 @@ LinearReducer::LinearReducer(std::vector<Point>& list_of_points)
 }
 
 void LinearReducer::reduce() {
-  if (points.size() < 2) return;
+  if (points.size() < 3) return;
 
-  Point start_p = points[0];
-  Point end_p = points[1];
-  auto dir = seq_dir(start_p, end_p);
-
+  size_t write_idx = 1;
   for (size_t i = 2; i < points.size(); ++i) {
-    Point point = points[i];
-    auto act_seq = seq_dir(end_p, point);
-    if (act_seq == dir) {
-      auto it = std::find_if(points.begin(), points.end(), [&](const Point& p) {  // TODO(ema): optimize...
-        return p.x == end_p.x && p.y == end_p.y;
-      });
-      if (it != points.end()) {
-        size_t removed_idx = std::distance(points.begin(), it);
-        points.erase(it);
-        if (removed_idx <= i) i--;
-      }
-    } else {
-      dir = act_seq;
-    }
-    end_p = point;
-  }
-}
+    const Point& start_p = points[write_idx - 1];
+    const Point& end_p   = points[write_idx];
+    const Point& curr_p  = points[i];
 
-std::array<int, 2> LinearReducer::seq_dir(const Point& a, const Point& b)
-{ return { b.x - a.x, b.y - a.y };
+    int dx1 = end_p.x - start_p.x;
+    int dy1 = end_p.y - start_p.y;
+
+    int dx2 = curr_p.x - end_p.x;
+    int dy2 = curr_p.y - end_p.y;
+
+    int sx1 = (0 < dx1) - (dx1 < 0);
+    int sy1 = (0 < dy1) - (dy1 < 0);
+
+    int sx2 = (0 < dx2) - (dx2 < 0);
+    int sy2 = (0 < dy2) - (dy2 < 0);
+
+    if (sx1 == sx2 && sy1 == sy2) {
+      points[write_idx] = curr_p;
+    } else {
+      write_idx++;
+      points[write_idx] = curr_p;
+    }
+  }
+  points.resize(write_idx + 1);
 }
