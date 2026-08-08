@@ -233,13 +233,6 @@ module Contrek
         next_node = node.my_next(last_node, versus, :inner)
         @plot_sequence << node
 
-        first_is_max = ((node.y > last_node.y) == (versus == :a))
-        if first_is_max
-          node.inner_right_index = stop_at.inner_index if node.inner_right_index == -1
-        elsif node.inner_left_index == -1
-          node.inner_left_index = stop_at.inner_index
-        end
-
         plot = true
         if next_node.y == last_node.y
           virtual_index = node.tangs_sequence.send((versus == :a) ? :first : :last)
@@ -247,6 +240,7 @@ module Contrek
         end
 
         if plot
+          node.assign_lateral_inner_index(last_node, stop_at, versus)
           first_point = last_node.coords_entering_to(node, VERSUS_INVERTER[versus], Contrek::Finder::Node::INNER)
           @sequence_coords << first_point if @sequence_coords.last != first_point
           if next_node.y == last_node.y
@@ -271,8 +265,10 @@ module Contrek
         else
           @inner_new.delete(node)
         end
-
-        return node if next_node == stop_at
+        if next_node == stop_at
+          next_node.assign_lateral_inner_index(node, stop_at, versus) if plot
+          return node
+        end
         plot_inner_node(next_node, versus, stop_at, start_node)
       end
 

@@ -534,24 +534,55 @@ RSpec.shared_examples "treemap" do
     end
 
     it "scans 3 level 27" do
-      skip
       chunk = "0000000000000000000000" \
-              "0                    0" \
-              "0         000000000  0" \
-              "0         0       0  0" \
-              "0         0       0  0" \
-              "00000000000       0  0" \
-              "0         0  222  0  0" \
-              "0         0       0  0" \
-              "0         0       0  0" \
-              "0         000000000  0" \
-              "0                    0" \
-              "0000000000000000000000"
+              "A                    S" \
+              "B         T00000000  R" \
+              "C         U       7  Q" \
+              "D0000000000       6  P" \
+              "E         V  222  5  O" \
+              "F         1  222  3  N" \
+              "G         Z       4  M" \
+              "H         X00000000  L" \
+              "I                    K" \
+              "J000000000000000000000"
       result = @polygon_finder_class.new(@bitmap_class.new(chunk, 22),
         @matcher, nil, {versus: :a, treemap: true, compress: {uniq: true, linear: true}}).process_info
       expect(result.metadata[:groups]).to eq(2)
-      verify_treemap(result)
       expect(result.metadata[:treemap]).to eq([[-1, -1], [0, 1]])
+    end
+
+    it "scans 3 level 28" do
+      chunk = "0000000000000000000000" \
+              "A                    S" \
+              "B         T00000000  R" \
+              "C         U       7  Q" \
+              "D0000000000       6  P" \
+              "E         V       5  O" \
+              "F         1  222  3  N" \
+              "G         Z       4  M" \
+              "H         X00000000  L" \
+              "I                    K" \
+              "J000000000000000000000"
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 22),
+        @matcher, nil, {versus: :a, treemap: true, compress: {uniq: true, linear: true}}).process_info
+      expect(result.metadata[:groups]).to eq(2)
+      expect(result.metadata[:treemap]).to eq([[-1, -1], [0, 1]])
+    end
+
+    it "scans 3 level 29" do
+      chunk = "0000000000000000000000" \
+              "A      Q             P" \
+              "B      R             O" \
+              "CCCCCCCC   11        N" \
+              "D      S             M" \
+              "E      T             L" \
+              "F      UUUUUUUUUUUUUUU" \
+              "G                    I" \
+              "H000000000000000000000"
+      result = @polygon_finder_class.new(@bitmap_class.new(chunk, 22),
+        @matcher, nil, {versus: :a, treemap: true, compress: {uniq: true, linear: true}}).process_info
+      expect(result.metadata[:groups]).to eq(2)
+      expect(result.metadata[:treemap]).to eq([[-1, -1], [0, 2]])
     end
   end
 end

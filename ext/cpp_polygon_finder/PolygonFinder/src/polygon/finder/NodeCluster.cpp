@@ -292,13 +292,6 @@ Node* NodeCluster::plot_inner_node(std::vector<Point>& sequence_coords, Node *no
     Node *next_node = current_node->my_next_inner(last_node, versus);
     plot_sequence.push_back(current_node);
 
-    bool first_is_max = ((current_node->y > last_node->y) == (versus == Node::A));
-    if (first_is_max) {
-      if (current_node->inner_right_index == -1) current_node->inner_right_index = stop_at->inner_index;
-    } else {
-      if (current_node->inner_left_index == -1) current_node->inner_left_index = stop_at->inner_index;
-    }
-
     bool plot = true;
     if (next_node->y == last_node->y) {
       Node *n;
@@ -309,6 +302,7 @@ Node* NodeCluster::plot_inner_node(std::vector<Point>& sequence_coords, Node *no
       plot = (n == next_node);
     }
     if (plot) {
+      current_node->assign_lateral_inner_index(last_node, stop_at, versus);
       Point first_point = last_node->coords_entering_to(current_node, versus_inverter[versus], Node::INNER);
       if (sequence_coords.back() != first_point) {
         sequence_coords.push_back(first_point);
@@ -338,7 +332,12 @@ Node* NodeCluster::plot_inner_node(std::vector<Point>& sequence_coords, Node *no
     } else {
       inner_new->remove(current_node);
     }
-    if (next_node == stop_at) break;
+    if (next_node == stop_at) {
+      if (plot) {
+        next_node->assign_lateral_inner_index(current_node, stop_at, versus);
+      }
+      break;
+    }
     current_node = next_node;
   }
   return current_node;

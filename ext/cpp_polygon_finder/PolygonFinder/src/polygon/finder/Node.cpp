@@ -132,3 +132,12 @@ Node* Node::get_tangent_node_by_virtual_index(int virtual_index) {
     return &(this->cluster->vert_nodes[y + T_DOWN][virtual_index]);
   }
 }
+
+void Node::assign_lateral_inner_index(Node* my_prev_node, Node* end_node, int versus) {
+  bool first_is_max = ((this->y > my_prev_node->y) == (versus == Node::A));
+  if (first_is_max) {
+    this->inner_right_index = end_node->inner_index;
+  } else {
+    this->inner_left_index = end_node->inner_index;
+  }
+}

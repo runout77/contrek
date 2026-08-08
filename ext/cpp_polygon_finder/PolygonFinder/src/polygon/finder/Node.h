@@ -113,6 +113,7 @@ class Node : public  Listable {
   int min_x, max_x;
   Node(int min_x, int max_x, int y, NodeCluster* cluster, char name);
   void precalc_tangs_sequences(NodeCluster& cluster);
+  void assign_lateral_inner_index(Node* my_prev_node, Node* end_node, int versus);
   bool processed = false;
   char name;
   int inner_left_index = -1;

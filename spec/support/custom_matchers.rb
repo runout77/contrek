@@ -2,12 +2,7 @@
 
 require "json"
 
-RSpec::Matchers.define :match_expected_polygons do |label,
-                                                    number_of_tiles: 1,
-                                                    draw_to_image: nil,
-                                                    draw_points: nil,
-                                                    store_coordinates: false,
-                                                    additional_files_path: []|
+RSpec::Matchers.define :match_expected_polygons do |label, number_of_tiles: 1, draw_to_image: nil, draw_points: nil, store_coordinates: false, additional_files_path: []|
   diffable
   attr_reader :expected, :actual
   match do |actual|
@@ -37,10 +32,7 @@ RSpec::Matchers.define :match_expected_polygons do |label,
   end
 end
 
-RSpec::Matchers.define :match_expected_stream do |label,
-                                                 extension:, number_of_tiles: 1,
-                                                 store_stream: false,
-                                                 additional_files_path: []|
+RSpec::Matchers.define :match_expected_stream do |label, extension:, number_of_tiles: 1, store_stream: false, additional_files_path: []|
   diffable
   attr_reader :expected, :actual
   match do |actual|

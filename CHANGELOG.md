@@ -144,3 +144,6 @@ All notable changes to this project will be documented in this file.
 - Added polygon compression to the progressive streaming pipeline (StreamingMerger).
 - Added strict validation in progressive streaming. Results passed to add_tile() are now validated to ensure they contain compatible settings (such as versus conventions and compression options).
 - Added unsafe_mode flag to streaming mergers. This allows bypassing compatibility checks when using custom or arbitrary input data.
+
+## [1.3.8] - 2026-08-08
+- Fixed issue found on treemap determination.

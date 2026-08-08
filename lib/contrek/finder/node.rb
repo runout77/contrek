@@ -105,6 +105,17 @@ module Contrek
         get_tangent_node_by_virtual_index(@tangs_sequence.at(last_node_index))
       end
 
+      def assign_lateral_inner_index(my_prev_node, end_node, versus)
+        is_moving_up = y > my_prev_node.y
+        is_forward = (versus == :a)
+        first_is_max = (is_moving_up == is_forward)
+        if first_is_max
+          self.inner_right_index = end_node.inner_index
+        else
+          self.inner_left_index = end_node.inner_index
+        end
+      end
+
       def coords_entering_to(enter_to, enter_mode, tracking)
         enter_to_index = if enter_to.y < y
           enter_to.abs_x_index + @up_indexer
