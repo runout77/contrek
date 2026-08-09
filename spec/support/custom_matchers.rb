@@ -2,7 +2,7 @@
 
 require "json"
 
-RSpec::Matchers.define :match_expected_polygons do |label, number_of_tiles: 1, draw_to_image: nil, draw_points: nil, store_coordinates: false, additional_files_path: []|
+RSpec::Matchers.define :match_expected_polygons do |label, number_of_tiles: 1, draw_to_image: nil, draw_points: nil, store_data: false, additional_files_path: []|
   diffable
   attr_reader :expected, :actual
   match do |actual|
@@ -10,7 +10,7 @@ RSpec::Matchers.define :match_expected_polygons do |label, number_of_tiles: 1, d
 
     basename = label.to_s
     path = File.join(["spec", "files", "coordinates"] + additional_files_path + ["#{basename}_w#{number_of_tiles}.json"])
-    File.write(path, JSON.generate(@actual)) if store_coordinates
+    File.write(path, JSON.generate(@actual)) if store_data
     raise "Expected coordinates file not found: #{path}" unless File.exist?(path)
 
     @expected = JSON.parse(File.read(path), symbolize_names: true)
@@ -32,7 +32,7 @@ RSpec::Matchers.define :match_expected_polygons do |label, number_of_tiles: 1, d
   end
 end
 
-RSpec::Matchers.define :match_expected_stream do |label, extension:, number_of_tiles: 1, store_stream: false, additional_files_path: []|
+RSpec::Matchers.define :match_expected_stream do |label, extension:, number_of_tiles: 1, store_data: false, additional_files_path: []|
   diffable
   attr_reader :expected, :actual
   match do |actual|
@@ -40,7 +40,7 @@ RSpec::Matchers.define :match_expected_stream do |label, extension:, number_of_t
 
     basename = label.to_s
     path = File.join(["spec", "files", "streams"] + additional_files_path + ["#{basename}_w#{number_of_tiles}.#{extension}"])
-    File.write(path, @actual) if store_stream
+    File.write(path, @actual) if store_data
     raise "Expected stream file not found: #{path}" unless File.exist?(path)
 
     @expected = File.read(path)
@@ -57,7 +57,7 @@ RSpec::Matchers.define :match_expected_stream do |label, extension:, number_of_t
   end
 end
 
-RSpec::Matchers.define :match_expected_json do |store_json: false, addons: []|
+RSpec::Matchers.define :match_expected_json do |store_data: false, addons: []|
   diffable
 
   match do |actual|
@@ -65,7 +65,7 @@ RSpec::Matchers.define :match_expected_json do |store_json: false, addons: []|
 
     actual_compact = actual.to_json
 
-    File.write(path, actual_compact) if store_json
+    File.write(path, actual_compact) if store_data
     raise "Expected json file not found: #{path}" unless File.exist?(path)
 
     expected_compact = File.read(path)

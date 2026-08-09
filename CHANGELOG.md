@@ -147,3 +147,6 @@ All notable changes to this project will be documented in this file.
 
 ## [1.3.8] - 2026-08-08
 - Fixed issue found on treemap determination.
+
+## [1.3.9] - 2026-08-09
+- Removed the curses development dependency along with the old TerminalTracker; actually Bitmaps::Rendering.to_window renders visually better results.

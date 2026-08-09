@@ -99,7 +99,6 @@ RSpec.shared_examples "finder_img" do
       png_bitmap = @png_bitmap_class.new("./spec/files/images/#{filename}.png")
       color = @color_class.new(r: 251, g: 251, b: 251, a: 255)
       rgb_matcher = @png_not_matcher.new(color.raw)
-      TerminalTracker.new
       result = @polygon_finder_class.new(
         bitmap: png_bitmap,
         matcher: rgb_matcher,
