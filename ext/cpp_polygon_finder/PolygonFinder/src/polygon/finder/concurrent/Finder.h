@@ -40,13 +40,14 @@ class Finder : public Poolable {
   std::mutex finders_mutex;
   std::map<std::string, double> reports;
   CpuTimer cpu_timer;
+  bool last_couple(const Tile* tile_a, const Tile* tile_b) const;
 
  protected:
   Queue<Tile*> tiles_;
   int maximum_width_;
   int height = 0;
   Tile* whole_tile = nullptr;
-  void process_tiles();
+  void process_tiles(bool deterministic = false);
 
  public:
   using Poolable::Poolable;

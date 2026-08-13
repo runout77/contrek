@@ -376,11 +376,9 @@ The native implementation uses the number of available CPU cores reported by the
 
 ## A note about determinism
 
-The tracing stage itself is deterministic.
+By default, the merge stage is **non-deterministic** to maximize performance and thread utilization.
 
-The merge stage is not.
-
-Each stripe is processed independently and adjacent stripes are merged as soon as they become available. Depending on thread scheduling, the merge order may differ from one execution to another.
+Each stripe is processed independently, and adjacent stripes are merged opportunistically as soon as they become available. Depending on thread scheduling, the merge order may differ between runs.
 
 For example, given three stripes:
 
@@ -400,7 +398,13 @@ while another execution may produce:
 B1 + (B2 + B3)
 ```
 
-Both executions generate equivalent polygons, but the order of intermediate merge operations is differentso the final coordinate sequence is not guaranteed to be byte-for-byte identical across executions.
+Both executions generate equivalent polygons, but the order of intermediate merge operations is different so the final coordinate sequence is not guaranteed to be byte-for-byte identical across executions.
+
+If you require byte-for-byte reproducible outputs across different runs, you can enable the **deterministic merge mode** (setting `deterministic: true`).
+
+In deterministic mode, stripes are merged strictly according to a fixed binary reduction tree based on their order and index.
+
+> **Requirement:** Deterministic mode requires an **even number of stripes/tiles** to process correctly.
 
 ## Native execution
 

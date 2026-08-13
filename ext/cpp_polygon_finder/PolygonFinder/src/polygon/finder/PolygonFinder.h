@@ -53,6 +53,7 @@ struct pf_Options {
   bool named_sequences = false;
   bool unsafe_mode = false;
   bool bounds = false;
+  bool deterministic = false;
   int connectivity_offset = 0;
   float compress_visvalingam_tolerance = 10.0;
   int number_of_tiles = 1;

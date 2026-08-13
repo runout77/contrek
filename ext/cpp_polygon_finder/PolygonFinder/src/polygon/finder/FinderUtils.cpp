@@ -28,6 +28,7 @@ void FinderUtils::sanitize_options(pf_Options& options, const Options& incoming_
     options.named_sequences);
   options.bounds = incoming_options.get<bool>("bounds", options.bounds);
   options.unsafe_mode = incoming_options.get<bool>("unsafe_mode", options.unsafe_mode);
+  options.deterministic = incoming_options.get<bool>("deterministic", options.deterministic);
 
   if (const Options* compress = incoming_options.get_options("compress")) {
     options.compress_uniq = compress->get<bool>("uniq", options.compress_uniq);

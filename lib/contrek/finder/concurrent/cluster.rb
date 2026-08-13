@@ -106,6 +106,8 @@ module Contrek
           start_x: @tiles.first.start_x,
           end_x: @tiles.last.end_x,
           benchmarks: {outer: tot_outer + past_tot_outer, inner: tot_inner + past_tot_inner},
+          index: @tiles.first.index / 2,
+          order: @tiles.first.order + 1,
           name: @tiles.first.name + @tiles.last.name
         )
 

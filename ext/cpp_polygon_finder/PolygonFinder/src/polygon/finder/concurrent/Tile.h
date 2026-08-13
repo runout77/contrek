@@ -29,11 +29,13 @@ class Tile {
   Finder *finder;
   int start_x_;
   int end_x_;
+  int index_;
+  int order_;
   std::string name_;
   std::vector<Shape*> shapes_;
 
  public:
-  Tile(Finder *finder, int start_x, int end_x, std::string name, const Benchmarks& b);
+  Tile(Finder *finder, int start_x, int end_x, std::string name, int index, const Benchmarks& b, int order = 0);
   virtual ~Tile();
   Tile *prev = nullptr;
   Tile *next = nullptr;
@@ -41,6 +43,8 @@ class Tile {
   Cluster *cluster = nullptr;
   int start_x() const { return start_x_; }
   int end_x() const { return end_x_; }
+  int index() const { return index_; }
+  int order() const { return order_; }
   std::string name() const { return name_; }
   const std::vector<Shape*>& shapes() const { return shapes_; }
   std::vector<Shape*>& shapes() { return shapes_; }

@@ -135,16 +135,17 @@ Tile* Cluster::merge_tiles() {
       }
     }
   }
-
-  double past_tot_outer = tiles_.front()->benchmarks.outer + tiles_.back()->benchmarks.outer;
-  double past_tot_inner = tiles_.front()->benchmarks.inner + tiles_.back()->benchmarks.inner;
+  Tile* first_tile = tiles_.front();
+  Tile* last_tile = tiles_.back();
+  double past_tot_outer = first_tile->benchmarks.outer + last_tile->benchmarks.outer;
+  double past_tot_inner = first_tile->benchmarks.inner + last_tile->benchmarks.inner;
   Benchmarks b{
     tot_outer + past_tot_outer,
     tot_inner + past_tot_inner
   };
 
   Tile* tile = new Tile(
-    this->finder_, tiles_.front()->start_x(), tiles_.back()->end_x(), tiles_.front()->name() + tiles_.back()->name(), b);
+    this->finder_, first_tile->start_x(), last_tile->end_x(), first_tile->name() + last_tile->name(), first_tile->index() / 2, b, first_tile->order() + 1);
 
   tile->assign_shapes(new_shapes);
   for (const auto shape : detach_shapes) {

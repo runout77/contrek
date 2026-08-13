@@ -10,6 +10,7 @@
 #include <utility>
 #include <vector>
 #include <string>
+#include <algorithm>
 #include "Finder.h"
 #include "../../bitmaps/Bitmap.h"
 #include "../../matchers/Matcher.h"
@@ -34,6 +35,9 @@ Finder::Finder(int number_of_threads, Bitmap *bitmap, Matcher *matcher, const Op
   double cw = static_cast<double>(this->maximum_width_) / this->options_.number_of_tiles;
   if (cw < 1.0) {
     throw std::runtime_error("One pixel tile width minimum!");
+  }
+  if (this->options_.deterministic && (this->options_.number_of_tiles % 2 != 0)) {
+    throw std::invalid_argument("Deterministic mode requires an even number of tiles!");
   }
   int x = 0;
   for (int tile_index = 0; tile_index < this->options_.number_of_tiles; tile_index++)
@@ -65,14 +69,14 @@ Finder::Finder(int number_of_threads, Bitmap *bitmap, Matcher *matcher, const Op
       }
 
       Tile* tile = new Tile(this, payload.tile_start_x, payload.tile_end_x,
-                            std::to_string(payload.tile_index), Benchmarks {0, 0});
+                            std::to_string(payload.tile_index), payload.tile_index, Benchmarks {0, 0});
       tile->initial_process(finder);
       tiles_.queue_push(tile);
     });
 
     x = tile_end_x - 1;
   }
-  this->process_tiles();
+  this->process_tiles(this->options_.deterministic);
   reports["init"] = cpu_timer.stop();
 }
 
@@ -82,7 +86,7 @@ Finder::Finder(int number_of_threads, const Options& options)
   reports["init"] = 0;
 }
 
-void Finder::process_tiles() {
+void Finder::process_tiles(bool deterministic) {
   std::vector<Tile*> arriving_tiles;
 
   while (true) {
@@ -97,7 +101,14 @@ void Finder::process_tiles() {
       arriving_tiles.begin(),
       arriving_tiles.end(),
       [&](Tile* t) {
-        return (t->start_x() == (tile->end_x() - 1)) || ((t->end_x() - 1) == tile->start_x());
+        bool is_adjacent = (t->start_x() == (tile->end_x() - 1)) ||
+                           ((t->end_x() - 1) == tile->start_x());
+        if (!is_adjacent) return false;
+        if (deterministic && !this->last_couple(tile, t)) {
+          if (tile->order() != t->order()) return false;
+          if (std::min(t->index(), tile->index()) % 2 != 0) return false;
+        }
+        return true;
       });
 
     if (it != arriving_tiles.end()) {
@@ -122,6 +133,13 @@ void Finder::process_tiles() {
       arriving_tiles.push_back(tile);
     }
   }
+}
+
+bool Finder::last_couple(const Tile* tile_a, const Tile* tile_b) const {
+  bool a_is_first = tile_a->index() < tile_b->index();
+  const Tile* first = a_is_first ? tile_a : tile_b;
+  const Tile* last  = a_is_first ? tile_b : tile_a;
+  return (first->start_x() == 0) && (last->end_x() == this->maximum_width());
 }
 
 Finder::~Finder() {

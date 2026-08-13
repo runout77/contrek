@@ -39,6 +39,7 @@ module Contrek
           x = 0
           current_versus = options[:versus]
           raise "Define versus!" if current_versus.nil?
+          raise ArgumentError, "Deterministic mode requires an even number of tiles!" if options[:deterministic] && @number_of_tiles.odd?
 
           @number_of_tiles.times do |tile_index|
             tile_end_x = (cw * (tile_index + 1)).to_i
@@ -62,7 +63,7 @@ module Contrek
                 finder: self,
                 start_x: payload[:tile_start_x],
                 end_x: payload[:tile_end_x],
-                name: payload[:tile_index].to_s
+                index: payload[:tile_index]
               )
               tile.initial_process!(finder)
               @tiles << tile
@@ -70,7 +71,7 @@ module Contrek
 
             x = tile_end_x - 1
           end
-          process_tiles!(bitmap, height: bitmap.h)
+          process_tiles!(bitmap, height: bitmap.h, deterministic: @options[:deterministic])
         end.real
       end
 
@@ -106,7 +107,12 @@ module Contrek
 
       private
 
-      def process_tiles!(bitmap, height:)
+      def last_couple?(tile_a, tile_b)
+        ordereds = [tile_a, tile_b].sort_by(&:index)
+        ordereds.first.start_x == 0 && ordereds.last.end_x == maximum_width
+      end
+
+      def process_tiles!(bitmap, height:, deterministic: false)
         arriving_tiles = []
         loop do
           tile = @tiles.pop
@@ -114,7 +120,17 @@ module Contrek
             @whole_tile = tile
             return
           end
-          if (twin_tile = arriving_tiles.find { |b| (b.start_x == (tile.end_x - 1)) || ((b.end_x - 1) == tile.start_x) })
+          twin_tile = arriving_tiles.find do |t|
+            is_adjacent = (t.start_x == (tile.end_x - 1)) || ((t.end_x - 1) == tile.start_x)
+            next false unless is_adjacent
+            if deterministic && !last_couple?(tile, t)
+              next false if tile.order != t.order
+              next false if [t.index, tile.index].min.odd?
+            end
+            true
+          end
+
+          if twin_tile
             cluster = Cluster.new(finder: self, height: height)
             if twin_tile.start_x == (tile.end_x - 1)
               cluster.add(tile)
@@ -126,13 +142,12 @@ module Contrek
             enqueue!(cluster: cluster) do |payload|
               merged_tile = payload[:cluster].merge_tiles!
               @tiles << merged_tile
-              # usefull external access to each merged_tile
-              @block&.call(merged_tile, bitmap)
+              @block&.call(merged_tile, bitmap) # usefull external access to each merged_tile
             end
             arriving_tiles.delete(twin_tile)
-            next
+          else
+            arriving_tiles << tile
           end
-          arriving_tiles << tile
         end
       end
     end

@@ -35,7 +35,7 @@ module Contrek
           finder: self,
           start_x: @current_x,
           end_x: end_x,
-          name: @tiles.size.to_s
+          index: @tiles.size
         )
         tile.assign_raw_polygons!(result[:polygons])
 

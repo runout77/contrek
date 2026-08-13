@@ -3,14 +3,16 @@
 module Contrek
   module Concurrent
     class Tile
-      attr_reader :start_x, :end_x, :benchmarks, :shapes, :name
+      attr_reader :start_x, :end_x, :benchmarks, :shapes, :name, :index, :order
       attr_accessor :prev, :next, :circular_next, :cluster
 
-      def initialize(finder:, start_x:, end_x:, name:, benchmarks: {})
+      def initialize(finder:, start_x:, end_x:, index:, name: nil, benchmarks: {}, order: 0)
         @finder = finder
         @start_x = start_x
         @end_x = end_x
-        @name = name
+        @index = index
+        @order = order
+        @name = name || index.to_s
         @prev = nil
         @next = nil
         @benchmarks = {outer: 0, inner: 0}.merge(benchmarks)
