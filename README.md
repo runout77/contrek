@@ -717,27 +717,6 @@ Instead, it repeatedly combines smaller topologically consistent pieces into a l
 This strategy makes it possible to process images whose full size would otherwise exceed the available memory.
 
 
-## Merge order
-
-The merge order is intentionally left to the thread scheduler.
-
-For three stripes, both of the following execution orders are valid:
-
-```
-(B1 + B2) + B3
-```
-
-or
-
-```
-B1 + (B2 + B3)
-```
-
-Although the intermediate merge sequence changes, the reconstructed polygons remain geometrically equivalent.
-
-The exact ordering of coordinates may differ because polygon simplification is applied after merging.
-
-
 ## Polygon reconstruction
 
 Internally, polygons crossing a stripe boundary are temporarily divided into smaller pieces.
