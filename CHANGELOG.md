@@ -149,7 +149,7 @@ All notable changes to this project will be documented in this file.
 - Fixed issue found on treemap determination.
 
 ## [1.3.9] - 2026-08-09
-- Removed the curses development dependency along with the old TerminalTracker; actually Bitmaps::Rendering.to_window renders visually better results.
+- Removed the curses development dependency along with the old TerminalTracker; actually Contrek::Bitmaps::PngBitmap.to_window renders visually better results.
 
 ## [1.4.0] - 2026-08-13
 - Added deterministic merge mode usefull when you need a byte-for-byte reproducible outputs across different runs (by default, the merge stage is non-deterministic to maximize performance and thread utilization).

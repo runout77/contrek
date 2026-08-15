@@ -1,4 +1,4 @@
-# ⚡ Contrek Performance Tuning
+# Contrek Performance Tuning
 
 This document describes optional dependencies and configuration tips to get the best performance out of Contrek on large images.
 
@@ -41,7 +41,7 @@ sudo make install
 sudo ldconfig
 ```
 
-> ⚠️ The `-DZLIB_COMPAT=ON` flag is mandatory. Without it, zlib-ng uses a different ABI and CMake's `find_package(ZLIB)` won't detect it.
+> The `-DZLIB_COMPAT=ON` flag is mandatory. Without it, zlib-ng uses a different ABI and CMake's `find_package(ZLIB)` won't detect it.
 
 **macOS:**
 ```bash
@@ -136,9 +136,45 @@ Consider this depends your system. Probably is better not to saturate all cores 
 
 ---
 
-## 4. Combining All Optimizations
+## 4. Transparent Huge Pages (THP) — Kernel Memory Allocation
 
-Install zlib-ng and tcmalloc, then configure:
+When processing high-resolution images, Contrek performs dense dynamic memory allocations. By default, Linux manages memory in standard 4 KiB pages, which creates heavy kernel overhead from frequent page faults and Translation Lookaside Buffer (TLB) misses under multithreaded loads.
+
+Enabling **Transparent Huge Pages (`always`)** forces the Linux kernel to allocate memory in **2 MiB blocks**, reducing page table lookup entries by a factor of 512 and dramatically speeding up memory access.
+
+### Temporary Activation
+
+To enable it immediately for your current Linux session:
+
+```bash
+echo always | sudo tee /sys/kernel/mm/transparent_hugepage/enabled
+```
+
+### Permanent Activation
+To ensure this setting persists across system reboots:
+
+Open /etc/default/grub in an editor:
+
+```bash
+sudo nano /etc/default/grub
+```
+Add transparent_hugepage=always to GRUB_CMDLINE_LINUX_DEFAULT:
+
+```Plaintext
+GRUB_CMDLINE_LINUX_DEFAULT="quiet splash transparent_hugepage=always"
+```
+
+Update GRUB:
+
+```bash
+sudo update-grub
+```
+
+---
+
+## 5. Combining All Optimizations
+
+Install zlib-ng and tcmalloc, enable THP, then configure:
 
 ```ruby
 # Ruby

@@ -24,10 +24,10 @@ Tile::Tile(Finder *finder, int start_x, int end_x, std::string name, int index, 
 : finder(finder),
   start_x_(start_x),
   end_x_(end_x),
-  name_(name),
   index_(index),
-  benchmarks(b),
-  order_(order) {
+  order_(order),
+  name_(name),
+  benchmarks(b) {
   this->shapes_pool = new ShapePool();
   this->shapes_pool->set_owner(this);
   this->shapes_pools.push_back(this->shapes_pool);
