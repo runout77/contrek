@@ -38,8 +38,8 @@ enum class Connectivity {
 
 
 struct Config {
-  int threads = 4;
-  int tiles = 2;
+  int threads = 0;
+  int tiles = 1;
   Versus versus = Versus::A;
   bool compress_unique = false;
   bool compress_linear = false;
