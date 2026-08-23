@@ -11,7 +11,7 @@ RSpec.describe Contrek::Cpp::CPPConcurrentFinder, type: :class do
     @ruby_bitmap_class = Contrek::Bitmaps::ChunkyBitmap
     @ruby_matcher = Contrek::Matchers::ValueNotMatcher.new(" ")
     @simple_polygon_finder = CPPPolygonFinder
-    @merger = Contrek::Cpp::CPPConcurrentHorizontalMerger
+    @horizontal_merger = Contrek::Cpp::CPPConcurrentHorizontalMerger
     @vertical_merger = Contrek::Cpp::CPPConcurrentVerticalMerger
     @svg_streaming_merger = Contrek::Cpp::CPPSvgConcurrentStreamingMerger
     @geo_json_streaming_merger = Contrek::Cpp::CPPGeoJsonConcurrentStreamingMerger

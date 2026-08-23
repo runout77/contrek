@@ -95,7 +95,8 @@ module Contrek
           width: @maximum_width,
           height: @height,
           versus: options[:versus],
-          options: options
+          options: options,
+          number_of_threads: @number_of_threads
         }
         metadata[:treemap] = @whole_tile.compute_treemap if options[:treemap]
         Contrek::Finder::Result.new(raw_polygons, metadata)

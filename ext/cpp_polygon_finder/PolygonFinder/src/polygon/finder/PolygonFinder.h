@@ -69,6 +69,7 @@ struct ProcessResult {
   int groups;
   int width, height;
   int versus;
+  int number_of_threads;
   bool has_bounds = false;
   std::map<std::string, double> benchmarks;
   std::list<Polygon> polygons;

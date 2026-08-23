@@ -166,7 +166,8 @@ Metadata includes timing information (expressed in milliseconds), the number of 
   },
   :groups=>2,
   :named_sequence=>"",
-  :treemap=>[]
+  :treemap=>[],
+  :number_of_threads=>0
 }
 ```
 
@@ -600,7 +601,8 @@ Typical information includes
   benchmarks:{...},
   groups:1,
   treemap:[],
-  options:{...}
+  options:{...},
+  number_of_threads: 4
 }
 ```
 

@@ -232,6 +232,7 @@ class To_Ruby<ProcessResult*>
     return_me[Symbol("height")] = pr->height;
     return_me[Symbol("versus")] = Symbol(pr->versus == Node::O ? "o" : "a");
     return_me[Symbol("options")] = options_to_ruby(pr->options);
+    return_me[Symbol("number_of_threads")] = pr->number_of_threads;
 
     Rice::Array out;
     for (Polygon& x : pr->polygons)

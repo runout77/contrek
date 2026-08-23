@@ -15,6 +15,7 @@ RSpec.shared_examples "multiprocessing" do
         options: {number_of_tiles: tiles, versus: :o, compress: {uniq: true}}
       ).process_info
       expect(result.metadata[:groups]).to eq 598
+      expect(result.metadata[:number_of_threads]).to eq(8)
     end
 
     it "works with 2 thread and 2 tiles" do
@@ -33,6 +34,7 @@ RSpec.shared_examples "multiprocessing" do
       result = polygonfinder.process_info
       puts result.metadata[:benchmarks].inspect
       expect(result.points).to match_expected_polygons(filename + "_o", number_of_tiles: workers)
+      expect(result.metadata[:number_of_threads]).to eq(2)
     end
 
     it "divides image into 4 tiles (2048x2048)" do

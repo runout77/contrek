@@ -83,6 +83,7 @@ RSpec.shared_examples "base" do
       ).process_info
       expect(result.metadata[:named_sequence]).to eq("ABA")
       expect(result.metadata[:groups]).to eq(1)
+      expect(result.metadata[:number_of_threads]).to eq(0)
       expect(result.points).to match_expected_json(addons: [:o])
     end
 

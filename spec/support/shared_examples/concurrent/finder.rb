@@ -43,6 +43,7 @@ RSpec.shared_examples "finder" do
       ).process_info
       expect(result.points).to eq([{outer: [{x: 7, y: 1}, {x: 7, y: 4}, {x: 2, y: 4}, {x: 2, y: 1}], inner: []}])
       expect(result.metadata[:options]).to eq(opts)
+      expect(result.metadata[:number_of_threads]).to eq(0)
 
       opts = {number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
       result = @polygon_finder_class.new(
@@ -52,6 +53,7 @@ RSpec.shared_examples "finder" do
       ).process_info
       expect(result.points).to match_expected_json(addons: [:o])
       expect(result.metadata[:options]).to eq(opts)
+      expect(result.metadata[:number_of_threads]).to eq(0)
     end
 
     it "2 workers left border" do

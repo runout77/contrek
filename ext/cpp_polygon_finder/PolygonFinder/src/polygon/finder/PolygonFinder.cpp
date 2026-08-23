@@ -110,6 +110,7 @@ ProcessResult* PolygonFinder::process_info() {
   pr->has_bounds = this->node_cluster->options->bounds;
   pr->versus = this->options.versus;
   pr->options = this->incoming_options_;
+  pr->number_of_threads = 0;
 
   if (this->node_cluster->options->named_sequences && typeid(*this->source_bitmap) == typeid(Bitmap))
   { std::string sequence;

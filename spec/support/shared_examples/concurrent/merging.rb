@@ -34,12 +34,13 @@ RSpec.shared_examples "merging" do
         nil,
         {versus: :a, bounds: true, compress: {uniq: true, linear: true}}).process_info
 
-      step_finder = @merger.new
+      step_finder = @horizontal_merger.new
       step_finder.add_tile(result_left)
       step_finder.add_tile(result_right)
       result = step_finder.process_info
       expect(result.points).to match_expected_json
       expect(result.metadata[:versus]).to eq(:a)
+      expect(result.metadata[:number_of_threads]).to eq(0)
     end
 
     it "merge mode (example 2)" do
@@ -77,11 +78,12 @@ RSpec.shared_examples "merging" do
         nil,
         {versus: :a, bounds: true, compress: {uniq: true, linear: true}}).process_info
 
-      step_finder = @merger.new
+      step_finder = @horizontal_merger.new(number_of_threads: 2)
       step_finder.add_tile(result_left)
       step_finder.add_tile(result_right)
       result = step_finder.process_info
       expect(result.points).to match_expected_json
+      expect(result.metadata[:number_of_threads]).to eq(2)
     end
 
     it "merge mode (example 3 vertical)" do
@@ -153,7 +155,7 @@ RSpec.shared_examples "merging" do
         nil,
         {versus: :a, bounds: true, compress: {uniq: true, linear: true}}).process_info
 
-      step_finder = @merger.new
+      step_finder = @horizontal_merger.new
       step_finder.add_tile(result_left)
       step_finder.add_tile(result_right)
       result = step_finder.process_info
@@ -222,7 +224,7 @@ RSpec.shared_examples "merging" do
         nil,
         {versus: :o, bounds: true, compress: {uniq: true, linear: true}}).process_info
 
-      step_finder = @vertical_merger.new
+      step_finder = @vertical_merger.new(number_of_threads: 2)
       step_finder.add_tile(result_up)
       step_finder.add_tile(result_mid)
       step_finder.add_tile(result_down)
@@ -230,6 +232,7 @@ RSpec.shared_examples "merging" do
       expect(result.metadata[:width]).to eq(12)
       expect(result.metadata[:height]).to eq(12)
       expect(result.points).to match_expected_json(addons: [:o])
+      expect(result.metadata[:number_of_threads]).to eq(2)
     end
 
     it "merge mode (example 7 vertical)" do
@@ -625,12 +628,13 @@ RSpec.shared_examples "merging" do
         {versus: :a, bounds: true, compress: {uniq: true, linear: true}})
       right = polygonfinder.process_info
 
-      step_finder = @merger.new
+      step_finder = @horizontal_merger.new(number_of_threads: 2)
       step_finder.add_tile(left)
       step_finder.add_tile(right)
       result = step_finder.process_info
       expect(result.metadata[:width]).to eq(599)
       expect(result.metadata[:height]).to eq(1024)
+      expect(result.metadata[:number_of_threads]).to eq(2)
       expect(result.points).to match_expected_polygons("graphs_599x1024", number_of_tiles: 2)
     end
 
@@ -742,6 +746,7 @@ RSpec.shared_examples "merging" do
       expect(result.metadata[:groups]).to eq(4)
       expect(result.metadata[:width]).to eq(16)
       expect(result.metadata[:height]).to eq(23)
+      expect(result.metadata[:number_of_threads]).to eq(0)
       expect(result.points).to be_empty # all polygons are on file
       shared_stream.rewind
       expect(shared_stream.read).to match_expected_stream("test_#{width}x#{height}", extension: "svg", number_of_tiles: stripes.count)
@@ -766,6 +771,7 @@ RSpec.shared_examples "merging" do
       expect(result.metadata[:groups]).to eq(4)
       expect(result.metadata[:width]).to eq(16)
       expect(result.metadata[:height]).to eq(23)
+      expect(result.metadata[:number_of_threads]).to eq(0)
       expect(result.points).to be_empty # all polygons are on file
       shared_stream.rewind
       expect(shared_stream.read).to match_expected_stream("test_#{width}x#{height}", extension: "geojson", number_of_tiles: stripes.count)
@@ -871,7 +877,7 @@ RSpec.shared_examples "merging" do
       expect(result_right.metadata[:options]).to eq(opts_o)
       expect(result_right.metadata[:versus]).to eq(:o)
 
-      step_finder = @merger.new
+      step_finder = @horizontal_merger.new
       step_finder.add_tile(result_left)
       expect {
         step_finder.add_tile(result_right)

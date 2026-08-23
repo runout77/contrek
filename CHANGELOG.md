@@ -153,3 +153,6 @@ All notable changes to this project will be documented in this file.
 
 ## [1.4.0] - 2026-08-13
 - Added deterministic merge mode usefull when you need a byte-for-byte reproducible outputs across different runs (by default, the merge stage is non-deterministic to maximize performance and thread utilization).
+
+## [1.4.1] - 2026-08-23
+- The number_of_threads effective value is now returned inside metadata output struct too.

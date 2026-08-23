@@ -166,6 +166,7 @@ ProcessResult* Finder::process_info() {
   pr->has_bounds = this->options_.bounds;
   pr->versus = this->options_.versus;
   pr->options = this->input_options;
+  pr->number_of_threads = this->number_of_threads();
   FakeCluster fake_cluster(pr->polygons, this->options_);
   cpu_timer.start();
   fake_cluster.compress_coords(pr->polygons, this->options_);

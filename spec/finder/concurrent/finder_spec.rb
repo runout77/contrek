@@ -11,7 +11,7 @@ RSpec.describe Contrek::Concurrent::Finder, type: :class do
     @png_not_matcher = Contrek::Matchers::ValueNotMatcher
     @color_class = Contrek::Bitmaps::RgbColor
     @simple_polygon_finder = Contrek::Finder::PolygonFinder
-    @merger = Contrek::Concurrent::HorizontalMerger
+    @horizontal_merger = Contrek::Concurrent::HorizontalMerger
     @vertical_merger = Contrek::Concurrent::VerticalMerger
     @svg_streaming_merger = Contrek::Concurrent::SvgStreamingMerger
     @geo_json_streaming_merger = Contrek::Concurrent::GeoJsonStreamingMerger

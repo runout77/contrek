@@ -76,6 +76,7 @@ RSpec.shared_examples "finder_img_bis" do
       ).process_info
       puts result.metadata[:benchmarks].inspect
 
+      expect(result.metadata[:groups]).to eq(258)
       expect(result.points).to match_expected_polygons(filename, number_of_tiles: workers)
     end
 

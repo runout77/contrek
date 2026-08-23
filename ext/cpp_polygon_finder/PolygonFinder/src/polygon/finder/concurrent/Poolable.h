@@ -38,6 +38,7 @@ class Poolable {
     }
   }
   void wait();
+  int number_of_threads() const { return number_of_threads_; }
 
  private:
   std::vector<std::thread> workers;

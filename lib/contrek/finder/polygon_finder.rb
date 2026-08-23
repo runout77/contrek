@@ -54,7 +54,8 @@ module Contrek
           height: @source_bitmap.h,
           treemap: (@node_cluster.treemap if @options.has_key?(:treemap)),
           options: @ori_options,
-          versus: @options[:versus]
+          versus: @options[:versus],
+          number_of_threads: 0
         }
         Result.new(@node_cluster.polygons, metadata)
       end
