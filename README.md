@@ -8,6 +8,8 @@ The engine is based on programmable pixel matchers, allowing the caller to decid
 
 Although the tracing engine is written in C++, Contrek is also distributed as a Ruby gem exposing almost the complete native API through an idiomatic Ruby interface.
 
+A **Python** binding is available 👉 **[here](https://github.com/runout77/contrek-python)**
+
 ## About Contrek
 
 **Contrek** (**CON**tour **TREK**king) at its simplest, the library scans a bitmap and returns the contours of all regions matching a user-defined criterion. Each region is represented by one outer polygon and, when necessary, one or more inner polygons describing holes.
