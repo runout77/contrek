@@ -27,58 +27,202 @@ The image below shows a simple example. Every non-white pixel is considered part
 
 Most contour tracing libraries process an image sequentially. That approach is perfectly adequate for many workloads, but it becomes less practical once images become very large or when memory usage starts to matter.
 
-Contrek follows a different strategy.
+Contrek supports monothread extraction but also different strategies.
 
-Instead of processing the whole image at once, it can split it into independent vertical stripes. Each stripe is traced separately and the resulting polygons are merged afterwards. Most of the implementation complexity lies in this merge phase, whose purpose is to reconstruct polygons crossing stripe boundaries without breaking their topology.
-
-The same design makes it possible to use the library in two different ways:
-
-- **Parallel processing**, where several stripes are traced simultaneously on different CPU cores.
-- **Streaming processing**, where only a small portion of the image is kept in memory at any given time.
-
-The tracing algorithm itself is identical in both cases; only the execution strategy changes.
-
-## Parallel execution
-
-When multiple CPU cores are available, independent stripes can be processed concurrently. The actual speedup depends on the image content and on how much work is required during the merge stage, but large datasets generally benefit from additional cores.
-
-This approach allows Contrek to make effective use of modern multicore processors without changing the resulting geometry.
-
-## Streaming large datasets
-
-Loading an entire gigapixel image into memory is often unnecessary.
-
-Contrek can instead process the image incrementally by reading one stripe at a time. Only the current working buffer needs to be allocated, making memory consumption predictable regardless of the final image height.
-
-This execution mode is particularly useful when processing images that are too large to fit comfortably into RAM.
-
-## Merging polygons
-
-Whenever a polygon crosses the boundary between two adjacent stripes, the library reconstructs it during the merge phase.
-
-This reconstruction preserves polygon connectivity across stripe boundaries, so the final output is equivalent to tracing the entire image in a single pass.
+### Mode 1: Single-threaded processing
 
 <table>
-  <tr>
-    <td width="50%" style="padding: 0; background-color: white;">
-      <img src="docs/images/stripes/whole_0.png" width="100%"><br>
-      <img src="docs/images/stripes/whole_256.png" width="100%"><br>
-      <img src="docs/images/stripes/whole_512.png" width="100%"><br>
-      <img src="docs/images/stripes/whole_768.png" width="100%">
-    </td>
-    <td width="50%" align="center" style="vertical-align: middle; background-color: white;">
-      <strong>Full Topological Reconstruction</strong><br><br>
-      <img src="docs/images/stripes/whole.png" width="90%">
-    </td>
-  </tr>
-  <tr>
-    <td colspan="2" align="center" style="background-color: white;">
-      <em><b>Left:</b> Image split into 4 independent memory buffers (stripes).</em><br>
-      <em><b>Right:</b> Contrek ensures <b>perfect topological continuity</b> during merging.</em><br>
-      🔴 <b>Red:</b> Outer contours &nbsp;&nbsp; | &nbsp;&nbsp; 🟢 <b>Green:</b> Inner zones
-    </td>
-  </tr>
-</table>
+<tr>
+<td width="40%" valign="top">
+<img src="docs/images/modes/mode1.jpg" width="100%" alt="Mode 1">
+</td>
+<td width="60%" valign="top">
+The entire image is processed using a single core.
+
+**Profile:** low speed; low memory efficiency.
+<br><br>
+<center><img src="docs/images/modes/mode1_panel.jpg" width="80%" alt="Mode 1"></center>
+</td></tr></table>
+
+Trace polygons from a PNG file (`CPPPngBitMap`).
+
+```ruby
+  png_bitmap = CPPPngBitMap.new("spec/files/images/labyrinth3.png")
+  color = Contrek::Bitmaps::RgbCppColor.new(r: 255, g: 255, b: 255, a: 255)
+  rgb_matcher = CPPRGBNotMatcher.new(color.raw)
+  polygonfinder = CPPPolygonFinder.new(
+    png_bitmap,
+    rgb_matcher,
+    nil,
+    { versus: :a,
+      compress: {
+        visvalingam: true,
+        visvalingam_tolerance: 1.5
+      }
+    }
+  )
+  result = polygonfinder.process_info
+  puts result.metadata[:number_of_threads] # => 0
+```
+
+`versus` accepts `:a`,`:o` for "anticlockwise"/"clockwise".
+
+
+### Mode 2: Parallel processing
+
+<table>
+<tr>
+<td width="40%" valign="top">
+<img src="docs/images/modes/mode2.jpg" width="100%" alt="Mode 1">
+</td>
+<td width="60%" valign="top">
+The entire image is loaded first, then split into tiles and processed across multiple CPU cores. Partial results are progressively and dynamically merged: there is no predefined merge order, and adjacent pairs are processed as soon as they become available.
+This mode prioritizes performance, using parallelism both for tile processing and for merging partial results.
+
+**Profile:** maximum speed, with processing time decreasing as more cores become available; low memory efficiency.
+<br><br>
+<center><img src="docs/images/modes/mode2_panel.jpg" width="80%" alt="Mode 1"></center>
+</td></tr></table>
+
+Use 8 threads and 8 tiles
+
+```ruby
+  png_bitmap = CPPPngBitMap.new("spec/files/images/sample_10240x10240.png")
+  color = Contrek::Bitmaps::RgbCppColor.new(r: 255, g: 255, b: 255, a: 255)
+  rgb_matcher = CPPRGBNotMatcher.new(color.raw)
+  polygonfinder = Contrek::Cpp::CPPConcurrentFinder.new(
+    number_of_threads: 8,
+    bitmap: png_bitmap,
+    matcher: rgb_matcher,
+    options: {number_of_tiles: 8, versus: :o, compress: {uniq: true}}
+  )
+  result = polygonfinder.process_info
+  puts result.metadata[:benchmarks].inspect
+  # => {"compress"=>5.08, "init"=>230.79, "inner"=>6.54, "outer"=>84.11, "total"=>235.87}
+  puts result.metadata[:number_of_threads] # => 8
+```
+
+### Mode 3: Input streaming
+
+<table>
+<tr>
+<td width="40%" valign="top">
+<img src="docs/images/modes/mode3.jpg" width="100%" alt="Mode 1">
+</td>
+<td width="60%" valign="top">
+The image does not need to be loaded entirely into memory. Instead, it can be read progressively using a fixed-size buffer. For example, with a PNG source, this can be done using libspng's progressive decoding.
+Adjacent tiles share an overlapping scanline to preserve geometry continuity across tile boundaries. Once all tiles have been added, the merge is performed (optionally using multiple threads) to reconstruct the complete geometry.
+This mode provides a trade-off between performance and memory usage: the entire raster does not need to be kept in RAM, while the vector state required to build the final result is retained.
+
+**Profile:** medium speed; medium-high memory efficiency.
+<br><br>
+<center><img src="docs/images/modes/mode3_panel.jpg" width="80%" alt="Mode 1"></center>
+</td></tr></table>
+
+Trace polygons from two in-memory pattern strings (`CPPBitMap`, useful for synthetic tiles or tests).
+Up is 6 rows height, down is 5 rows. Total after merging: 10 rows, because one row is the shared scanline
+
+```ruby
+  up =    " 00000000000000               " \
+          " 00000000000000               " \
+          " 00          00               " \
+          " 00          00               " \
+          " 00          00               " \
+          " 00          00               "
+
+  down =  " 00          00               " \
+          " 00          00               " \
+          " 00          00               " \
+          " 00000000000000               " \
+          " 00000000000000               "
+  matcher = CPPValueNotMatcher.new(" ")
+  result_up = CPPPolygonFinder.new(CPPBitMap.new(up, 30),
+    matcher,
+    nil,
+    {versus: :a, bounds: true}).process_info
+  result_down = CPPPolygonFinder.new(CPPBitMap.new(down, 30),
+    matcher,
+    nil,
+    {versus: :a, bounds: true}).process_info
+
+  step_finder = Contrek::Cpp::CPPConcurrentVerticalMerger.new(options: {compress: {linear: true}})
+  step_finder.add_tile(result_up)
+  step_finder.add_tile(result_down)
+  result = step_finder.process_info
+
+  expect(result.metadata[:groups]).to eq(1)
+  expect(result.metadata[:width]).to eq(30)
+  expect(result.metadata[:height]).to eq(10)
+```
+See an other example of **[input streaming graphical result](docs/images/stripes/merging_polygons.md)**.
+
+### Mode 4: End-to-end streaming
+
+<table>
+<tr>
+<td width="40%" valign="top">
+<img src="docs/images/modes/mode4.jpg" width="100%" alt="Mode 1">
+</td>
+<td width="60%" valign="top">
+This mode extends the incremental processing used in Mode 3 by streaming the output as well.
+The image is read and processed one tile at a time. Each new tile is immediately merged with the current state. As processing moves forward, whenever a geometry is complete and can no longer be affected by subsequent tiles, it is finalized and written directly to the SVG file.
+This limits both the amount of raster data kept in memory and the accumulation of generated vector geometries. It is particularly well suited to very large datasets or cases where the vector output itself can become significant in size.
+
+**Profile:** low speed; maximum memory efficiency.
+<br><br>
+<center><img src="docs/images/modes/mode4_panel.jpg" width="80%" alt="Mode 1"></center>
+</td></tr></table>
+
+Trace polygons from 2 in-memory pattern strings.
+
+```ruby
+  stripe1 = "     000       000" \
+            "    00 00     00 0" \
+            "   00   00   00  0" \
+            "    00 00   00   0" \
+            "     000   00    0" \
+            "          00     0"
+
+  stripe2 = "          00     0" \
+            " 000     00      0" \
+            "00 00   00       0" \
+            " 000   00        0" \
+            "      00         0" \
+            "     0000000000000"
+  # streaming to svg file pattern
+  stripes = [stripe1, stripe2]
+  shared_stream = Contrek::Cpp::CPPTempfile.new("output.svg")
+  step_finder = Contrek::Cpp::CPPSvgConcurrentStreamingMerger.new(
+    options:  {bounds: true, compress: {uniq: true, linear: true, douglas_peucker: true}},
+    stream_to: shared_stream,
+    total_width: 18,
+    total_height: 11
+  )
+  matcher = CPPValueNotMatcher.new(" ")
+  stripes.each do |stripe|
+    stripe_result = CPPPolygonFinder.new(CPPBitMap.new(stripe, 18),
+      matcher,
+      nil,
+      {versus: :a, bounds: true}).process_info
+    last = stripes.last == stripe
+    step_finder.add_tile(stripe_result, last)
+  end
+  result = step_finder.process_info
+  expect(result.metadata[:groups]).to eq(3)
+  expect(result.metadata[:width]).to eq(18)
+  expect(result.metadata[:height]).to eq(11)
+  shared_stream.rewind
+  puts shared_stream.read.inspect
+  # => "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"18\" height=\"11\">
+  #     <polygon points=\"3,3 5,5 8,5 10,3 8,0 5,0\" class=\"out\"/>
+  #     <polygon points=\"7,1 8,3 6,4 5,2\" class=\"in\"/>
+  #     <polygon points=\"5,11 18,11 18,0 15,0\" class=\"out\"/> ...
+```
+
+
+
+
+
 
 ## Benchmarking
 
