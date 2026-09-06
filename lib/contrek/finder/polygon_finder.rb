@@ -10,10 +10,13 @@ module Contrek
         @options = {versus: :a}.merge(options)
         sanitize_options
         @source_bitmap = bitmap
+        @processing_height = (options[:processing_height] || bitmap.h).abs
+        raise ArgumentError, "Option processing_height must be less or equal than image height!" if @processing_height > bitmap.h
+
         @matcher = matcher
 
         @test_bitmap = test_bitmap
-        @node_cluster = NodeCluster.new(@source_bitmap.h, @options)
+        @node_cluster = NodeCluster.new(@processing_height, @options)
         @reports = {}
 
         # 1 finds matching blocks
@@ -51,7 +54,7 @@ module Contrek
           groups_names: @node_cluster.root_nodes.map(&:name).join,
           benchmarks: format_benchmarks,
           width: @source_bitmap.w,
-          height: @source_bitmap.h,
+          height: @processing_height,
           treemap: (@node_cluster.treemap if @options.has_key?(:treemap)),
           options: @ori_options,
           versus: @options[:versus],
@@ -103,7 +106,7 @@ module Contrek
         matching = false
         min_x = start_x
         max_x = start_x
-        @source_bitmap.scan(start_x: start_x, end_x: end_x) do |x, y, color|
+        @source_bitmap.scan(start_x: start_x, end_x: end_x, end_y: @processing_height) do |x, y, color|
           # puts "#{x} #{y}"
           if @matcher.match?(color) && matching == false
             min_x = x

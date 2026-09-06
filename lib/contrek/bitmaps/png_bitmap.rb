@@ -20,6 +20,10 @@ module Contrek
         @image.dimension.height
       end
 
+      def get_bytes_per_pixel
+        4
+      end
+
       def draw_line(start_x, start_y, end_x, end_y, value)
         @image.line_xiaolin_wu(start_x, start_y, end_x, end_y, value)
       end

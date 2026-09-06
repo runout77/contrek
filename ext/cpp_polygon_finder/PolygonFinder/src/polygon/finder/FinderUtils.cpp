@@ -17,18 +17,17 @@ void FinderUtils::sanitize_options(pf_Options& options, const Options& incoming_
   const Identifier versus = incoming_options.get<Identifier>("versus", options.versus == Node::A ? "a" : "o");
   options.versus = versus == "a" ? Node::A : Node::O;
   options.number_of_tiles = std::max(1, static_cast<int>(incoming_options.get<std::int64_t>(
-    "number_of_tiles",
-    options.number_of_tiles)));
+    "number_of_tiles", options.number_of_tiles)));
   options.connectivity_offset = incoming_options.get<std::int64_t>(
-    "connectivity",
-    options.connectivity_offset == 1 ? 8 : 4) == 8;
+    "connectivity", options.connectivity_offset == 1 ? 8 : 4) == 8;
   options.treemap = incoming_options.get<bool>("treemap", options.treemap);
   options.named_sequences = incoming_options.get<bool>(
-    "named_sequences",
-    options.named_sequences);
+    "named_sequences", options.named_sequences);
   options.bounds = incoming_options.get<bool>("bounds", options.bounds);
   options.unsafe_mode = incoming_options.get<bool>("unsafe_mode", options.unsafe_mode);
   options.deterministic = incoming_options.get<bool>("deterministic", options.deterministic);
+  options.processing_height = static_cast<int>(incoming_options.get<std::int64_t>(
+    "processing_height", options.processing_height));
 
   if (const Options* compress = incoming_options.get_options("compress")) {
     options.compress_uniq = compress->get<bool>("uniq", options.compress_uniq);
@@ -39,8 +38,7 @@ void FinderUtils::sanitize_options(pf_Options& options, const Options& incoming_
     if (compress->contains("visvalingam_tolerance")) {
       options.compress_visvalingam = true;
       options.compress_visvalingam_tolerance = static_cast<float>(compress->get<double>(
-        "visvalingam_tolerance",
-        options.compress_visvalingam_tolerance));
+        "visvalingam_tolerance", options.compress_visvalingam_tolerance));
     }
   }
 

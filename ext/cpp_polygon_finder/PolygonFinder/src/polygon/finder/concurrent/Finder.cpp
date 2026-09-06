@@ -32,6 +32,9 @@ Finder::Finder(int number_of_threads, Bitmap *bitmap, Matcher *matcher, const Op
 { cpu_timer.start();
   FinderUtils::sanitize_options(this->options_, options);
 
+  if (this->options_.processing_height != 0) {
+    this->height = std::abs(this->options_.processing_height);
+  }
   double cw = static_cast<double>(this->maximum_width_) / this->options_.number_of_tiles;
   if (cw < 1.0) {
     throw std::runtime_error("One pixel tile width minimum!");
@@ -53,6 +56,9 @@ Finder::Finder(int number_of_threads, Bitmap *bitmap, Matcher *matcher, const Op
       }
       if (this->options_.treemap) {
         base_arguments["treemap"] = true;
+      }
+      if (this->options_.processing_height != 0) {
+        base_arguments["processing_height"] = this->options_.processing_height;
       }
 
       CpuTimer t;

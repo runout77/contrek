@@ -5,7 +5,7 @@ module Contrek
     class Bitmap
       include Painting
 
-      def scan(start_x: 0, end_x: w)
+      def scan(start_x: 0, end_x: w, end_y: h)
         x = start_x
         y = 0
         loop do
@@ -14,7 +14,7 @@ module Contrek
           if x == end_x
             x = start_x
             y += 1
-            break if y == h
+            break if y == end_y
           end
         end
       end

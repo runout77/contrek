@@ -18,7 +18,15 @@
 
 RawBitmap::RawBitmap() : Bitmap("", 0),
   width(0),
-  height(0) {
+  height(0),
+  bpp(0) {
+}
+
+RawBitmap::RawBitmap(uint width, uint height) : Bitmap("", 0),
+  width(0),
+  height(0),
+  bpp(0) {
+  define(width, height, 4, false);
 }
 
 int RawBitmap::w() {
@@ -34,7 +42,11 @@ char RawBitmap::value_at(int, int) {
 }
 
 const unsigned char* RawBitmap::get_row_ptr(int y) const {
-  return image.get() + (static_cast<size_t>(y) * static_cast<size_t>(width) * 4);
+  return image.get() + ( 
+    static_cast<std::size_t>(y) * 
+    static_cast<std::size_t>(width) *
+    static_cast<std::size_t>(bpp)
+  );
 }
 
 int RawBitmap::get_bytes_per_pixel() const {

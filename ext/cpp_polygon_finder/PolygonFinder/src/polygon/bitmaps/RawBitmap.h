@@ -19,6 +19,7 @@ class RGBMatcher;
 class RawBitmap : public Bitmap {
  public:
   explicit RawBitmap();
+  RawBitmap(uint width, uint height);
   int h();
   int w();
   char value_at(int x, int y);

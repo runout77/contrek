@@ -156,3 +156,6 @@ All notable changes to this project will be documented in this file.
 
 ## [1.4.1] - 2026-08-23
 - The number_of_threads effective value is now returned inside metadata output struct too.
+
+## [1.4.2] - 2026-09-06
+- Contrek takes care of the streaming process, providing an API that greatly simplifies the implementation of streaming raster processing.

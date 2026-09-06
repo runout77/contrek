@@ -54,6 +54,7 @@ struct pf_Options {
   bool unsafe_mode = false;
   bool bounds = false;
   bool deterministic = false;
+  int processing_height = 0;
   int connectivity_offset = 0;
   float compress_visvalingam_tolerance = 10.0;
   int number_of_tiles = 1;
@@ -159,6 +160,7 @@ class PolygonFinder {
  protected:
   int start_x;
   int end_x;
+  int processing_height;
   Options incoming_options_;
 
  private:
@@ -173,7 +175,7 @@ class PolygonFinder {
 
   template <typename M, typename F>
   void run_loop(M* specific_matcher, F&& fetch_color, int offset) {
-    int img_h = this->source_bitmap->h();
+    int img_h = this->processing_height;
     int bpp = this->source_bitmap->get_bytes_per_pixel();
 
     for (int y = 0; y < img_h; y++) {

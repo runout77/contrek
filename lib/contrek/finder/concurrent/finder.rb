@@ -30,7 +30,7 @@ module Contrek
           @options = options
           @clusters = []
           @maximum_width = bitmap.w
-          @height = bitmap.h
+          @height = options[:processing_height] || bitmap.h
           @number_of_tiles = options[:number_of_tiles] || (raise "number_of_tiles params is needed!")
           @number_of_tiles = 1 if @number_of_tiles <= 0
 
@@ -51,6 +51,7 @@ module Contrek
                 bitmap: bitmap,
                 matcher: matcher,
                 options: {
+                  processing_height: @options[:processing_height],
                   versus: current_versus,
                   bounds: true,
                   treemap: @options[:treemap],
@@ -71,7 +72,7 @@ module Contrek
 
             x = tile_end_x - 1
           end
-          process_tiles!(bitmap, height: bitmap.h, deterministic: @options[:deterministic])
+          process_tiles!(bitmap, height: @height, deterministic: @options[:deterministic])
         end.real
       end
 

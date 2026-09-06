@@ -1,15 +1,19 @@
 # frozen_string_literal: true
 
+require "ffi"
+
 module Contrek
   module Bitmaps
     class ChunkyBitmap < Bitmap
       def initialize(data, mod)
-        @raw = data.dup
         @module = mod
+        @height = data.bytesize / @module
+        @raw = FFI::MemoryPointer.new(:uint8, data.bytesize)
+        @raw.put_bytes(0, data)
       end
 
       def clear(val = "0")
-        @raw = val * @module * h
+        @raw.put_bytes(0, val * @module * h)
       end
 
       def w
@@ -17,22 +21,30 @@ module Contrek
       end
 
       def h
-        @raw.size / @module
+        @height
+      end
+
+      def get_bytes_per_pixel
+        1
+      end
+
+      def get_row_ptr(y)
+        @raw + (@module * y)
       end
 
       def value_at(x, y)
-        @raw[y * @module + x]
+        @raw.get_uint8(y * @module + x).chr
       end
 
       def value_set(x, y, value)
         return if y >= h
         return if x >= w
 
-        @raw[y * @module + x] = value
+        @raw.put_uint8(y * @module + x, value.ord)
       end
 
       def dup!
-        ChunkyBitmap.new(@raw, @module)
+        ChunkyBitmap.new(@raw.read_bytes(@module * h), @module)
       end
 
       def draw_rect(x:, y:, width:, height:, color: "o", filled: true)
@@ -80,7 +92,7 @@ module Contrek
         puts label if label
         puts "  " + (0...@module).map { |i| (i % 10).to_s }.join
         n = 0
-        @raw.scan(/.{1,#{@module}}/).each do |line|
+        @raw.read_bytes(@module * h).scan(/.{1,#{@module}}/).each do |line|
           colored_line = line.chars.map { |c| colorize_char(c) }.join
           puts "#{n} #{colored_line}"
           n += 1
@@ -96,8 +108,11 @@ module Contrek
             transposed += value_at(x, y)
           end
         end
-        @raw = transposed
+        old_width = w
         @module = h
+        @height = old_width
+        @raw = FFI::MemoryPointer.new(:uint8, transposed.bytesize)
+        @raw.put_bytes(0, transposed)
       end
 
       private

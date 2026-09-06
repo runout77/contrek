@@ -37,6 +37,12 @@
 #include "PolygonFinder/src/polygon/bitmaps/FastPngBitmap.cpp"
 #include "PolygonFinder/src/polygon/bitmaps/RemoteFastPngBitmap.h"
 #include "PolygonFinder/src/polygon/bitmaps/RemoteFastPngBitmap.cpp"
+#include "PolygonFinder/src/polygon/bitmaps/streaming/RasterSource.h"
+#include "PolygonFinder/src/polygon/bitmaps/streaming/AsciiSource.h"
+#include "PolygonFinder/src/polygon/bitmaps/streaming/AsciiSource.cpp"
+#include "PolygonFinder/src/polygon/bitmaps/streaming/PngSource.h"
+#include "PolygonFinder/src/polygon/bitmaps/streaming/PngSource.cpp"
+#include "PolygonFinder/src/polygon/bitmaps/streaming/RasterStreamer.h"
 #include "PolygonFinder/src/polygon/matchers/Matcher.h"
 #include "PolygonFinder/src/polygon/matchers/Matcher.cpp"
 #include "PolygonFinder/src/polygon/matchers/ValueNotMatcher.h"
@@ -395,6 +401,7 @@ void Init_cpp_polygon_finder() {
     .define_method("value_at", &Bitmap::value_at)
     .define_method("w", &Bitmap::w)
     .define_method("h", &Bitmap::h)
+    .define_method("get_bytes_per_pixel", &Bitmap::get_bytes_per_pixel)
     .define_method("error", &Bitmap::error)
     .define_method("clear", &Bitmap::clear)
     .define_method("print", &Bitmap::print);
@@ -402,6 +409,7 @@ void Init_cpp_polygon_finder() {
   Data_Type<RawBitmap> rb_cRawBitmap =
     define_class<RawBitmap, Bitmap>("CPPRawBitMap")
     .define_constructor(Constructor<RawBitmap>())
+    .define_constructor(Constructor<RawBitmap, uint, uint>())
     .define_method("rgb_value_at", &RawBitmap::rgb_value_at)
     .define_method("w", &RawBitmap::w)
     .define_method("h", &RawBitmap::h)
@@ -429,6 +437,44 @@ void Init_cpp_polygon_finder() {
     .define_method("h", &FastPngBitmap::h)
     .define_method("error", &FastPngBitmap::error)
     .define_method("print", &FastPngBitmap::print);
+
+  Data_Type<RasterSource> rb_cRasterSource =
+    define_class<RasterSource>("CPPRasterSource");
+
+  Data_Type<AsciiSource> rb_cAsciiSource =
+    define_class<AsciiSource, RasterSource>("CPPAsciiSource")
+    .define_constructor(Constructor<AsciiSource, Bitmap&>(),Arg("bitmap"))
+    .define_method("width",&AsciiSource::width)
+    .define_method("height",&AsciiSource::height)
+    .define_method("get_bytes_per_pixel",&AsciiSource::get_bytes_per_pixel);
+
+  Data_Type<PngSource> rb_cPngSource =
+    define_class<PngSource, RasterSource>("CPPPngSource")
+    .define_constructor(Constructor<PngSource, std::string>(),Arg("filepath"))
+    .define_method("width",&PngSource::width)
+    .define_method("height",&PngSource::height)
+    .define_method("get_bytes_per_pixel",&PngSource::get_bytes_per_pixel);
+
+  Data_Type<RasterStreamer> rb_cRasterStreamer =
+    define_class<RasterStreamer>("CPPRasterStreamer")
+    .define_constructor(Constructor<RasterStreamer, RasterSource&, uint32_t>(),Arg("source"),Arg("stripe_height"))
+    .define_method("stripe_height",&RasterStreamer::stripe_height)
+    .define_method("each",[](RasterStreamer& self, Bitmap& buffer) {
+        VALUE block = rb_block_proc();
+        self.each(
+          buffer,
+          [block](Bitmap& bitmap,uint32_t buffer_rows,std::size_t buffer_size) {
+            Rice::Data_Object<Bitmap> rb_bitmap(&bitmap);
+            Rice::Object(block).call(
+              "call",
+              rb_bitmap,
+              buffer_rows,
+              buffer_size
+            );
+          }
+        );
+      }
+    );
 
   Data_Type<Matcher> rb_cMatcher =
     define_class<Matcher>("CPPMatcher")

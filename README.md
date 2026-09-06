@@ -156,6 +156,36 @@ Up is 6 rows height, down is 5 rows. Total after merging: 10 rows, because one r
 ```
 See an other example of **[input streaming graphical result](docs/images/stripes/merging_polygons.md)**.
 
+The same operation using Contrek's built-in streaming API and progressive PNG decoding via libspng:
+
+```ruby
+  # PNG image to stream from
+  source = CPPPngSource.new("./spec/files/images/labyrinth2.png")
+  # streamer with a 20-row window
+  streamer = CPPRasterStreamer.new(source, stripe_height: 20)
+  white = Contrek::Bitmaps::RgbCppColor.new(r: 255, g: 255, b: 255, a: 255)
+  matcher = CPPRGBNotMatcher.new(white.raw)
+  # reusable bitmap where libspng decodes rows directly
+  buffer_bitmap = CPPRawBitMap.new(source.width, streamer.stripe_height)
+  finder = Contrek::Cpp::CPPConcurrentVerticalMerger.new(options: {compress: {uniq: true, linear: true}})
+  
+  # streaming loop, 20 rows each
+  streamer.each(buffer_bitmap) do |bitmap, buffer_rows, buffer_size|
+    tile = CPPPolygonFinder.new(
+      bitmap,
+      matcher,
+      nil,
+      {processing_height: buffer_rows, versus: :o, bounds: true}
+    ).process_info
+    finder.add_tile(tile)
+  end
+  result = finder.process_info
+  puts result.metadata[:width] # => 130
+  puts result.metadata[:height] # => 130
+  puts result.points[0][:outer].first.inspect # => {:x=>10, :y=>4} # first point
+  puts result.points[0][:outer].size # => 1171 points
+```
+
 ### Mode 4: End-to-end streaming
 
 <table>
@@ -218,11 +248,6 @@ Trace polygons from 2 in-memory pattern strings.
   #     <polygon points=\"7,1 8,3 6,4 5,2\" class=\"in\"/>
   #     <polygon points=\"5,11 18,11 18,0 15,0\" class=\"out\"/> ...
 ```
-
-
-
-
-
 
 ## Benchmarking
 

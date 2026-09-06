@@ -266,5 +266,32 @@ RSpec.shared_examples "simples" do
       expect(result.metadata[:groups]).to eq(2)
       expect(result.points).to match_expected_json
     end
+
+    it "processing_height option" do
+      chunk = " 000000 " \
+              " 000000 " \
+              " 00  00 " \
+              " 000000 " \
+              " 000000 "
+      result = @polygon_finder_class.new(
+        @bitmap_class.new(chunk, 8),
+        @matcher,
+        nil,
+        {processing_height: 3, bounds: true, compress: {uniq: true, linear: true}}
+      ).process_info
+      expect(result.metadata[:height]).to eq(3)
+      expect(result.metadata[:groups]).to eq(1)
+      expect(result.points[0][:inner]).to be_empty
+      expect(result.points[0][:bounds][:max_y]).to eq(3)
+
+      expect {
+        @polygon_finder_class.new(
+          @bitmap_class.new(chunk, 8),
+          @matcher,
+          nil,
+          {processing_height: -6}
+        ).process_info
+      }.to raise_error(ArgumentError, "Option processing_height must be less or equal than image height!")
+    end
   end
 end

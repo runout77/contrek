@@ -11,6 +11,7 @@
 #include <list>
 #include <map>
 #include <ctime>
+#include <cmath>
 #include <typeinfo>
 #include <string>
 #include <vector>
@@ -40,7 +41,11 @@ PolygonFinder::PolygonFinder(Bitmap *bitmap,
 { this->rgb_matcher = dynamic_cast<RGBMatcher*>(matcher);
   FinderUtils::sanitize_options(this->options, options);
 
-  this->node_cluster = new NodeCluster(source_bitmap->h(), source_bitmap->w(), &this->options);
+  this->processing_height = std::abs(this->options.processing_height == 0 ? source_bitmap->h() : this->options.processing_height);
+  if (this->processing_height > source_bitmap->h()) {
+    throw std::invalid_argument("Option processing_height must be less or equal than image height!");
+  }
+  this->node_cluster = new NodeCluster(this->processing_height, source_bitmap->w(), &this->options);
 
   //= SCAN ==============//
   cpu_timer.start();
@@ -106,7 +111,7 @@ ProcessResult* PolygonFinder::process_info() {
   pr->benchmarks = std::move(this->reports);
   pr->treemap = this->node_cluster->treemap;
   pr->width = this->source_bitmap->w();
-  pr->height = this->source_bitmap->h();
+  pr->height = this->processing_height;
   pr->has_bounds = this->node_cluster->options->bounds;
   pr->versus = this->options.versus;
   pr->options = this->incoming_options_;

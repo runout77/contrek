@@ -48,5 +48,30 @@ RSpec.shared_examples "generic" do
         )
       }.to raise_error(ArgumentError, "Deterministic mode requires an even number of tiles!")
     end
+
+    it "processing_height option" do
+      chunk = " 0000000000 " \
+              " 0000000000 " \
+              " 000    000 " \
+              " 0000000000 " \
+              " 0000000000 "
+      result = @polygon_finder_class.new(
+        bitmap: @bitmap_class.new(chunk, 12),
+        matcher: @matcher,
+        options: {processing_height: 3, number_of_tiles: 2, bounds: true, versus: :a, compress: {uniq: true, linear: true}}
+      ).process_info
+      expect(result.metadata[:height]).to eq(3)
+      expect(result.metadata[:groups]).to eq(1)
+      expect(result.points[0][:inner]).to be_empty
+      expect(result.points[0][:bounds][:max_y]).to eq(3)
+
+      expect {
+        @polygon_finder_class.new(
+          bitmap: @bitmap_class.new(chunk, 12),
+          matcher: @matcher,
+          options: {processing_height: -6, number_of_tiles: 2, versus: :a, compress: {uniq: true, linear: true}}
+        ).process_info
+      }.to raise_error(ArgumentError, "Option processing_height must be less or equal than image height!")
+    end
   end
 end
