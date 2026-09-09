@@ -7,14 +7,14 @@
  * See the LICENSE file in this directory for the full license text.
  */
 
+#include "RawBitmap.h"
+#include "spng.h"
 #include <memory>
 #include <cstdio>
 #include <iostream>
 #include <cstring>
 #include <cerrno>
 #include <string>
-#include "spng.h"
-#include "RawBitmap.h"
 
 RawBitmap::RawBitmap() : Bitmap("", 0),
   width(0),
@@ -42,11 +42,7 @@ char RawBitmap::value_at(int, int) {
 }
 
 const unsigned char* RawBitmap::get_row_ptr(int y) const {
-  return image.get() + ( 
-    static_cast<std::size_t>(y) * 
-    static_cast<std::size_t>(width) *
-    static_cast<std::size_t>(bpp)
-  );
+  return image.get() + (static_cast<std::size_t>(y) * static_cast<std::size_t>(width) * static_cast<std::size_t>(bpp));
 }
 
 int RawBitmap::get_bytes_per_pixel() const {

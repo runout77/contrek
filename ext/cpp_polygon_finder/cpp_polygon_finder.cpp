@@ -40,6 +40,10 @@
 #include "PolygonFinder/src/polygon/bitmaps/streaming/RasterSource.h"
 #include "PolygonFinder/src/polygon/bitmaps/streaming/AsciiSource.h"
 #include "PolygonFinder/src/polygon/bitmaps/streaming/AsciiSource.cpp"
+#ifdef CONTREK_HAS_TIFF
+#include "PolygonFinder/src/polygon/bitmaps/streaming/TiffSource.h"
+#include "PolygonFinder/src/polygon/bitmaps/streaming/TiffSource.cpp"
+#endif
 #include "PolygonFinder/src/polygon/bitmaps/streaming/PngSource.h"
 #include "PolygonFinder/src/polygon/bitmaps/streaming/PngSource.cpp"
 #include "PolygonFinder/src/polygon/bitmaps/streaming/RasterStreamer.h"
@@ -455,6 +459,38 @@ void Init_cpp_polygon_finder() {
     .define_method("height",&PngSource::height)
     .define_method("get_bytes_per_pixel",&PngSource::get_bytes_per_pixel);
 
+#ifdef CONTREK_HAS_TIFF
+  Data_Type<TiffSource> rb_cTiffSource =
+    define_class<TiffSource, RasterSource>("CPPTiffSource")
+    .define_constructor(Constructor<TiffSource, std::string, bool>(),Arg("filepath"),Arg("suppress_warnings") = false)
+    .define_method("width",&TiffSource::width)
+    .define_method("height",&TiffSource::height)
+    .define_method("get_bytes_per_pixel",&TiffSource::get_bytes_per_pixel)
+    .define_method("geo_localization",[](TiffSource& self) {
+      const GeoLocalization& geo = self.geo_localization();
+
+      if (!geo.valid) return Object(Qnil);
+
+      Hash transform;
+      transform[Symbol("x_origin")] = geo.transform.x_origin;
+      transform[Symbol("y_origin")] = geo.transform.y_origin;
+      transform[Symbol("x_pixel_size")] = geo.transform.x_pixel_size;
+      transform[Symbol("y_pixel_size")] = geo.transform.y_pixel_size;
+      transform[Symbol("x_row_offset")] = geo.transform.x_row_offset;
+      transform[Symbol("y_column_offset")] = geo.transform.y_column_offset;
+
+      Hash crs;
+      crs[Symbol("authority")] = geo.crs.authority;
+      crs[Symbol("code")] = geo.crs.code;
+
+      Hash result;
+      result[Symbol("transform")] = transform;
+      result[Symbol("crs")] = crs;
+
+      return Object(result);
+    });
+#endif
+
   Data_Type<RasterStreamer> rb_cRasterStreamer =
     define_class<RasterStreamer>("CPPRasterStreamer")
     .define_constructor(Constructor<RasterStreamer, RasterSource&, uint32_t>(),Arg("source"),Arg("stripe_height"))
@@ -463,13 +499,14 @@ void Init_cpp_polygon_finder() {
         VALUE block = rb_block_proc();
         self.each(
           buffer,
-          [block](Bitmap& bitmap,uint32_t buffer_rows,std::size_t buffer_size) {
+          [block](Bitmap& bitmap,uint32_t buffer_rows,std::size_t buffer_size, std::size_t buffer_read) {
             Rice::Data_Object<Bitmap> rb_bitmap(&bitmap);
             Rice::Object(block).call(
               "call",
               rb_bitmap,
               buffer_rows,
-              buffer_size
+              buffer_size,
+              buffer_read
             );
           }
         );

@@ -159,3 +159,6 @@ All notable changes to this project will be documented in this file.
 
 ## [1.4.2] - 2026-09-06
 - Contrek takes care of the streaming process, providing an API that greatly simplifies the implementation of streaming raster processing.
+
+## [1.4.3] - 2026-09-09
+- Added TIFF/GeoTIFF streaming support with geolocation metadata and direct WGS84 GeoJSON output.

@@ -11,6 +11,7 @@
 
 #include <stdexcept>
 #include <string>
+#include <cstdio>
 
 PngSource::PngSource(const std::string& filepath)
   : fp_(nullptr),
@@ -18,7 +19,7 @@ PngSource::PngSource(const std::string& filepath)
     width_(0),
     height_(0),
     current_row_(0) {
-  fp_ = std::fopen(filepath.c_str(),"rb");
+  fp_ = std::fopen(filepath.c_str(), "rb");
   if (!fp_) {
     throw std::runtime_error("Unable to open PNG file");
   }
@@ -30,7 +31,7 @@ PngSource::PngSource(const std::string& filepath)
     throw std::runtime_error("Unable to create spng context");
   }
 
-  int ret = spng_set_png_file(ctx_,fp_);
+  int ret = spng_set_png_file(ctx_, fp_);
   if (ret != 0) {
     spng_ctx_free(ctx_);
     ctx_ = nullptr;
@@ -52,13 +53,7 @@ PngSource::PngSource(const std::string& filepath)
 
   width_ = static_cast<uint32_t>(ihdr.width);
   height_ = static_cast<uint32_t>(ihdr.height);
-  ret = spng_decode_image(
-    ctx_,
-    nullptr,
-    0,
-    SPNG_FMT_RGBA8,
-    SPNG_DECODE_PROGRESSIVE
-  );
+  ret = spng_decode_image(ctx_, nullptr, 0, SPNG_FMT_RGBA8, SPNG_DECODE_PROGRESSIVE);
 
   if (ret != 0) {
     spng_ctx_free(ctx_);
@@ -98,7 +93,7 @@ bool PngSource::read_next_row(unsigned char* destination, std::size_t row_size) 
   if (row_size != expected_row_size) {
     throw std::runtime_error("Invalid row size");
   }
-  const int ret = spng_decode_row(ctx_,destination,row_size);
+  const int ret = spng_decode_row(ctx_, destination, row_size);
 
   if (ret != 0 && ret != SPNG_EOI) {
     throw std::runtime_error(std::string("spng_decode_row failed: ") + spng_strerror(ret));

@@ -102,7 +102,7 @@ void Tests::test_b()
 
   Options options = {
     {"versus", Identifier{"o"}},
-    {"number_of_tiles",2},
+    {"number_of_tiles", 2},
     {"compress", Options{
       {"uniq", true},
       {"linear", true},
@@ -204,7 +204,7 @@ void Tests::test_e()
 
   Options options = {
     {"versus", Identifier{"a"}},
-    {"number_of_tiles",2},
+    {"number_of_tiles", 2},
     {"compress", Options{
       {"uniq", true},
     }},
@@ -245,7 +245,7 @@ void Tests::test_g()
 
   Options options = {
     {"versus", Identifier{"a"}},
-    {"number_of_tiles",2},
+    {"number_of_tiles", 2},
     {"compress", Options{
       {"uniq", true},
     }},
@@ -339,10 +339,10 @@ void stream_png_image(const std::string& filepath, uint32_t stripe_height, bool 
     int stripe_count = 0;
 
     // main stripes loop
-    streamer.each(stripe_bitmap, [&](Bitmap& bitmap, uint32_t buffer_rows, std::size_t) {
+    streamer.each(stripe_bitmap, [&](Bitmap& bitmap, uint32_t buffer_rows, std::size_t, std::size_t) {
       // stripe contour tracing
       Options options = {
-        {"processing_height", (int) buffer_rows},
+        {"processing_height", static_cast<int>(buffer_rows)},
         {"versus", Identifier{"a"}},
       };
       PolygonFinder polygon_finder(&bitmap, &not_matcher, nullptr, options);
@@ -399,7 +399,7 @@ double get_current_rss_mb() {
   return (resident * page_size) / (1024.0 * 1024.0);
 }
 
-void stream_progressive_png_image(const std::string& filepath,uint32_t stripe_height) {
+void stream_progressive_png_image(const std::string& filepath, uint32_t stripe_height) {
   PngSource source(filepath);
   RasterStreamer streamer(source, stripe_height);
   RawBitmap bitmap(source.width(), stripe_height);
@@ -412,38 +412,33 @@ void stream_progressive_png_image(const std::string& filepath,uint32_t stripe_he
     {{"bounds", true}},
     &stream,
     source.width(),
-    source.height()
-  );
+    source.height());
 
   uint32_t processed_rows = 0;
   bool first = true;
   int stripe_count = 0;
   streamer.each(
     bitmap,
-    [&](Bitmap& bitmap, uint32_t buffer_rows, std::size_t) {
-
-      PolygonFinder finder(&bitmap,&not_matcher,nullptr,
+    [&](Bitmap& bitmap, uint32_t buffer_rows, std::size_t, std::size_t) {
+      PolygonFinder finder(&bitmap, &not_matcher, nullptr,
         {
-          {"processing_height", (int) buffer_rows},
+          {"processing_height", static_cast<int>(buffer_rows)},
           {"versus", Identifier{"a"}},
           {"bounds", true},
           {"compress", Options{
             {"uniq", true},
             {"linear", true},
           }},
-        }
-      );
+        });
       ProcessResult* result = finder.process_info();
       if (result) {
         std::cout << "stripe " << stripe_count++ << ": found polygons " << result->groups << std::endl;
         processed_rows += buffer_rows - (first ? 0 : RasterStreamer::OVERLAP);
-        merger.add_tile(*result,processed_rows == source.height());
+        merger.add_tile(*result, processed_rows == source.height());
         delete result;
       }
       first = false;
-
-    }
-  );
+    });
 
   delete merger.process_info();
 }

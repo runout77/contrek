@@ -55,7 +55,7 @@ module Contrek
             buffer_rows = overlap_rows + rows_read
             break if buffer_rows == 0
 
-            yield buffer, buffer_rows, buffer_rows * row_size
+            yield buffer, buffer_rows, buffer_rows * row_size, rows_read
 
             first_stripe = false
           end

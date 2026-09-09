@@ -16,19 +16,14 @@
 #include "../Bitmap.h"
 
 class AsciiSource : public RasterSource {
-public:
+ public:
   explicit AsciiSource(Bitmap& bitmap);
-
   uint32_t width() const override;
   uint32_t height() const override;
   uint32_t get_bytes_per_pixel() const override;
+  bool read_next_row(unsigned char* destination, std::size_t row_size) override;
 
-  bool read_next_row(
-    unsigned char* destination,
-    std::size_t row_size
-  ) override;
-
-private:
+ private:
   Bitmap& bitmap_;
   uint32_t current_row_;
 };

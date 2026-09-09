@@ -80,7 +80,7 @@ class RasterStreamer {
       }
       const std::size_t buffer_size = static_cast<std::size_t>(buffer_rows) * row_size;
 
-      std::forward<Callback>(callback)(buffer, buffer_rows, buffer_size);
+      std::forward<Callback>(callback)(buffer, buffer_rows, buffer_size, rows_read);
       previous_buffer_rows = buffer_rows;
       first_stripe = false;
     }

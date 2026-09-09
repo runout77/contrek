@@ -2,9 +2,9 @@
 
 **Contrek** is a standalone **C++17 contour tracing and polygonization library** for raster images.
 
-It was originally developed to solve a practical problem: extracting polygons from very large raster images without loading the entire image into memory. Over time the implementation evolved into a reusable library that can process PNG images as well as raw memory buffers, while preserving polygon topology during the entire tracing process.
+It was originally developed to solve a practical problem: extracting polygons from very large raster images without loading the entire image into memory. Over time the implementation evolved into a reusable library that can process PNG and TIFF/GeoTIFF images as well as raw memory buffers, while preserving polygon topology during the entire tracing process.
 
-The engine is based on programmable pixel matchers, allowing the caller to decide which pixels belong to the regions being traced. Polygon coordinates can be streamed as they are produced, making the library suitable for datasets that would otherwise require a large amount of RAM.
+The engine is based on programmable pixel matchers, allowing the caller to decide which pixels belong to the regions being traced. Polygon coordinates can be streamed as they are produced, making the library suitable for datasets that would otherwise require a large amount of RAM. GeoTIFF geolocation can also be preserved when streaming directly to GeoJSON (EPSG:4326).
 
 Although the tracing engine is written in C++, Contrek is also distributed as a Ruby gem exposing almost the complete native API through an idiomatic Ruby interface.
 
@@ -304,6 +304,15 @@ bundle install
 During installation the native C++ extension is compiled automatically.
 
 Once installed, the C++ implementation is used by default. A pure Ruby implementation is also included and can be selected explicitly whenever native extensions are not desired.
+
+### TIFF / GeoTIFF support
+
+TIFF and GeoTIFF streaming support requires the system `libtiff` and `libgeotiff` libraries.
+Ubuntu / Debian:
+
+```bash
+sudo apt install libtiff-dev libgeotiff-dev
+```
 
 # Usage
 
