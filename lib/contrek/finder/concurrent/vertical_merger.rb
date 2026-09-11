@@ -22,6 +22,9 @@ module Contrek
 
       private
 
+      # After transposing the polygon, move the cyclic sequence boundary away from the middle of a partition.
+      # This prevents partition! from splitting the same cyclic part between the beginning and the end of the
+      # linear array.
       def adjust(result)
         result.polygons.each do |polygon|
           polygon[:outer].rotate!(1)

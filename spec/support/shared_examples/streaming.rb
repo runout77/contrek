@@ -117,7 +117,7 @@ RSpec.shared_examples "streaming" do
           {processing_height: buffer_rows, versus: :o, bounds: true, compress: {uniq: true}}
         ).process_info
         total_height += rows_read
-        geo_finder.add_tile(tile, total_height > source.height)
+        geo_finder.add_tile(tile, total_height == source.height)
         stripes_count += 1
       end
       result = geo_finder.process_info

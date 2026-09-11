@@ -580,7 +580,7 @@ RSpec.shared_examples "merging" do
       result_up = @result.new
       polygons_up = [{
         outer: [{x: 0, y: 0}, {x: 0, y: 5}, {x: 2, y: 5}, {x: 2, y: 2}, {x: 9, y: 2},
-                 {x: 9, y: 5}, {x: 11, y: 5}, {x: 11, y: 0}], inner: [],
+        {x: 9, y: 5}, {x: 11, y: 5}, {x: 11, y: 0}], inner: [],
         bounds: {min_x: 0, max_x: 11, min_y: 0, max_y: 5}
       }]
       polygons_up = @result.to_numpy(polygons_up) if result_up.is_a? Contrek::Cpp::CPPResult
@@ -588,11 +588,12 @@ RSpec.shared_examples "merging" do
       result_up.metadata = {width: 12, height: 5}
 
       result_down = @result.new
-      polygons_down = [
-        {outer: [{x: 0, y: 0}, {x: 0, y: 4}, {x: 11, y: 4}, {x: 11, y: 0}, {x: 9, y: 0},
-        {x: 9, y: 2}, {x: 2, y: 2}, {x: 2, y: 0}], inner: [],
-         bounds: {min_x: 0, max_x: 11, min_y: 0, max_y: 4}}
-]
+      polygons_down = [{
+        outer: [{x: 0, y: 0}, {x: 0, y: 4}, {x: 11, y: 4}, {x: 11, y: 0}, {x: 9, y: 0},
+                 {x: 9, y: 2}, {x: 2, y: 2}, {x: 2, y: 0}], inner: [],
+        bounds: {min_x: 0, max_x: 11, min_y: 0, max_y: 4}
+      }]
+
       polygons_down = @result.to_numpy(polygons_down) if result_down.is_a? Contrek::Cpp::CPPResult
       result_down.polygons = polygons_down
       result_down.metadata = {width: 12, height: 5}
@@ -603,7 +604,36 @@ RSpec.shared_examples "merging" do
       result = step_finder.process_info
       expect(result.metadata[:width]).to eq(12)
       expect(result.metadata[:height]).to eq(9)
+      expect(result.points).to match_expected_json
+    end
 
+    it "merge mode from existing polygons clockwise" do
+      result_up = @result.new
+      polygons_up = [{
+        outer: [{x: 11, y: 0}, {x: 11, y: 5}, {x: 9, y: 5}, {x: 9, y: 2}, {x: 2, y: 2},
+        {x: 2, y: 5}, {x: 0, y: 5}, {x: 0, y: 0}], inner: [],
+        bounds: {min_x: 0, max_x: 11, min_y: 0, max_y: 5}
+      }]
+      polygons_up = @result.to_numpy(polygons_up) if result_up.is_a? Contrek::Cpp::CPPResult
+      result_up.polygons = polygons_up
+      result_up.metadata = {width: 12, height: 5}
+
+      result_down = @result.new
+      polygons_down = [{
+        outer: [{x: 2, y: 0}, {x: 2, y: 2}, {x: 9, y: 2}, {x: 9, y: 0}, {x: 11, y: 0},
+        {x: 11, y: 4}, {x: 0, y: 4}, {x: 0, y: 0}], inner: [],
+        bounds: {min_x: 0, max_x: 11, min_y: 0, max_y: 4}
+      }]
+      polygons_down = @result.to_numpy(polygons_down) if result_down.is_a? Contrek::Cpp::CPPResult
+      result_down.polygons = polygons_down
+      result_down.metadata = {width: 12, height: 5}
+
+      step_finder = @vertical_merger.new(options: {unsafe_mode: true})
+      step_finder.add_tile(result_up)
+      step_finder.add_tile(result_down)
+      result = step_finder.process_info
+      expect(result.metadata[:width]).to eq(12)
+      expect(result.metadata[:height]).to eq(9)
       expect(result.points).to match_expected_json
     end
 
