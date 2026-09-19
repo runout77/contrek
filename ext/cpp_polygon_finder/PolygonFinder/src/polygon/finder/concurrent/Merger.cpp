@@ -14,6 +14,9 @@
 
 Merger::Merger(int number_of_threads, const Options& options)
 : Finder(number_of_threads, options) {
+  if (options.contains("versus")) {
+    std::cerr << "[Contrek WARNING] The given options 'versus' will be ignored." << std::endl;
+  }
   if (!this->safe()) {
     std::cerr << "[Contrek WARNING] Processing tile with 'unsafe_mode: true'. "
               << "Incompatible result options might lead to unexpected vector geometry.\n";
@@ -58,7 +61,9 @@ void Merger::add_tile(ProcessResult& result)
 
 ProcessResult* Merger::process_info() {
   this->process_tiles();
-  return(Finder::process_info());
+  ProcessResult* result = Finder::process_info();
+  result->versus = this->versus;
+  return result;
 }
 
 void Merger::translate(ProcessResult& result, int offset) {

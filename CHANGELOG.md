@@ -162,3 +162,8 @@ All notable changes to this project will be documented in this file.
 
 ## [1.4.3] - 2026-09-09
 - Added TIFF/GeoTIFF streaming support with geolocation metadata and direct WGS84 GeoJSON output.
+
+## [1.4.4] - 2026-09-19
+- Fixed `VerticalMerger` handling of polygon orientation and starting points.
+- Added `detach()` to `RawBitmap` on the C++ side.
+- Added an OpenCV coordinate converter helper for converting contours to Contrek-compatible polygons.

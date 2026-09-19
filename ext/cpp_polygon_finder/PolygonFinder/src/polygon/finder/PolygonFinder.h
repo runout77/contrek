@@ -154,6 +154,15 @@ struct ProcessResult {
     to_svg_stream(file);
     file.close();
   }
+
+  void sort_polygons() {
+    polygons.sort([](const Polygon& a, const Polygon& b) {
+      if (a.bounds.min_y != b.bounds.min_y) {
+        return a.bounds.min_y < b.bounds.min_y;
+      }
+      return a.bounds.min_x < b.bounds.min_x;
+    });
+  }
 };
 
 class PolygonFinder {

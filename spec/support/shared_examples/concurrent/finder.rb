@@ -1871,6 +1871,31 @@ RSpec.shared_examples "finder" do
       ).process_info
       expect(result.points).to match_expected_json
     end
+
+    it "complex shape 3" do
+      chunk = "  0000              " \
+              "  0  0 000000000000 " \
+              "  0  000          0 " \
+              "  0  0 0          0 " \
+              "  0000 0          0 " \
+              "       000000000000 " \
+              "              0     " \
+              " 000000000000 0     " \
+              " 0          0 0     " \
+              " 0    0000000 0     " \
+              " 0    0       0     " \
+              " 0    000000000     " \
+              " 0    0             " \
+              " 0    00000000      " \
+              " 0           0      " \
+              " 0000000000000      "
+      result = @polygon_finder_class.new(
+        bitmap: @bitmap_class.new(chunk, 20),
+        matcher: @matcher,
+        options: {connectivity: 8, number_of_tiles: 2, versus: :o, compress: {uniq: true, linear: true}}
+      ).process_info
+      expect(result.points).to match_expected_json
+    end
   end
 end
 # rubocop:enable Layout/ArrayAlignment, Layout/FirstArrayElementIndentation

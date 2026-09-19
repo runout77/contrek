@@ -8,13 +8,14 @@
  */
 
 #include "RawBitmap.h"
-#include "spng.h"
 #include <memory>
 #include <cstdio>
 #include <iostream>
 #include <cstring>
 #include <cerrno>
 #include <string>
+#include <utility>
+#include "spng.h"
 
 RawBitmap::RawBitmap() : Bitmap("", 0),
   width(0),
@@ -168,4 +169,17 @@ bool RawBitmap::save_to_png(const std::string& filename) {
   fclose(fp);
 
   return (ret == 0);
+}
+
+std::unique_ptr<RawBitmap> RawBitmap::detach() {
+  auto detached = std::make_unique<RawBitmap>();
+
+  detached->width = width;
+  detached->height = height;
+  detached->bpp = bpp;
+  detached->image = std::move(image);
+
+  define(width, height, bpp, false);
+
+  return detached;
 }

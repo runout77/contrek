@@ -40,17 +40,10 @@ class RasterStreamer {
     const uint32_t bytes_per_pixel = source_.get_bytes_per_pixel();
     const std::size_t row_size = static_cast<std::size_t>(width) * static_cast<std::size_t>(bytes_per_pixel);
     uint32_t source_row = 0;
-    uint32_t previous_buffer_rows = 0;
     bool first_stripe = true;
+    std::vector<unsigned char> overlap_row(row_size);
 
     while (source_row < height) {
-      std::vector<unsigned char> overlap_row;
-      if (!first_stripe) {
-        overlap_row.resize(row_size);
-        const unsigned char* previous_last_row = buffer.get_row_ptr(previous_buffer_rows - 1);
-        std::memcpy(overlap_row.data(), previous_last_row, row_size);
-      }
-
       const uint32_t overlap_rows = first_stripe ? 0 : OVERLAP;
       const uint32_t available_rows = stripe_height_ - overlap_rows;
       const uint32_t remaining_rows = height - source_row;
@@ -80,8 +73,10 @@ class RasterStreamer {
       }
       const std::size_t buffer_size = static_cast<std::size_t>(buffer_rows) * row_size;
 
+      const unsigned char* last_row = buffer.get_row_ptr(buffer_rows - 1);
+      std::memcpy(overlap_row.data(), last_row, row_size);
+
       std::forward<Callback>(callback)(buffer, buffer_rows, buffer_size, rows_read);
-      previous_buffer_rows = buffer_rows;
       first_stripe = false;
     }
   }

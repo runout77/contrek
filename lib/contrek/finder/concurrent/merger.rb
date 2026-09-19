@@ -6,13 +6,18 @@ module Contrek
       attr_reader :tiles
       prepend Poolable
 
+      IGNORE_OPTIONS = [:versus]
+
       def initialize(options: {})
         @initialize_time = 0
         @current_x = 0
         @tiles = Queue.new
         @whole_tile = nil
         @user_options = options
-        @options = {unsafe_mode: false}.merge(@user_options)
+        if (warn_options = @user_options.keys & IGNORE_OPTIONS).any?
+          warn "[Contrek WARNING] The given options '#{warn_options.join(",")}' will be ignored."
+        end
+        @options = {unsafe_mode: false}.merge(@user_options).except(*IGNORE_OPTIONS)
         unless safe?
           warn "[Contrek WARNING] Processing tile with 'unsafe_mode: true'. Incompatible result options might lead to unexpected vector geometry."
         end

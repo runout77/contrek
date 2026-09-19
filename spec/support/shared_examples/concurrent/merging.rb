@@ -33,7 +33,10 @@ RSpec.shared_examples "merging" do
         @matcher,
         nil,
         {versus: :a, bounds: true, compress: {uniq: true, linear: true}}).process_info
-
+      # here passing versus option is expected to get a warn (the versus depends on the tiles results you add)
+      expect {
+        @horizontal_merger.new(options: {versus: :o})
+      }.to output("[Contrek WARNING] The given options 'versus' will be ignored.\n").to_stderr_from_any_process
       step_finder = @horizontal_merger.new
       step_finder.add_tile(result_left)
       step_finder.add_tile(result_right)
@@ -569,13 +572,13 @@ RSpec.shared_examples "merging" do
       expect(result.points).to match_expected_json(addons: [:o])
     end
 
-    # This test demonstrates how join polygons by their coordinates. Youn need to build some results from scratch by
+    # This test demonstrates how join polygons by their coordinates. You need to build some results from scratch by
     # defining polygons each one composed by the outer polyline and a list of inners ones including its bounding box.
-    # Finally you need to declare the width and the height of the whole area (tile) inside the metadata hash.
+    # Finally you need to declare the width and height of the whole area (tile) and declare the versus of the
+    # plotting sequence inside the metadata hash.
     #
-    # Pay attention to the format of the data you pass. You must account for versus conventions and ensure coordinates
-    # start from the correct origin in the shape. To bypass safety checks, all controls must be explicitly disabled
-    # using the `unsafe_mode: true` option.
+    # Pay attention to the format of the data you pass. You must account for versus conventions. To bypass safety
+    # checks, all controls must be explicitly disabled using the `unsafe_mode: true` option.
     it "merge mode from existing polygons" do
       result_up = @result.new
       polygons_up = [{
@@ -585,7 +588,7 @@ RSpec.shared_examples "merging" do
       }]
       polygons_up = @result.to_numpy(polygons_up) if result_up.is_a? Contrek::Cpp::CPPResult
       result_up.polygons = polygons_up
-      result_up.metadata = {width: 12, height: 5}
+      result_up.metadata = {width: 12, height: 5, versus: :a}
 
       result_down = @result.new
       polygons_down = [{
@@ -596,7 +599,7 @@ RSpec.shared_examples "merging" do
 
       polygons_down = @result.to_numpy(polygons_down) if result_down.is_a? Contrek::Cpp::CPPResult
       result_down.polygons = polygons_down
-      result_down.metadata = {width: 12, height: 5}
+      result_down.metadata = {width: 12, height: 5, versus: :a}
 
       step_finder = @vertical_merger.new(options: {unsafe_mode: true})
       step_finder.add_tile(result_up)
@@ -616,7 +619,7 @@ RSpec.shared_examples "merging" do
       }]
       polygons_up = @result.to_numpy(polygons_up) if result_up.is_a? Contrek::Cpp::CPPResult
       result_up.polygons = polygons_up
-      result_up.metadata = {width: 12, height: 5}
+      result_up.metadata = {width: 12, height: 5, versus: :o}
 
       result_down = @result.new
       polygons_down = [{
@@ -626,7 +629,7 @@ RSpec.shared_examples "merging" do
       }]
       polygons_down = @result.to_numpy(polygons_down) if result_down.is_a? Contrek::Cpp::CPPResult
       result_down.polygons = polygons_down
-      result_down.metadata = {width: 12, height: 5}
+      result_down.metadata = {width: 12, height: 5, versus: :o}
 
       step_finder = @vertical_merger.new(options: {unsafe_mode: true})
       step_finder.add_tile(result_up)

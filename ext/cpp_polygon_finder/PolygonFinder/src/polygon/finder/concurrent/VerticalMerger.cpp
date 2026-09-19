@@ -20,10 +20,10 @@ VerticalMerger::VerticalMerger(int number_of_threads, const Options& options)
 
 void VerticalMerger::add_tile(ProcessResult& result)
 { transpose(result);
+  adjust(result);
   if (this->tiles_.size() > 0) {
     translate(result, this->current_x);
   }
-  adjust(result);
   Merger::add_tile(result);
 }
 
@@ -50,14 +50,32 @@ void VerticalMerger::transpose(ProcessResult& result) {
 }
 
 void VerticalMerger::adjust(ProcessResult& result) {
+  const int tile_width = result.width;
+  const auto number_of_tiles = this->tiles_.size();
+
   for (auto& polygon : result.polygons) {
-    if (!polygon.outer.empty()) {
-      std::rotate(polygon.outer.begin(), polygon.outer.begin() + 1, polygon.outer.end());
+    const auto& bounds = polygon.bounds;
+    const bool needs_left = number_of_tiles > 0 && bounds.min_x == 0;
+    const bool needs_right = bounds.max_x == tile_width;
+
+    if (!needs_left && !needs_right) {
+      continue;
     }
-    for (auto& sequence : polygon.inner) {
-      if (!sequence.empty()) {
-        std::rotate(sequence.begin(), sequence.begin() + 1, sequence.end());
+
+    auto& sequence = polygon.outer;
+    auto best = sequence.end();
+    for (auto it = sequence.begin(); it != sequence.end(); ++it) {
+      if (it->y != bounds.min_y) {
+        continue;
       }
+      if (best == sequence.end() ||
+         (result.versus == Node::A ? it->x > best->x : it->x < best->x)) {
+        best = it;
+      }
+    }
+
+    if (best != sequence.end() && best != sequence.begin()) {
+      std::rotate(sequence.begin(), best, sequence.end());
     }
   }
 }
