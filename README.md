@@ -676,6 +676,54 @@ result = Contrek.contour!(
 
 The choice mainly affects how diagonally touching regions are interpreted.
 
+## Merging External Geometry
+
+Contrek's merger can process polygon data produced by external contour
+extractors, provided that the input geometry follows the requirements below.
+
+### The Laws of the Tiles
+
+1. **Adjacent tiles must share an overlap and the endpoints of their exposed segments must coincide.**
+   Adjacent tiles must share a single scanline of overlap. Exposed contour
+   segments may contain different intermediate coordinates, but their
+   corresponding endpoints must coincide, allowing the merger to identify and
+   reconnect the geometry across tile boundaries.
+
+2. **Coordinates must describe cell boundaries.**
+   A cell is the square area occupied by a pixel in the raster. Coordinates
+   must describe the boundaries of these cells, rather than representing a
+   pixel by its center or by a single vertex.
+
+3. **Contours must follow cell boundaries.**
+   Contour segments supplied to the merger must follow the horizontal and
+   vertical edges of the raster cells. Diagonal segments are not allowed in
+   the geometry passed to the merger.
+
+4. **Polygon orientation (`versus`) must be consistent across all tiles.**
+   All polygons must follow the orientation declared by the result, either
+   clockwise or counterclockwise. The same orientation must be used by every
+   tile submitted to the merger.
+
+5. **Every contour must start at the canonical point of its first scanline.**
+   A *scanline* is a horizontal raster row scanned from left to right, like
+   the electron beam of a CRT display. Consider the topmost scanline
+   intersecting the contour. On that scanline, a **counterclockwise** contour
+   must start from the **leftmost** point, while a **clockwise** contour must
+   start from the **rightmost** point.
+
+6. **The bounding box must match the contour geometry.**
+   `min_x`, `max_x`, `min_y`, and `max_y` must correctly describe the spatial
+   extent of the contour.
+
+7. **Tile metadata must match the supplied geometry.**
+   `width`, `height`, and `versus` must correctly describe the tile. In
+   particular, `height` must represent the actual height of the result.
+
+8. **Polygons must be sorted in raster scan order.**
+   Polygons must be ordered by increasing **Y**, and then by increasing **X**
+   when they have the same Y: top to bottom, and left to right at the same
+   vertical position.
+
 # Results
 
 The tracing result contains two kinds of information:
