@@ -571,6 +571,7 @@ void Init_cpp_polygon_finder() {
     rb_cstd_ofstream.define_method("closed?", [](OfstreamWrapper& self) { return self.closed(); });
     rb_cstd_ofstream.define_method("rewind",  [](OfstreamWrapper& self) { self.rewind(); });
     rb_cstd_ofstream.define_method("read",    [](OfstreamWrapper& self) { return self.read(); });
+    rb_cstd_ofstream.define_method("path",    [](OfstreamWrapper& self) { return self.path; });
 
   Data_Type<StreamingMerger> rb_cstreaming_merger = define_class<StreamingMerger, VerticalMerger>("CPPStreamingMerger");
     rb_cstreaming_merger.define_method("add_tile", [](StreamingMerger& self, Object rb_result, bool flush) {

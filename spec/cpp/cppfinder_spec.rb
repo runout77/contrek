@@ -103,4 +103,8 @@ RSpec.describe Contrek::Cpp::CPPConcurrentFinder, type: :class do
   describe "concurrent" do
     include_examples "performances"
   end
+
+  describe "validation" do
+    include_examples "validation"
+  end
 end
