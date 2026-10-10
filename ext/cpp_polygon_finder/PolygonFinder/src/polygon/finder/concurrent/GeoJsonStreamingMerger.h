@@ -34,7 +34,7 @@ class GeoJsonStreamingMerger : public StreamingMerger {
     if (!transform || !crs) throw std::invalid_argument("Invalid geo_localization.");
 
     const std::string authority = crs->get<std::string>("authority", "");
-    const auto code = crs->get("code", 0L);
+    const auto code = crs->get("code", std::int64_t{0});
     if (authority != "EPSG" || code != 4326) throw std::invalid_argument("Unsupported CRS: " + authority + ":" + std::to_string(code));
     const double x_origin = transform->get<double>("x_origin", 0.0);
     const double y_origin = transform->get<double>("y_origin", 0.0);
