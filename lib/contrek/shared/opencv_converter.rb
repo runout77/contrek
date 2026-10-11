@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Contrek
   module Shared
     class OpencvConverter

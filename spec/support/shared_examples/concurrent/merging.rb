@@ -37,7 +37,7 @@ RSpec.shared_examples "merging" do
       expect {
         @horizontal_merger.new(options: {versus: :o})
       }.to output("[Contrek WARNING] The given options 'versus' will be ignored.\n").to_stderr_from_any_process
-      step_finder = @horizontal_merger.new
+      step_finder = @horizontal_merger.new(options: {unsafe_mode: true})
       step_finder.add_tile(result_left)
       step_finder.add_tile(result_right)
       result = step_finder.process_info
@@ -81,7 +81,7 @@ RSpec.shared_examples "merging" do
         nil,
         {versus: :a, bounds: true, compress: {uniq: true, linear: true}}).process_info
 
-      step_finder = @horizontal_merger.new(number_of_threads: 2)
+      step_finder = @horizontal_merger.new(number_of_threads: 2, options: {unsafe_mode: true})
       step_finder.add_tile(result_left)
       step_finder.add_tile(result_right)
       result = step_finder.process_info
@@ -114,7 +114,7 @@ RSpec.shared_examples "merging" do
       expect(result_down.metadata[:width]).to eq(12)
       expect(result_down.metadata[:height]).to eq(5)
 
-      step_finder = @vertical_merger.new
+      step_finder = @vertical_merger.new(options: {unsafe_mode: true})
       step_finder.add_tile(result_up)
       step_finder.add_tile(result_down)
       result = step_finder.process_info
@@ -158,7 +158,7 @@ RSpec.shared_examples "merging" do
         nil,
         {versus: :a, bounds: true, compress: {uniq: true, linear: true}}).process_info
 
-      step_finder = @horizontal_merger.new
+      step_finder = @horizontal_merger.new(options: {unsafe_mode: true})
       step_finder.add_tile(result_left)
       step_finder.add_tile(result_right)
       result = step_finder.process_info
@@ -188,7 +188,7 @@ RSpec.shared_examples "merging" do
         nil,
         {versus: :o, bounds: true, compress: {uniq: true, linear: true}}).process_info
 
-      step_finder = @vertical_merger.new
+      step_finder = @vertical_merger.new(options: {unsafe_mode: true})
       step_finder.add_tile(result_up)
       step_finder.add_tile(result_down)
       result = step_finder.process_info
@@ -227,7 +227,7 @@ RSpec.shared_examples "merging" do
         nil,
         {versus: :o, bounds: true, compress: {uniq: true, linear: true}}).process_info
 
-      step_finder = @vertical_merger.new(number_of_threads: 2)
+      step_finder = @vertical_merger.new(number_of_threads: 2, options: {unsafe_mode: true})
       step_finder.add_tile(result_up)
       step_finder.add_tile(result_mid)
       step_finder.add_tile(result_down)
@@ -278,7 +278,7 @@ RSpec.shared_examples "merging" do
         nil,
         {versus: :o, bounds: true}).process_info
 
-      step_finder = @vertical_merger.new(options: {compress: {uniq: true, linear: true}})
+      step_finder = @vertical_merger.new(options: {unsafe_mode: true, compress: {uniq: true, linear: true}})
       step_finder.add_tile(result_up)
       step_finder.add_tile(result_down)
       result = step_finder.process_info
@@ -326,7 +326,7 @@ RSpec.shared_examples "merging" do
         {versus: :o, bounds: true})
       result_down = finder.process_info
 
-      step_finder = @vertical_merger.new
+      step_finder = @vertical_merger.new(options: {unsafe_mode: true})
       step_finder.add_tile(result_up)
       step_finder.add_tile(result_down)
       result = step_finder.process_info
@@ -383,7 +383,7 @@ RSpec.shared_examples "merging" do
         nil,
         {versus: :a, bounds: true}).process_info
 
-      step_finder = @vertical_merger.new(options: {compress: {uniq: true, linear: true}})
+      step_finder = @vertical_merger.new(options: {unsafe_mode: true, compress: {uniq: true, linear: true}})
       step_finder.add_tile(result_up)
       step_finder.add_tile(result_mid)
       step_finder.add_tile(result_down)
@@ -408,7 +408,7 @@ RSpec.shared_examples "merging" do
         nil,
         {versus: :a, bounds: true}).process_info
 
-      step_finder = @vertical_merger.new
+      step_finder = @vertical_merger.new(options: {unsafe_mode: true})
       step_finder.add_tile(result_up)
       step_finder.add_tile(result_down)
       result = step_finder.process_info
@@ -430,7 +430,7 @@ RSpec.shared_examples "merging" do
         nil,
         {versus: :a, bounds: true}).process_info
       expect(result_down.metadata[:versus]).to eq(:a)
-      step_finder = @vertical_merger.new
+      step_finder = @vertical_merger.new(options: {unsafe_mode: true})
       step_finder.add_tile(result_up)
       step_finder.add_tile(result_down)
       result = step_finder.process_info
@@ -444,7 +444,7 @@ RSpec.shared_examples "merging" do
         @matcher,
         nil,
         {versus: :o, bounds: true}).process_info
-      step_finder = @vertical_merger.new
+      step_finder = @vertical_merger.new(options: {unsafe_mode: true})
       step_finder.add_tile(result_up)
       step_finder.add_tile(result_down)
       result = step_finder.process_info
@@ -471,7 +471,7 @@ RSpec.shared_examples "merging" do
         nil,
         {versus: :a, bounds: true}).process_info
       expect(result_down.metadata[:versus]).to eq(:a)
-      step_finder = @vertical_merger.new
+      step_finder = @vertical_merger.new(options: {unsafe_mode: true})
       step_finder.add_tile(result_up)
       step_finder.add_tile(result_down)
       result = step_finder.process_info
@@ -485,7 +485,7 @@ RSpec.shared_examples "merging" do
         @matcher,
         nil,
         {versus: :o, bounds: true}).process_info
-      step_finder = @vertical_merger.new
+      step_finder = @vertical_merger.new(options: {unsafe_mode: true})
       step_finder.add_tile(result_up)
       step_finder.add_tile(result_down)
       result = step_finder.process_info
@@ -508,7 +508,7 @@ RSpec.shared_examples "merging" do
         nil,
         {versus: :a, bounds: true}).process_info
       expect(result_down.metadata[:versus]).to eq(:a)
-      step_finder = @vertical_merger.new
+      step_finder = @vertical_merger.new(options: {unsafe_mode: true})
       step_finder.add_tile(result_up)
       step_finder.add_tile(result_down)
       result = step_finder.process_info
@@ -523,7 +523,7 @@ RSpec.shared_examples "merging" do
         nil,
         {versus: :o, bounds: true}).process_info
       expect(result_down.metadata[:versus]).to eq(:o)
-      step_finder = @vertical_merger.new
+      step_finder = @vertical_merger.new(options: {unsafe_mode: true})
       step_finder.add_tile(result_up)
       step_finder.add_tile(result_down)
       result = step_finder.process_info
@@ -551,7 +551,7 @@ RSpec.shared_examples "merging" do
         nil,
         {versus: :a, bounds: true}).process_info
       expect(result_down.metadata[:versus]).to eq(:a)
-      step_finder = @vertical_merger.new
+      step_finder = @vertical_merger.new(options: {unsafe_mode: true})
       step_finder.add_tile(result_up)
       step_finder.add_tile(result_down)
       result = step_finder.process_info
@@ -565,7 +565,7 @@ RSpec.shared_examples "merging" do
         @matcher,
         nil,
         {versus: :o, bounds: true}).process_info
-      step_finder = @vertical_merger.new
+      step_finder = @vertical_merger.new(options: {unsafe_mode: true})
       step_finder.add_tile(result_up)
       step_finder.add_tile(result_down)
       result = step_finder.process_info
@@ -596,7 +596,6 @@ RSpec.shared_examples "merging" do
                  {x: 9, y: 2}, {x: 2, y: 2}, {x: 2, y: 0}], inner: [],
         bounds: {min_x: 0, max_x: 11, min_y: 0, max_y: 4}
       }]
-
       polygons_down = @result.to_numpy(polygons_down) if result_down.is_a? Contrek::Cpp::CPPResult
       result_down.polygons = polygons_down
       result_down.metadata = {width: 12, height: 5, versus: :a}
@@ -608,6 +607,34 @@ RSpec.shared_examples "merging" do
       expect(result.metadata[:width]).to eq(12)
       expect(result.metadata[:height]).to eq(9)
       expect(result.points).to match_expected_json
+    end
+
+    it "raises an error when adjacent tiles have mismatched boundary coordinates" do
+      result_up = @result.new
+      polygons_up = [{
+        outer: [{x: 0, y: 0}, {x: 0, y: 5}, {x: 3, y: 5}, {x: 3, y: 2}, {x: 9, y: 2},
+        {x: 9, y: 5}, {x: 11, y: 5}, {x: 11, y: 0}], inner: [],
+        bounds: {min_x: 0, max_x: 11, min_y: 0, max_y: 5}
+      }]
+      polygons_up = @result.to_numpy(polygons_up) if result_up.is_a? Contrek::Cpp::CPPResult
+      result_up.polygons = polygons_up
+      result_up.metadata = {width: 12, height: 5, versus: :a}
+
+      result_down = @result.new
+      polygons_down = [{
+        outer: [{x: 0, y: 0}, {x: 0, y: 4}, {x: 11, y: 4}, {x: 11, y: 0}, {x: 9, y: 0},
+                 {x: 9, y: 2}, {x: 2, y: 2}, {x: 2, y: 0}], inner: [],
+        bounds: {min_x: 0, max_x: 11, min_y: 0, max_y: 4}
+      }]
+      polygons_down = @result.to_numpy(polygons_down) if result_down.is_a? Contrek::Cpp::CPPResult
+      result_down.polygons = polygons_down
+      result_down.metadata = {width: 12, height: 5, versus: :a}
+
+      step_finder = @vertical_merger.new
+      step_finder.add_tile(result_up)
+      expect {
+        step_finder.add_tile(result_down)
+      }.to raise_error(ArgumentError, "Tile boundary mismatch: adjacent tiles have different edge coordinates")
     end
 
     it "merge mode from existing polygons clockwise" do
@@ -661,7 +688,7 @@ RSpec.shared_examples "merging" do
         {versus: :a, bounds: true, compress: {uniq: true, linear: true}})
       right = polygonfinder.process_info
 
-      step_finder = @horizontal_merger.new(number_of_threads: 2)
+      step_finder = @horizontal_merger.new(number_of_threads: 2, options: {unsafe_mode: true})
       step_finder.add_tile(left)
       step_finder.add_tile(right)
       result = step_finder.process_info
@@ -692,7 +719,7 @@ RSpec.shared_examples "merging" do
         {versus: :a, bounds: true})
       result_down = polygonfinder.process_info
 
-      step_finder = @vertical_merger.new
+      step_finder = @vertical_merger.new(options: {unsafe_mode: true})
       step_finder.add_tile(result_up)
       step_finder.add_tile(result_down)
       result = step_finder.process_info
@@ -760,7 +787,7 @@ RSpec.shared_examples "merging" do
       width = result.metadata[:width]
       height = result.metadata[:height]
       shared_stream = @streaming_file.new("output.svg")
-      v_merger_options = {bounds: true}
+      v_merger_options = {bounds: true, unsafe_mode: true}
       step_finder = @svg_streaming_merger.new(
         options: v_merger_options,
         stream_to: shared_stream,
@@ -786,7 +813,7 @@ RSpec.shared_examples "merging" do
 
       # streaming to geojson file pattern
       shared_stream = @streaming_file.new("output.geojson")
-      v_merger_options = {bounds: true}
+      v_merger_options = {bounds: true, unsafe_mode: true}
       step_finder = @geo_json_streaming_merger.new(
         options: v_merger_options,
         stream_to: shared_stream,
@@ -829,7 +856,7 @@ RSpec.shared_examples "merging" do
       width = 18
       height = 11
       shared_stream = @streaming_file.new("output.svg")
-      v_merger_options = {bounds: true, compress: {uniq: true, linear: true, douglas_peucker: true}}
+      v_merger_options = {unsafe_mode: true, bounds: true, compress: {uniq: true, linear: true, douglas_peucker: true}}
       step_finder = @svg_streaming_merger.new(
         options: v_merger_options,
         stream_to: shared_stream,
@@ -856,7 +883,7 @@ RSpec.shared_examples "merging" do
 
       # streaming to geojson file pattern
       shared_stream = @streaming_file.new("output.geojson")
-      v_merger_options = {bounds: true, compress: {uniq: true, linear: true, douglas_peucker: true}}
+      v_merger_options = {unsafe_mode: true, bounds: true, compress: {uniq: true, linear: true, douglas_peucker: true}}
       step_finder = @geo_json_streaming_merger.new(
         options: v_merger_options,
         stream_to: shared_stream,

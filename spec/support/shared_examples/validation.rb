@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.shared_examples "validation" do
   describe "validation", :validation do
     it "extracts very large amount of polygons" do

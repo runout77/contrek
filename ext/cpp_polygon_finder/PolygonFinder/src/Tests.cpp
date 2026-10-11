@@ -294,7 +294,9 @@ void Tests::test_h()
   PolygonFinder pl_right(&b_right, &matcher, nullptr, options);
   ProcessResult *right_result = pl_right.process_info();
 
-  Options merger_options = {};
+  Options merger_options = {
+    {"unsafe_mode", true}
+  };
   HorizontalMerger hmerger(1, merger_options);
   hmerger.add_tile(*left_result);
   hmerger.add_tile(*right_result);
@@ -326,7 +328,9 @@ double get_peak_rss() {
 
 void stream_png_image(const std::string& filepath, uint32_t stripe_height, bool generate_svg = false, bool generate_png = false) {
     std::vector<ProcessResult*> result_clones;
-    Options options = {};
+    Options options = {
+      {"unsafe_mode", true}
+    };
     VerticalMerger vmerger(0, options);
 
     PngSource source(filepath);
@@ -409,7 +413,7 @@ void stream_progressive_png_image(const std::string& filepath, uint32_t stripe_h
 
   SvgStreamingMerger merger(
     0,
-    {{"bounds", true}},
+    {{"bounds", true},{"unsafe_mode", true}},
     &stream,
     source.width(),
     source.height());

@@ -683,11 +683,11 @@ extractors, provided that the input geometry follows the requirements below.
 
 ### The Laws of the Tiles
 
-1. **Adjacent tiles must share an overlap and the endpoints of their exposed segments must coincide.**
-   Adjacent tiles must share a single scanline of overlap. Exposed contour
-   segments may contain different intermediate coordinates, but their
-   corresponding endpoints must coincide, allowing the merger to identify and
-   reconnect the geometry across tile boundaries.
+1. **Adjacent tiles must share an overlap and have identical exposed boundary sequences.**
+   Adjacent tiles must share a single scanline of overlap. The exposed contour
+   segments on their shared boundary must have identical coordinate sequences,
+   including all intermediate vertices, expressed in the same coordinate system.
+   Any mismatch between the two sequences makes the tiles incompatible for merging.
 
 2. **Coordinates must describe cell boundaries.**
    A cell is the square area occupied by a pixel in the raster. Coordinates
@@ -723,6 +723,20 @@ extractors, provided that the input geometry follows the requirements below.
    Polygons must be ordered by increasing **Y**, and then by increasing **X**
    when they have the same Y: top to bottom, and left to right at the same
    vertical position.
+
+### Boundary Validation
+
+By default, Contrek validates the shared boundaries of adjacent tiles when
+merging externally supplied geometries. Boundary coordinates must match
+exactly, including intermediate vertices. Otherwise, the merger raises a
+`Tile boundary mismatch` error.
+
+This validation can be disabled by setting `unsafe_mode: true`, avoiding
+validation overhead when the input geometries are known to be valid.
+
+**Important:** Boundary validation does not verify all the Laws of the Tiles.
+Users supplying external geometries remain responsible for satisfying every
+requirement listed above.
 
 # Results
 

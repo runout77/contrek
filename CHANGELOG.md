@@ -167,3 +167,6 @@ All notable changes to this project will be documented in this file.
 - Fixed `VerticalMerger` handling of polygon orientation and starting points.
 - Added `detach()` to `RawBitmap` on the C++ side.
 - Added an OpenCV coordinate converter helper for converting contours to Contrek-compatible polygons.
+
+## [1.4.5] - 2026-10-11
+- Added tile boundary validation for external geometries, with support for bypassing checks via `unsafe_mode: true`.

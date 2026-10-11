@@ -26,7 +26,7 @@ RSpec.shared_examples "streaming" do
               "00   00         " \
               "0000000         " \
               "0000000         "
-      @finder = @vertical_merger_class.new(options: {compress: {uniq: true, linear: true}})
+      @finder = @vertical_merger_class.new(options: {unsafe_mode: true, compress: {uniq: true, linear: true}})
       @matcher = @value_not_matcher_class.new(" ")
       @image = @ascii_bitmap_class.new(chunk, 16)
     end
@@ -218,7 +218,7 @@ RSpec.shared_examples "streaming" do
 
       shared_stream = @streaming_file.new("output.geojson")
 
-      v_merger_options = {geo_localization: localization, compress: {uniq: true, linear: true}}
+      v_merger_options = {unsafe_mode: true, geo_localization: localization, compress: {uniq: true, linear: true}}
       geo_finder = @geo_json_streaming_merger.new(
         options: v_merger_options,
         stream_to: shared_stream,
