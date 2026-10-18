@@ -637,6 +637,44 @@ RSpec.shared_examples "merging" do
       }.to raise_error(ArgumentError, "Tile boundary mismatch: adjacent tiles have different edge coordinates")
     end
 
+    it "raises an error when boundings box are wrong or outer polygon is empty" do
+      result_up = @result.new
+      polygons_up = [{
+        outer: [{x: 0, y: 0}, {x: 0, y: 5}, {x: 2, y: 5}, {x: 2, y: 2}, {x: 9, y: 2},
+        {x: 9, y: 5}, {x: 11, y: 5}, {x: 11, y: 0}], inner: [],
+        bounds: {min_x: 0, max_x: 11, min_y: 0, max_y: 4}
+      }]
+      polygons_up = @result.to_numpy(polygons_up) if result_up.is_a? Contrek::Cpp::CPPResult
+      result_up.polygons = polygons_up
+      result_up.metadata = {width: 12, height: 5, versus: :a}
+
+      step_finder = @vertical_merger.new
+      expect {
+        step_finder.add_tile(result_up)
+      }.to raise_error(ArgumentError, "Invalid polygon bounds: bounding box does not match outer contour")
+
+      # empty outer
+      result_up.polygons = [{
+        outer: [], inner: [],
+        bounds: {min_x: 0, max_x: 11, min_y: 0, max_y: 4}
+      }]
+      step_finder = @vertical_merger.new
+      expect {
+        step_finder.add_tile(result_up)
+      }.to raise_error(ArgumentError, "Invalid polygon: empty outer contour")
+
+      result_wrong = @result.new
+      polygons = [{outer: [{x: 0, y: 0}, {x: 0, y: 5}, {x: 2, y: 5}, {x: 2, y: 0}], inner: [],
+                   bounds: {min_x: 0, max_x: 2, min_y: 0, max_y: 5}}]
+      polygons = @result.to_numpy(polygons) if result_up.is_a? Contrek::Cpp::CPPResult
+      result_wrong.polygons = polygons
+      result_wrong.metadata = {width: 0, height: 0, versus: :a}
+      step_finder = @vertical_merger.new
+      expect {
+        step_finder.add_tile(result_wrong)
+      }.to raise_error(ArgumentError, "Invalid result metadata: width must be a positive integer")
+    end
+
     it "merge mode from existing polygons clockwise" do
       result_up = @result.new
       polygons_up = [{

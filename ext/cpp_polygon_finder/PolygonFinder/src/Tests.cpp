@@ -413,7 +413,7 @@ void stream_progressive_png_image(const std::string& filepath, uint32_t stripe_h
 
   SvgStreamingMerger merger(
     0,
-    {{"bounds", true},{"unsafe_mode", true}},
+    {{"bounds", true}, {"unsafe_mode", true}},
     &stream,
     source.width(),
     source.height());

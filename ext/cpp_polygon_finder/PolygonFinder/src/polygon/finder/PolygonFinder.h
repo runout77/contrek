@@ -68,7 +68,8 @@ struct pf_Options {
 
 struct ProcessResult {
   int groups;
-  int width, height;
+  int width = 0;
+  int height = 0;
   int versus;
   int number_of_threads;
   bool has_bounds = false;

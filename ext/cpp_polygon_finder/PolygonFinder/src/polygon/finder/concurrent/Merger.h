@@ -11,7 +11,9 @@
 #include <string>
 #include <vector>
 #include <list>
+#include <memory>
 #include "Finder.h"
+#include "MergerValidator.h"
 #include "../Options.h"
 
 class Merger : public Finder {
@@ -24,7 +26,5 @@ class Merger : public Finder {
  protected:
   void translate(ProcessResult& result, int offset);
   int current_x = 0;
-  void validate(const ProcessResult& result);
-  static std::vector<int> boundary_coordinates(const std::list<Polygon>& polygons, int boundary_x);
-  std::vector<int> previous_boundary_;
+  std::unique_ptr<MergerValidator> validator_;
 };

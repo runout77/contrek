@@ -726,17 +726,13 @@ extractors, provided that the input geometry follows the requirements below.
 
 ### Boundary Validation
 
-By default, Contrek validates the shared boundaries of adjacent tiles when
-merging externally supplied geometries. Boundary coordinates must match
-exactly, including intermediate vertices. Otherwise, the merger raises a
-`Tile boundary mismatch` error.
+By default, Contrek validates the shared boundaries of adjacent tiles when merging externally supplied geometries. Boundary coordinates must match exactly, including intermediate vertices. Otherwise, the merger raises a `Tile boundary mismatch` error.
 
-This validation can be disabled by setting `unsafe_mode: true`, avoiding
-validation overhead when the input geometries are known to be valid.
+This validation can be disabled by setting `unsafe_mode: true`, avoiding validation overhead when the input geometries are known to be valid.
 
-**Important:** Boundary validation does not verify all the Laws of the Tiles.
-Users supplying external geometries remain responsible for satisfying every
-requirement listed above.
+**Important:** Boundary validation does not verify all the Laws of the Tiles. Users supplying external geometries remain responsible for satisfying every requirement listed above.
+
+**Important:** Boundary validation prioritizes correctness over performance and introduce additional processing overhead. Experienced users who can guarantee that their input geometries satisfy the Laws of the Tiles can enable `unsafe_mode: true` to bypass validation entirely and achieve maximum merging performance. This option can also be useful during debugging to isolate merging issues from validation errors.
 
 # Results
 

@@ -13,18 +13,21 @@ module Contrek
         @current_x = 0
         @tiles = Queue.new
         @whole_tile = nil
-        @previous_boundary = nil
         @user_options = options
         if (warn_options = @user_options.keys & IGNORE_OPTIONS).any?
           warn "[Contrek WARNING] The given options '#{warn_options.join(",")}' will be ignored."
         end
         @options = {unsafe_mode: false}.merge(@user_options).except(*IGNORE_OPTIONS)
-        unless safe?
+        if safe?
+          @validator = MergerValidator.new(self)
+        else
           warn "[Contrek WARNING] Processing tile with 'unsafe_mode: true'. Incompatible result options might lead to unexpected vector geometry."
         end
       end
 
       def add_tile(result)
+        @validator&.validate_metadata(result)
+
         @height ||= result.metadata[:height]
         raise ArgumentError, "All results must have the same height" if @height != result.metadata[:height] && safe?
         @options[:versus] ||= result.metadata[:versus]
@@ -35,8 +38,8 @@ module Contrek
           end
         end
 
-        validate(result) if safe?
         end_x = @current_x + result.metadata[:width]
+        @validator&.validate(result, @current_x, end_x)
 
         tile = Tile.new(
           finder: self,
@@ -47,9 +50,6 @@ module Contrek
         tile.assign_raw_polygons!(result[:polygons])
 
         @tiles << tile
-
-        @previous_boundary = boundary_coordinates(result.polygons, end_x) if safe?
-
         @maximum_width = end_x
         @current_x = end_x - 1
       end
@@ -64,25 +64,6 @@ module Contrek
       end
 
       private
-
-      def validate(result)
-        return unless @previous_boundary
-
-        current = boundary_coordinates(result.polygons, @current_x)
-        unless @previous_boundary == current
-          raise ArgumentError, "Tile boundary mismatch: adjacent tiles have different edge coordinates"
-        end
-      end
-
-      def boundary_coordinates(polygons, boundary_x)
-        coordinates = []
-        polygons.each do |polygon|
-          polygon[:outer].each do |point|
-            coordinates << point[:y] if point[:x] == boundary_x
-          end
-        end
-        coordinates.sort!
-      end
 
       def translate(result, offset)
         result.polygons.each do |polygon|

@@ -60,27 +60,25 @@ void Tile::assign_raw_polygons(const std::list<Polygon>& raw_polylines, const st
   std::unordered_map<int, Shape*> shapes_map;
   int polyline_index = 0;
   for (const auto& raw_polyline : raw_polylines)
-  { if (raw_polyline.bounds.width() > 0)
-    { Polyline* polyline = this->shapes_pool->acquire_polyline(this, raw_polyline.outer, raw_polyline.bounds);
-      std::vector<InnerPolyline*> inner_polylines_list;
-      for (auto& raw_points : raw_polyline.inner) {
-        inner_polylines_list.push_back(this->shapes_pool->acquire_inner_polyline(raw_points, nullptr));
-      }
-      Shape* shape = this->shapes_pool->acquire_shape(polyline, inner_polylines_list);
-      polyline->shape = shape;
-      this->shapes_.push_back(shape);
+  { Polyline* polyline = this->shapes_pool->acquire_polyline(this, raw_polyline.outer, raw_polyline.bounds);
+    std::vector<InnerPolyline*> inner_polylines_list;
+    for (auto& raw_points : raw_polyline.inner) {
+      inner_polylines_list.push_back(this->shapes_pool->acquire_inner_polyline(raw_points, nullptr));
+    }
+    Shape* shape = this->shapes_pool->acquire_shape(polyline, inner_polylines_list);
+    polyline->shape = shape;
+    this->shapes_.push_back(shape);
 
-      if (treemap.size() > 0)
-      { auto treemap_entry = treemap[polyline_index];
-        shapes_map[polyline_index] = shape;
-        if (treemap_entry.first != -1 && treemap_entry.second != -1) {
-          auto it = shapes_map.find(treemap_entry.first);
-          if (it != shapes_map.end()) {
-            Shape* parent = it->second;
-            shape->set_parent_shape(parent);
-            shape->fixed = true;
-            shape->parent_inner_polyline = parent->inner_polylines[treemap_entry.second];
-          }
+    if (treemap.size() > 0)
+    { auto treemap_entry = treemap[polyline_index];
+      shapes_map[polyline_index] = shape;
+      if (treemap_entry.first != -1 && treemap_entry.second != -1) {
+        auto it = shapes_map.find(treemap_entry.first);
+        if (it != shapes_map.end()) {
+          Shape* parent = it->second;
+          shape->set_parent_shape(parent);
+          shape->fixed = true;
+          shape->parent_inner_polyline = parent->inner_polylines[treemap_entry.second];
         }
       }
     }

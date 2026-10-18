@@ -92,7 +92,6 @@ module Contrek
         @shapes = []
         shapes_map = {}
         raw_polylines.each_with_index do |raw_polyline, polyline_index|
-          next if raw_polyline[:bounds][:max_x] - raw_polyline[:bounds][:min_x] == 0
           shape = Shape.new.tap do |shape|
             shape.outer_polyline = Polyline.new(tile: self, polygon: raw_polyline[:outer], shape: shape, bounds: raw_polyline[:bounds])
             shape.inner_polylines = raw_polyline[:inner].map { |raw| InnerPolyline.new(shape: shape, raw_coordinates: raw) }

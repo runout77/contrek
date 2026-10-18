@@ -106,6 +106,8 @@
 #include "PolygonFinder/src/polygon/finder/concurrent/PartPool.cpp"
 #include "PolygonFinder/src/polygon/finder/concurrent/Merger.h"
 #include "PolygonFinder/src/polygon/finder/concurrent/Merger.cpp"
+#include "PolygonFinder/src/polygon/finder/concurrent/MergerValidator.h"
+#include "PolygonFinder/src/polygon/finder/concurrent/MergerValidator.cpp"
 #include "PolygonFinder/src/polygon/finder/concurrent/HorizontalMerger.h"
 #include "PolygonFinder/src/polygon/finder/concurrent/HorizontalMerger.cpp"
 #include "PolygonFinder/src/polygon/finder/concurrent/VerticalMerger.h"

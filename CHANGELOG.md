@@ -170,3 +170,6 @@ All notable changes to this project will be documented in this file.
 
 ## [1.4.5] - 2026-10-11
 - Added tile boundary validation for external geometries, with support for bypassing checks via `unsafe_mode: true`.
+
+## [1.4.6] - 2026-10-18
+- Added tile metadata, polygon bounds, ordering, and shared boundary validation for Ruby and C++ mergers, with `unsafe_mode: true` to bypass validation.
