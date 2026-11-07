@@ -277,6 +277,9 @@ class To_Ruby<ProcessResult*>
         poly_hash[Symbol("bounds")] = bounds_hash;
       }
 
+      if(pr->options.contains("multiclass")) {
+        poly_hash[Symbol("class")] = x.class_id;
+      }
       out.push(poly_hash);
     }
     rr->polygons = out;
@@ -317,6 +320,10 @@ ProcessResult ruby_result_to_process_result(Rice::Object rb_result) {
   for (size_t i = 0; i < rb_polygons.size(); ++i) {
     Rice::Hash rb_poly = (Rice::Hash)rb_polygons[i];
     Polygon poly;
+    Rice::Object rb_class = rb_poly[Symbol("class")];
+    if (!rb_class.is_nil()) {
+      poly.class_id = detail::From_Ruby<unsigned int>().convert(rb_class.value());
+    }
     // BOUNDS
     Rice::Object rb_bounds_obj = rb_poly[Symbol("bounds")];
     if (!rb_bounds_obj.is_nil()) {
@@ -382,10 +389,9 @@ SvgStreamingMerger* create_svg_streaming_merger(Object self,
 GeoJsonStreamingMerger* create_geo_json_streaming_merger(Object self,
                                          int number_of_threads,
                                          Options options,
-                                         Object stream_obj,
-                                         int pixel_val) {
+                                         Object stream_obj) {
   OfstreamWrapper* wrapper = Rice::detail::From_Ruby<OfstreamWrapper*>().convert(stream_obj.value());
-  return new GeoJsonStreamingMerger(number_of_threads, options, &wrapper->get_stream(), pixel_val);
+  return new GeoJsonStreamingMerger(number_of_threads, options, &wrapper->get_stream());
 }
 
 OfstreamWrapper* create_ofstream(Object self, std::string path) {

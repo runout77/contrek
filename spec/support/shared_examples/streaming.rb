@@ -221,8 +221,7 @@ RSpec.shared_examples "streaming" do
       v_merger_options = {unsafe_mode: true, geo_localization: localization, compress: {uniq: true, linear: true}}
       geo_finder = @geo_json_streaming_merger.new(
         options: v_merger_options,
-        stream_to: shared_stream,
-        pixel_val: 11
+        stream_to: shared_stream
       )
       stripes_count = 0
       total_height = 0
@@ -240,6 +239,42 @@ RSpec.shared_examples "streaming" do
       result = geo_finder.process_info
       expect(result.metadata[:width]).to eq(64)
       expect(result.metadata[:height]).to eq(64)
+      expect(result.points).to be_empty
+      shared_stream.rewind
+
+      expect(shared_stream.read).to match_expected_stream(
+        "test_#{result.metadata[:width]}x#{result.metadata[:height]}_#{@geo_json_streaming_merger.name.gsub("::", "_").downcase}",
+        extension: "geojson",
+        number_of_tiles: stripes_count
+      )
+    end
+
+    it "streams by multiple parts multiclass png" do
+      source = @png_source_class.new("./spec/files/images/gdal_multiclass_100x100.png")
+      streamer = @raster_streamer_class.new(source, stripe_height: 20)
+      buffer_bitmap = @png_bitmap_class.new(source.width, streamer.stripe_height)
+      shared_stream = @streaming_file.new("output.geojson")
+      v_merger_options = {unsafe_mode: true, compress: {uniq: true, linear: true}}
+      geo_finder = @geo_json_streaming_merger.new(
+        options: v_merger_options,
+        stream_to: shared_stream
+      )
+      stripes_count = 0
+      total_height = 0
+      streamer.each(buffer_bitmap) do |bitmap, buffer_rows, buffer_size, rows_read|
+        tile = @polygon_finder_class.new(
+          bitmap,
+          nil,
+          nil,
+          {connectivity: 8, multiclass: true, processing_height: buffer_rows, versus: :o, bounds: true, compress: {uniq: true}}
+        ).process_info
+        total_height += rows_read
+        geo_finder.add_tile(tile, total_height == source.height)
+        stripes_count += 1
+      end
+      result = geo_finder.process_info
+      expect(result.metadata[:width]).to eq(100)
+      expect(result.metadata[:height]).to eq(100)
       expect(result.points).to be_empty
       shared_stream.rewind
 

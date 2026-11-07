@@ -19,16 +19,15 @@
 
 static const int TURNER[2][2] = {{Node::OMAX, Node::OMIN}, {Node::TURN_MAX, Node::TURN_MIN}};
 
-Node::Node(int min_x, int max_x, int y, NodeCluster* cluster, char name)
-: cluster(cluster),
+Node::Node(int min_x, int max_x, int y, NodeCluster* cluster, char name, unsigned int class_id)
+: class_id(class_id),
+  cluster(cluster),
   min_x(min_x),
   max_x(max_x + 1) {
   this->y = y;
   this->name = name;
   this->tangs_count = 0;
   this->abs_x_index = 0;
-  this->down_indexer = 0;
-  this->up_indexer = 0;
   this->track = 0;
   this->outer_index = -1;
   this->inner_index = -1;
@@ -63,47 +62,45 @@ void Node::precalc_tangs_sequences(NodeCluster& cluster) {
   int upper_size = this->upper_end >= 0 ? (this->upper_end - this->upper_start + 1) : 0;
   this->tangs_sequence.reserve(lower_size + upper_size);
 
-  if (this->upper_end >= 0) {
-    this->up_indexer = -cluster.vert_nodes[y + T_UP][this->upper_start].abs_x_index;
-  }
   // --- CLOCKWISE (UP) ---
   for (int upper_pos = this->upper_start; upper_pos <= this->upper_end; upper_pos++) {
-    tangs_sequence.push_back(-(upper_pos + 1));
+    if (cluster.vert_nodes[y + T_UP][upper_pos].class_id == this->class_id) {
+      tangs_sequence.push_back(-(upper_pos + 1));
+    }
   }
-  if (this->lower_end >= 0) {
-    this->down_indexer = (cluster.vert_nodes[y + T_DOWN][this->lower_start].abs_x_index + lower_size + upper_size - 1);
-  }
+
   // --- COUNTER-CLOCKWISE (DOWN) ---
   for (int lower_pos = this->lower_end; lower_pos >= this->lower_start; lower_pos--) {
-    tangs_sequence.push_back(lower_pos);
+    if (cluster.vert_nodes[y + T_DOWN][lower_pos].class_id == this->class_id) {
+      tangs_sequence.push_back(lower_pos);
+    }
   }
   this->tangs_count = this->tangs_sequence.size();
 }
 
 Node* Node::my_next_inner(Node *last, int versus) {
-  unsigned int last_node_index;
-  if (last->y < this->y)       last_node_index = last->abs_x_index + this->up_indexer;
-  else            last_node_index = this->down_indexer - last->abs_x_index;
-  if (versus == Node::O) last_node_index == 0 ? last_node_index = this->tangs_sequence.size() - 1 : last_node_index--;
-  else          last_node_index == this->tangs_sequence.size() - 1 ? last_node_index = 0 : last_node_index++;
+  int virtual_index = (last->y < this->y) ? -(last->abs_x_index + 1) : last->abs_x_index;
+  auto it = std::find(this->tangs_sequence.begin(), this->tangs_sequence.end(), virtual_index);
+  size_t last_node_index = std::distance(this->tangs_sequence.begin(), it);
+  size_t size = this->tangs_sequence.size();
+  if (versus == Node::O) last_node_index = (last_node_index == 0) ? size - 1 : last_node_index - 1;
+  else                   last_node_index = (last_node_index == size - 1) ? 0 : last_node_index + 1;
   return get_tangent_node_by_virtual_index(this->tangs_sequence[last_node_index]);
 }
 
 Node* Node::my_next_outer(Node *last, int versus) {
-  unsigned int last_node_index;
-  if (last->y < this->y) last_node_index = last->abs_x_index + this->up_indexer;
-  else                   last_node_index = this->down_indexer - last->abs_x_index;
-  if (versus == Node::O) last_node_index == this->tangs_sequence.size() - 1 ? last_node_index = 0 : last_node_index++;
-  else                   last_node_index == 0 ? last_node_index = this->tangs_sequence.size() - 1 : last_node_index--;
+  int virtual_index = (last->y < this->y) ? -(last->abs_x_index + 1) : last->abs_x_index;
+  auto it = std::find(this->tangs_sequence.begin(), this->tangs_sequence.end(), virtual_index);
+  size_t last_node_index = std::distance(this->tangs_sequence.begin(), it);
+  size_t size = this->tangs_sequence.size();
+  if (versus == Node::O) last_node_index = (last_node_index == size - 1) ? 0 : last_node_index + 1;
+  else                   last_node_index = (last_node_index == 0) ? size - 1 : last_node_index - 1;
   return get_tangent_node_by_virtual_index(this->tangs_sequence[last_node_index]);
 }
 
 Point Node::coords_entering_to(Node *enter_to, int mode, int tracking) {
-  int enter_to_index;
-  if (enter_to->y < this->y) enter_to_index = enter_to->abs_x_index + this->up_indexer;
-  else                       enter_to_index = this->down_indexer - enter_to->abs_x_index;
+  int tg_index = (enter_to->y < this->y) ? -(enter_to->abs_x_index + 1) : enter_to->abs_x_index;
 
-  int tg_index = this->tangs_sequence[enter_to_index];
   if (tg_index < 0) {
     Node& node_up = cluster->vert_nodes[y + T_UP][-(tg_index + 1)];
     if (mode == Node::A) {

@@ -17,10 +17,11 @@
 #include "Tile.h"
 #include "Shape.h"
 
-Polyline::Polyline(ShapePool* shape_pool, Tile* tile, std::vector<Point> polygon, const std::optional<RectBounds>& bounds)
+Polyline::Polyline(ShapePool* shape_pool, Tile* tile, std::vector<Point> polygon, const std::optional<RectBounds>& bounds, unsigned int class_id)
 : tile(tile),
   shape_pool(shape_pool),
-  raw_(std::move(polygon))
+  raw_(std::move(polygon)),
+  class_id_(class_id)
 { if (bounds.has_value()) {
     min_x =  bounds->min_x;
     max_x_ = bounds->max_x;

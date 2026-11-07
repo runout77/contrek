@@ -854,8 +854,7 @@ RSpec.shared_examples "merging" do
       v_merger_options = {bounds: true, unsafe_mode: true}
       step_finder = @geo_json_streaming_merger.new(
         options: v_merger_options,
-        stream_to: shared_stream,
-        pixel_val: 34
+        stream_to: shared_stream
       )
       stripes.each do |stripe|
         stripe_result = @simple_polygon_finder.new(@bitmap_class.new(stripe, 16),
@@ -924,8 +923,7 @@ RSpec.shared_examples "merging" do
       v_merger_options = {unsafe_mode: true, bounds: true, compress: {uniq: true, linear: true, douglas_peucker: true}}
       step_finder = @geo_json_streaming_merger.new(
         options: v_merger_options,
-        stream_to: shared_stream,
-        pixel_val: 34
+        stream_to: shared_stream
       )
       stripes.each do |stripe|
         stripe_result = @simple_polygon_finder.new(@bitmap_class.new(stripe, 18),

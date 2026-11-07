@@ -6,7 +6,7 @@ module Contrek
       include Listable
 
       attr_reader :min_x, :max_x, :y, :name, :tangs_sequence, :tangs_count, :data_pointer,
-        :upper_start, :upper_end, :lower_start, :lower_end
+        :upper_start, :upper_end, :lower_start, :lower_end, :class_id
       attr_accessor :track, :abs_x_index, :outer_index, :inner_index, :inner_left_index, :inner_right_index
 
       T_UP = -1
@@ -27,8 +27,9 @@ module Contrek
       OUTER = 0
       INNER = 1
 
-      def initialize(cluster, min_x, max_x, y, name, connectivity_offset = 0)
+      def initialize(cluster, min_x, max_x, y, name, connectivity_offset = 0, class_id = 0)
         @name = name
+        @class_id = class_id
         @min_x = min_x
         @max_x = max_x + 1
         @y = y
@@ -37,8 +38,6 @@ module Contrek
         @track = 0
         @abs_x_index = 0
         @data_pointer = cluster.lists.get_data_pointer
-        @up_indexer = 0
-        @down_indexer = 0
         @outer_index = -1
         @inner_index = -1
         @inner_left_index = -1
@@ -81,11 +80,8 @@ module Contrek
       end
 
       def my_next(last, versus, mode)
-        last_node_index = if last.y < y
-          last.abs_x_index + @up_indexer
-        else
-          @down_indexer - last.abs_x_index
-        end
+        virtual_index = (last.y < y) ? -(last.abs_x_index + 1) : last.abs_x_index
+        last_node_index = @tangs_sequence.index(virtual_index)
 
         case mode
         when :outer
@@ -117,13 +113,8 @@ module Contrek
       end
 
       def coords_entering_to(enter_to, enter_mode, tracking)
-        enter_to_index = if enter_to.y < y
-          enter_to.abs_x_index + @up_indexer
-        else
-          @down_indexer - enter_to.abs_x_index
-        end
+        tg_index = (enter_to.y < y) ? -(enter_to.abs_x_index + 1) : enter_to.abs_x_index
 
-        tg_index = @tangs_sequence[enter_to_index]
         if tg_index < 0
           node_up = @cluster.vert_nodes[y + T_UP][-(tg_index + 1)]
           if enter_mode == :a
@@ -166,20 +157,19 @@ module Contrek
 
       def precalc_tangs_sequences(cluster:)
         @tangs_sequence = []
-        @up_indexer = -cluster.vert_nodes[@y + T_UP][@upper_start].abs_x_index if @upper_end >= 0
         if @upper_end >= 0
           (@upper_start..@upper_end).each do |upper_pos|
-            @tangs_sequence << -(upper_pos + 1)
+            if cluster.vert_nodes[@y + T_UP][upper_pos].class_id == class_id
+              @tangs_sequence << -(upper_pos + 1)
+            end
           end
         end
-        if @lower_end >= 0
-          lower_size = (@lower_end >= 0) ? (@lower_end - @lower_start + 1) : 0
-          upper_size = (@upper_end >= 0) ? (@upper_end - @upper_start + 1) : 0
-          @down_indexer = (cluster.vert_nodes[@y + T_DOWN][@lower_start].abs_x_index + lower_size + upper_size - 1)
-        end
+
         if @lower_end >= 0
           @lower_end.downto(@lower_start).each do |lower_pos|
-            @tangs_sequence << lower_pos
+            if cluster.vert_nodes[@y + T_DOWN][lower_pos].class_id == class_id
+              @tangs_sequence << lower_pos
+            end
           end
         end
         @tangs_count = tangs_sequence.size

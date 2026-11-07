@@ -173,3 +173,6 @@ All notable changes to this project will be documented in this file.
 
 ## [1.4.6] - 2026-10-18
 - Added tile metadata, polygon bounds, ordering, and shared boundary validation for Ruby and C++ mergers, with `unsafe_mode: true` to bypass validation.
+
+## [1.4.7] - 2026-11-07
+- Added multiclass raster polygonization support, preserving class IDs throughout polygon extraction and tile merging, including streaming mergers.

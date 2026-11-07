@@ -21,7 +21,7 @@ module Contrek
 
         # 1 finds matching blocks
         @reports[:scan] = Benchmark.measure do
-          scan
+          @options[:multiclass] ? multiclass_scan : scan
         end
 
         # 2 builds relational spatially tree map
@@ -125,6 +125,34 @@ module Contrek
             max_x = x
             Contrek::Finder::Node.new(@node_cluster, min_x, max_x, y, last_color, offset)
             matching = false
+          end
+        end
+      end
+
+      def multiclass_scan
+        offset = (@node_cluster.options[:connectivity] == 8) ? 1 : 0
+        current_color = nil
+        min_x = start_x
+        current_y = nil
+        last_x = end_x - 1
+
+        @source_bitmap.scan(start_x: start_x, end_x: end_x, end_y: @processing_height) do |x, y, color|
+          if current_y != y || (current_color && color != current_color)
+            unless current_color.nil?
+              Contrek::Finder::Node.new(@node_cluster, min_x, ((current_y == y) ? x - 1 : last_x), current_y, current_color, offset, current_color.ord)
+            end
+            min_x = x if current_y == y
+          end
+
+          if current_y != y
+            current_y = y
+            min_x = x
+          end
+
+          current_color = color
+          if x == last_x && current_color
+            Contrek::Finder::Node.new(@node_cluster, min_x, last_x, current_y, current_color, offset, current_color.ord)
+            current_color = nil
           end
         end
       end

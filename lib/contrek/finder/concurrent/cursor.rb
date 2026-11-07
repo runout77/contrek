@@ -91,7 +91,9 @@ module Contrek
               new_position.end_point.tracked_outer = true
               versus = act_part.versus
               part = new_position.end_point.queues.find do |p|
-                (p.versus == -versus) && p.polyline.tile != act_part.polyline.tile
+                (p.versus == -versus) &&
+                  p.polyline.tile != act_part.polyline.tile &&
+                  p.polyline.class_id == act_part.polyline.class_id
               end
               if part
                 if all_parts[-2] != part

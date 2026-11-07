@@ -13,7 +13,8 @@ RSpec.shared_examples "validation" do
       svg_streaming_merger = Contrek::Cpp::CPPSvgConcurrentStreamingMerger.new(
         stream_to: streaming_file,
         total_width: source.width,
-        total_height: source.height
+        total_height: source.height,
+        options: {unsafe_mode: true}
       )
       streamer = CPPRasterStreamer.new(source, stripe_height: stripe_height)
       white = Contrek::Bitmaps::RgbCppColor.new(r: 255, g: 255, b: 255, a: 255)

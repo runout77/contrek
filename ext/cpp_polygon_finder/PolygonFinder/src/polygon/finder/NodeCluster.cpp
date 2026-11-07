@@ -85,8 +85,8 @@ void NodeCluster::build_tangs_sequence() {
   }
 }
 
-Node* NodeCluster::add_node(int min_x, int max_x, int y, char name, int offset) {
-  vert_nodes[y].emplace_back(min_x, max_x, y, this, name);
+Node* NodeCluster::add_node(int min_x, int max_x, int y, char name, int offset, unsigned int class_id) {
+  vert_nodes[y].emplace_back(min_x, max_x, y, this, name, class_id);
 
   Node& node = vert_nodes[y].back();
   node.abs_x_index = vert_nodes[y].size() - 1;
@@ -104,8 +104,10 @@ Node* NodeCluster::add_node(int min_x, int max_x, int y, char name, int offset) 
 
       while (it != up_nodes.end()) {
         if ((it->min_x - offset) > (node.max_x - 1)) break;
-        node.add_intersection(*it, it->abs_x_index);
-        it->add_intersection(node, node.abs_x_index);
+        if (!this->options->multiclass || node.class_id == it->class_id) {
+          node.add_intersection(*it, it->abs_x_index);
+          it->add_intersection(node, node.abs_x_index);
+        }
         ++it;
       }
     }
@@ -123,6 +125,7 @@ void NodeCluster::plot(int versus) {
     this->plot_sequence.clear();
     this->plot_sequence.push_back(root_node);
     Polygon poly;
+      poly.class_id = root_node->class_id;
       Node *next_node = nullptr;
       if ((root_node)->tangs_sequence.size() > 0)  // front() or back() on empty list is undefined
       { versus == Node::A ?

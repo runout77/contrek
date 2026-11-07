@@ -24,6 +24,7 @@ void FinderUtils::sanitize_options(pf_Options& options, const Options& incoming_
   options.named_sequences = incoming_options.get<bool>(
     "named_sequences", options.named_sequences);
   options.bounds = incoming_options.get<bool>("bounds", options.bounds);
+  options.multiclass = incoming_options.get<bool>("multiclass", options.multiclass);
   options.unsafe_mode = incoming_options.get<bool>("unsafe_mode", options.unsafe_mode);
   options.deterministic = incoming_options.get<bool>("deterministic", options.deterministic);
   options.processing_height = static_cast<int>(incoming_options.get<std::int64_t>(

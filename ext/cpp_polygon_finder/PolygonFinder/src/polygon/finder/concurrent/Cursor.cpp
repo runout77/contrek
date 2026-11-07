@@ -102,11 +102,17 @@ void Cursor::traverse_outer(Part* start_part,
           return;
         }
         new_position->end_point()->tracked_outer = true;
-        int versus = act_part->versus();
+        int opposite_versus = -act_part->versus();
         auto& q_set = new_position->end_point()->queues();
+        auto* act_part_polyline = act_part->polyline();
         auto it = std::find_if(q_set.begin(), q_set.end(), [&](Queueable<Point>* q) {
           Part* p = static_cast<Part*>(q);
-          return (p->versus() == -versus) && p->polyline()->tile != act_part->polyline()->tile;
+          if (p->versus() != opposite_versus) {
+            return false;
+          }
+          auto* polyline = p->polyline();
+          return  polyline->tile != act_part_polyline->tile &&
+                  polyline->class_id() == act_part_polyline->class_id();
         });
 
         Part* part = nullptr;

@@ -76,10 +76,8 @@ class GeoJsonStreamingMerger : public StreamingMerger {
  public:
   GeoJsonStreamingMerger(int number_of_threads,
                          const Options& options,
-                         std::ofstream* stream_to,
-                         unsigned int pixel_value)
-      : StreamingMerger(number_of_threads, options, stream_to),
-        target_value(pixel_value) {
+                         std::ofstream* stream_to)
+      : StreamingMerger(number_of_threads, options, stream_to) {
     configure_point_writer(options);
   }
 
@@ -90,7 +88,7 @@ class GeoJsonStreamingMerger : public StreamingMerger {
     }
     is_first_feature = false;
 
-    *stream << "{\"type\":\"Feature\",\"properties\":{\"PixelVal\":" << target_value
+    *stream << "{\"type\":\"Feature\",\"properties\":{\"PixelVal\":" << polygon.class_id
             << "},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[";
     const std::vector<Point>& points = polygon.outer;
     const size_t points_size = points.size();

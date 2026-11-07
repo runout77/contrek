@@ -49,7 +49,7 @@ PolygonFinder::PolygonFinder(Bitmap *bitmap,
 
   //= SCAN ==============//
   cpu_timer.start();
-  scan();
+  this->options.multiclass ? multiclass_scan() : scan();
   reports["scan"] = cpu_timer.stop();
   //=====================//
 
@@ -89,20 +89,33 @@ PolygonFinder::~PolygonFinder() {
 }
 
 void PolygonFinder::scan() {
-    int bpp = this->source_bitmap->get_bytes_per_pixel();
-    int offset = options.connectivity_offset;
+  int bpp = this->source_bitmap->get_bytes_per_pixel();
+  int offset = options.connectivity_offset;
 
-    RGBMatcher* rgb_m = dynamic_cast<RGBMatcher*>(this->matcher);
+  RGBMatcher* rgb_m = dynamic_cast<RGBMatcher*>(this->matcher);
 
-    if (bpp == 1) {
+  if (bpp == 1) {
+    auto fetcher = [](const unsigned char* p) { return static_cast<unsigned int>(p[0]); };
+    if (rgb_m) run_loop(rgb_m, fetcher, offset);
+    else       run_loop(this->matcher, fetcher, offset);
+  } else {
+    auto fetcher = [](const unsigned char* p) { return *reinterpret_cast<const uint32_t*>(p); };
+    if (rgb_m) run_loop(rgb_m, fetcher, offset);
+    else       run_loop(this->matcher, fetcher, offset);
+  }
+}
+
+void PolygonFinder::multiclass_scan() {
+  int bpp = this->source_bitmap->get_bytes_per_pixel();
+  int offset = options.connectivity_offset;
+
+  if (bpp == 1) {
       auto fetcher = [](const unsigned char* p) { return static_cast<unsigned int>(p[0]); };
-      if (rgb_m) run_loop(rgb_m, fetcher, offset);
-      else       run_loop(this->matcher, fetcher, offset);
-    } else {
+      run_multiclass_loop(fetcher, offset);
+  } else {
       auto fetcher = [](const unsigned char* p) { return *reinterpret_cast<const uint32_t*>(p); };
-      if (rgb_m) run_loop(rgb_m, fetcher, offset);
-      else       run_loop(this->matcher, fetcher, offset);
-    }
+      run_multiclass_loop(fetcher, offset);
+  }
 }
 
 ProcessResult* PolygonFinder::process_info() {

@@ -40,8 +40,9 @@ module Contrek
         "Shape (outer_polyline = #{outer_polyline.named}, children count = #{@children_shapes.size}"
       end
 
-      def to_raw_polygon(bounds: false)
+      def to_raw_polygon(bounds: false, multiclass: false)
         {bounds: (outer_polyline.get_bounds if bounds),
+         class: (outer_polyline.class_id if multiclass),
          outer: outer_polyline.raw,
          inner: inner_polylines.map(&:raw)}.compact
       end

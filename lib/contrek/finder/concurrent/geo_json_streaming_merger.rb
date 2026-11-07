@@ -3,11 +3,10 @@
 module Contrek
   module Concurrent
     class GeoJsonStreamingMerger < StreamingMerger
-      def initialize(stream_to:, pixel_val:, options: {})
-        @pixel_val = pixel_val
+      def initialize(stream_to:, options: {})
         @point_converter = self.class.coordinates_converter(options[:geo_localization])
 
-        super(stream_to:, options:)
+        super
       end
 
       def write_header
@@ -35,7 +34,7 @@ module Contrek
         end
         feature_hash = {
           type: "Feature",
-          properties: {PixelVal: @pixel_val},
+          properties: {PixelVal: polygon[:class]},
           geometry: {
             type: "Polygon",
             coordinates: polygon_coordinates

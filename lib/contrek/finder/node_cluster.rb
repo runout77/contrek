@@ -57,6 +57,8 @@ module Contrek
         versus = @options[:versus]
         inner_v = VERSUS_INVERTER[versus]
         index_order = 0
+        multiclass = @options[:multiclass]
+
         while @root_nodes.size > 0
           root_node = @root_nodes.shift
 
@@ -110,7 +112,12 @@ module Contrek
           draw_sequence(bitmap, "X") unless bitmap.nil?
 
           if @sequence_coords.any?
-            @polygons << {outer: @sequence_coords, inner: [], bounds: (bounds.to_h if @options[:bounds])}.compact
+            @polygons << {
+              outer: @sequence_coords,
+              inner: [],
+              bounds: (bounds.to_h if @options[:bounds]),
+              class: (root_node.class_id if multiclass)
+            }.compact
             @sequences << @plot_sequence
 
             @count = 0
@@ -332,6 +339,7 @@ module Contrek
       end
 
       def add_node(node, offset)
+        multiclass = options[:multiclass]
         @nodes += 1
         node.abs_x_index = @vert_nodes[node.y].size
 
@@ -348,15 +356,19 @@ module Contrek
               up_node = up_nodes[index]
               if ((up_node.max_x - 1) + offset) >= node.min_x
                 if (up_node.min_x - offset) <= (node.max_x - 1)
-                  node.add_intersection(up_node, index)
-                  up_node.add_intersection(node, node.abs_x_index)
+                  unless multiclass && node.class_id != up_node.class_id
+                    node.add_intersection(up_node, index)
+                    up_node.add_intersection(node, node.abs_x_index)
+                  end
                 end
                 return if (index += 1) == up_nodes_count
                 loop do
                   up_node = up_nodes[index]
                   if (up_node.min_x - offset) <= (node.max_x - 1)
-                    node.add_intersection(up_node, index)
-                    up_node.add_intersection(node, node.abs_x_index)
+                    unless multiclass && node.class_id != up_node.class_id
+                      node.add_intersection(up_node, index)
+                      up_node.add_intersection(node, node.abs_x_index)
+                    end
                   else
                     return
                   end

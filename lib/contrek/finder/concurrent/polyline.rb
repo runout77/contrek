@@ -7,10 +7,10 @@ module Contrek
 
       TRACKED_OUTER = 1 << 0
 
-      attr_reader :raw, :name, :min_y, :max_y
+      attr_reader :raw, :name, :min_y, :max_y, :class_id
       attr_accessor :shape, :tile, :any_ancients, :inside_inner_polyline
 
-      def initialize(tile:, polygon:, shape: nil, bounds: nil, force_named: nil)
+      def initialize(tile:, polygon:, shape: nil, bounds: nil, force_named: nil, class_id: 0)
         @tile = tile
         @name = tile.shapes.count
         @named = force_named
@@ -19,6 +19,7 @@ module Contrek
         @flags = 0
         @any_ancients = false
         @inside_inner_polyline = nil
+        @class_id = class_id
 
         if bounds.nil?
           find_boundary

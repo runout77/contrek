@@ -57,7 +57,8 @@ module Contrek
 
       def to_raw_polygons
         bounds = @finder.options[:bounds]
-        @shapes.map { |s| s.to_raw_polygon(bounds:) }
+        multiclass = @finder.options[:multiclass]
+        @shapes.map { |s| s.to_raw_polygon(bounds:, multiclass:) }
       end
 
       def compute_treemap
@@ -93,7 +94,13 @@ module Contrek
         shapes_map = {}
         raw_polylines.each_with_index do |raw_polyline, polyline_index|
           shape = Shape.new.tap do |shape|
-            shape.outer_polyline = Polyline.new(tile: self, polygon: raw_polyline[:outer], shape: shape, bounds: raw_polyline[:bounds])
+            shape.outer_polyline = Polyline.new(
+              tile: self,
+              polygon: raw_polyline[:outer],
+              shape: shape,
+              bounds: raw_polyline[:bounds],
+              class_id: raw_polyline[:class] || 0
+            )
             shape.inner_polylines = raw_polyline[:inner].map { |raw| InnerPolyline.new(shape: shape, raw_coordinates: raw) }
           end
           @shapes << shape

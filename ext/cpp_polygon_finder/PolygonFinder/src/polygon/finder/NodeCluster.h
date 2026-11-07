@@ -47,7 +47,7 @@ class NodeCluster {
   std::list<Polygon> polygons;
   NodeCluster(int h, int w, pf_Options *options);
   virtual ~NodeCluster();
-  Node* add_node(int min_x, int max_x, int y, char name, int offset);
+  Node* add_node(int min_x, int max_x, int y, char name, int offset, unsigned int class_id = 0);
   void calc_root_nodes();
   void build_tangs_sequence();
   void plot(int versus);

@@ -100,7 +100,7 @@ Tile* Cluster::merge_tiles() {
         }
         shape->clear_inner();
 
-        Polyline* polyline = tile->shapes_pool->acquire_polyline(tile, new_outer.to_vector(), std::nullopt);
+        Polyline* polyline = tile->shapes_pool->acquire_polyline(tile, new_outer.to_vector(), shape->outer_polyline->class_id(), std::nullopt);
         Shape* inserting_new_shape = tile->shapes_pool->acquire_shape(polyline, new_inners);
         new_shapes.push_back(inserting_new_shape);
         polyline->shape = inserting_new_shape;

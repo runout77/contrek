@@ -37,7 +37,7 @@ module Contrek
           bounds = shape.outer_polyline.get_bounds
           if flush || bounds[:max_x] < safe_boundary_x
             @moved += 1
-            polygon = shape.to_raw_polygon
+            polygon = shape.to_raw_polygon(multiclass: true)
             polygons_to_stream << polygon
             false
           else

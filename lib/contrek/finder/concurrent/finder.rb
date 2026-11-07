@@ -55,7 +55,8 @@ module Contrek
                   versus: current_versus,
                   bounds: true,
                   treemap: @options[:treemap],
-                  connectivity: @options[:connectivity]
+                  connectivity: @options[:connectivity],
+                  multiclass: @options[:multiclass]
                 }.compact,
                 start_x: payload[:tile_start_x],
                 end_x: payload[:tile_end_x]

@@ -53,6 +53,7 @@ struct pf_Options {
   bool named_sequences = false;
   bool unsafe_mode = false;
   bool bounds = false;
+  bool multiclass = false;
   bool deterministic = false;
   int processing_height = 0;
   int connectivity_offset = 0;
@@ -181,6 +182,7 @@ class PolygonFinder {
   pf_Options options;
   std::map<std::string, double> reports;
   void scan();
+  void multiclass_scan();
   CpuTimer cpu_timer;
 
   template <typename M, typename F>
@@ -276,6 +278,70 @@ class PolygonFinder {
 
       if (matching) {
         this->node_cluster->add_node(min_x, this->end_x - 1, y, last_red_value, offset);
+      }
+    }
+  }
+
+  template <typename F>
+  void run_multiclass_loop(F&& fetch_color, int offset) {
+    int img_h = this->processing_height;
+    int bpp = this->source_bitmap->get_bytes_per_pixel();
+
+    for (int y = 0; y < img_h; y++) {
+      const unsigned char* row_ptr = this->source_bitmap->get_row_ptr(y);
+      const unsigned char* p = row_ptr + (this->start_x * bpp);
+
+      int min_x = this->start_x;
+      bool has_color = false;
+      unsigned int current_color = 0;
+      int x = this->start_x;
+      if (bpp == 4) {
+        for (; x <= this->end_x - 4; x += 4) {
+          unsigned int c0 = fetch_color(p);
+          unsigned int c1 = fetch_color(p + 4);
+          unsigned int c2 = fetch_color(p + 8);
+          unsigned int c3 = fetch_color(p + 12);
+          p += 16;
+
+          if (!has_color) {
+            min_x = x; current_color = c0; has_color = true;
+          } else if (c0 != current_color) {
+            this->node_cluster->add_node(min_x, x - 1, y, current_color, offset, current_color);
+            min_x = x; current_color = c0;
+          }
+
+          if (c1 != current_color) {
+            this->node_cluster->add_node(min_x, x, y, current_color, offset, current_color);
+            min_x = x + 1; current_color = c1;
+          }
+
+          if (c2 != current_color) {
+            this->node_cluster->add_node(min_x, x + 1, y, current_color, offset, current_color);
+            min_x = x + 2; current_color = c2;
+          }
+
+          if (c3 != current_color) {
+            this->node_cluster->add_node(min_x, x + 2, y, current_color, offset, current_color);
+            min_x = x + 3; current_color = c3;
+          }
+        }
+      }
+
+      for (; x < this->end_x; x++) {
+        unsigned int color = fetch_color(p);
+        p += bpp;
+        if (!has_color) {
+          min_x = x;
+          current_color = color;
+          has_color = true;
+        } else if (color != current_color) {
+          this->node_cluster->add_node(min_x, x - 1, y, current_color, offset, current_color);
+          min_x = x;
+          current_color = color;
+        }
+      }
+      if (has_color) {
+        this->node_cluster->add_node(min_x, this->end_x - 1, y, current_color, offset, current_color);
       }
     }
   }

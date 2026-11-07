@@ -18,6 +18,8 @@ Besides extracting contours, Contrek can also determine the nesting relationship
 
 Several coordinate-compression algorithms are available to reduce polygon size after tracing. The library can also split the work across multiple threads by processing independent vertical stripes and merging the results afterwards into a single topologically consistent representation.
 
+Contrek also supports multiclass polygonization, extracting multiple raster classes in a single pass while preserving their identifiers throughout the merging process.
+
 The image below shows a simple example. Every non-white pixel is considered part of the traced region. The resulting outer contour is shown in red, while inner contours are shown in green.
 
 ![alt text](contrek.png "Contour tracing")
@@ -675,6 +677,27 @@ result = Contrek.contour!(
 ```
 
 The choice mainly affects how diagonally touching regions are interpreted.
+
+
+## Multiclass Polygonization
+
+Contrek supports multiclass polygonization, extracting contours for multiple pixel classes in a single processing pass.
+Enable it using the `multiclass: true` option:
+
+```ruby
+result = Contrek.contour!(
+  png_file_path: "classified.png",
+  options: {
+    finder: {
+      multiclass: true,
+      connectivity: 8
+    }
+  }
+)
+```
+
+Each polygon retains its original pixel value in the `class` attribute. Regions belonging to different classes remain separate, while regions of the same class can be merged across tile boundaries.
+Multiclass processing is supported by both the Ruby and native C++ implementations, including streaming mergers.
 
 ## Merging External Geometry
 

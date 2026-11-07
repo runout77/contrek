@@ -23,7 +23,8 @@ module Contrek
         @to_points ||= raw_list.map do |polygon|
           {bounds: (polygon[:bounds] if polygon.key?(:bounds)),
            outer: self.class.to_points(polygon[:outer]),
-           inner: polygon[:inner].map { |s| self.class.to_points(s) }}.compact
+           inner: polygon[:inner].map { |s| self.class.to_points(s) },
+           class: (polygon[:class] if polygon.key?(:class))}.compact
         end
       end
 

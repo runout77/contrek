@@ -86,7 +86,6 @@ class Node : public  Listable {
 
   int y;
   int abs_x_index;
-  int up_indexer, down_indexer;
   int tangs_count;
   int track;
   int outer_index, inner_index;
@@ -94,6 +93,7 @@ class Node : public  Listable {
   int upper_end   = -1;
   int lower_start = std::numeric_limits<int>::max();
   int lower_end   = -1;
+  unsigned int class_id;
   NodeCluster* cluster;
   void add_intersection(Node& other_node, int other_node_index);
   SmallVec tangs_sequence;
@@ -111,7 +111,7 @@ class Node : public  Listable {
 
  public:
   int min_x, max_x;
-  Node(int min_x, int max_x, int y, NodeCluster* cluster, char name);
+  Node(int min_x, int max_x, int y, NodeCluster* cluster, char name, unsigned int class_id = 0);
   void precalc_tangs_sequences(NodeCluster& cluster);
   void assign_lateral_inner_index(Node* my_prev_node, Node* end_node, int versus);
   bool processed = false;

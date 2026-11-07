@@ -60,6 +60,9 @@ Finder::Finder(int number_of_threads, Bitmap *bitmap, Matcher *matcher, const Op
       if (this->options_.processing_height != 0) {
         base_arguments["processing_height"] = this->options_.processing_height;
       }
+      if (this->options_.multiclass) {
+        base_arguments["multiclass"] = true;
+      }
 
       CpuTimer t;
       t.start();

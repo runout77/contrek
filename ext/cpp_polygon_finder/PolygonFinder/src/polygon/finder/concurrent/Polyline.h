@@ -29,7 +29,7 @@ class InnerPolyline;
 class Polyline : public Partitionable {
  public:
   using Partitionable::Partitionable;
-  Polyline(ShapePool* shape_pool, Tile* tile, std::vector<Point> polygon, const std::optional<RectBounds>& bounds = std::nullopt);
+  Polyline(ShapePool* shape_pool, Tile* tile, std::vector<Point> polygon, const std::optional<RectBounds>& bounds = std::nullopt, unsigned int class_id = 0);
   enum Flags : uint32_t {
     TRACKED_OUTER = 1 << 0
   };
@@ -47,6 +47,7 @@ class Polyline : public Partitionable {
   int max_y() const { return max_y_; }
   int min_y() const { return min_y_; }
   int max_x() const { return max_x_; }
+  unsigned int class_id() const { return class_id_; }
   void clear();
   bool is_empty();
   bool any_ancients = false;
@@ -63,5 +64,6 @@ class Polyline : public Partitionable {
   void find_boundary();
   uint32_t flags_ = 0;
   int name;
+  unsigned int class_id_;
   std::string named_;
 };

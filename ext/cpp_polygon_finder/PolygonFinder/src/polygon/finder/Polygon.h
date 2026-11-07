@@ -17,5 +17,6 @@ struct Polygon {
   std::vector<Point> outer;
   std::list<std::vector<Point>> inner;
   RectBounds bounds;
+  unsigned int class_id = 0;
   Polygon() : bounds(RectBounds::empty()) {}
 };

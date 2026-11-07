@@ -19,8 +19,8 @@ Shape* ShapePool::acquire_shape(Polyline* outer_polyline, const std::vector<Inne
   return shape;
 }
 
-Polyline* ShapePool::acquire_polyline(Tile* tile, std::vector<Point> polygon, const std::optional<RectBounds>& bounds = std::nullopt) {
-  return this->polylines.acquire(this, tile, std::move(polygon), bounds);
+Polyline* ShapePool::acquire_polyline(Tile* tile, std::vector<Point> polygon, unsigned int class_id, const std::optional<RectBounds>& bounds = std::nullopt) {
+  return this->polylines.acquire(this, tile, std::move(polygon), bounds, class_id);
 }
 
 InnerPolyline* ShapePool::acquire_inner_polyline(std::vector<Point> coords, Shape* shape) {

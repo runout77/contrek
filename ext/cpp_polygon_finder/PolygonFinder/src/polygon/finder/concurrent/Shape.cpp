@@ -49,6 +49,7 @@ std::string Shape::name() {
 Polygon Shape::to_raw_polygon(bool bounds) {
   Polygon poly;
   poly.outer = this->outer_polyline->raw();
+  poly.class_id = this->outer_polyline->class_id();
   if (bounds) {
     this->outer_polyline->fill_bounds(poly.bounds);
   }

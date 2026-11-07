@@ -60,7 +60,7 @@ void Tile::assign_raw_polygons(const std::list<Polygon>& raw_polylines, const st
   std::unordered_map<int, Shape*> shapes_map;
   int polyline_index = 0;
   for (const auto& raw_polyline : raw_polylines)
-  { Polyline* polyline = this->shapes_pool->acquire_polyline(this, raw_polyline.outer, raw_polyline.bounds);
+  { Polyline* polyline = this->shapes_pool->acquire_polyline(this, raw_polyline.outer, raw_polyline.class_id, raw_polyline.bounds);
     std::vector<InnerPolyline*> inner_polylines_list;
     for (auto& raw_points : raw_polyline.inner) {
       inner_polylines_list.push_back(this->shapes_pool->acquire_inner_polyline(raw_points, nullptr));

@@ -74,4 +74,8 @@ RSpec.describe Contrek::Concurrent::Finder, type: :class do
   describe "concurrent" do
     include_examples "performances"
   end
+
+  describe "concurrent" do
+    include_examples "multiclass"
+  end
 end
