@@ -21,4 +21,5 @@ class Tests {
   virtual void test_h();
   virtual void test_i();
   virtual void test_l();
+  virtual void test_m();
 };

@@ -27,6 +27,7 @@ void run_test() {
   // test_suite.test_h();
   // test_suite.test_i();
   // test_suite.test_l();
+  // test_suite.test_m();
   std::cout << "compute time = " << cpu_timer.stop() << std::endl;
 }
 

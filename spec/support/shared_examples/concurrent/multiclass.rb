@@ -183,5 +183,35 @@ RSpec.shared_examples "multiclass" do
       #      got: [[-1, -1], [0, 0], [1, -1], [1, -1]]
       # expect(result[:metadata][:treemap]).to eq([[-1, -1], [0, 0], [1, 0], [1, 1]])
     end
+
+    # This case demonstrates the issue with the class 2 pixel at position x=8, y=7.
+    # Without the class check, an infinite loop occurs.
+    # (EXCLUSIVE) ([8,7][8,8])
+    # (SEAM) ([9,8][9,7])
+
+    it "multiclass scans case 13" do
+      chunk =
+        "       356  2 2  5" \
+        "       35  2112  7" \
+        "        5 2112 267" \
+        "        5521122 67" \
+        "       3 52 125676" \
+        "        5 22115776" \
+        "       3 22 2 6865" \
+        "        2   22665 " \
+        "       3  22256655" \
+        "        5  12666  " \
+        "        552156566 " \
+        "        552 555762" \
+        "         5 2 55752" \
+        "        5 1 5555 0" \
+        "        52255  620"
+      result = @polygon_finder_class.new(
+        bitmap: @bitmap_class.new(chunk, 18),
+        matcher: nil,
+        options: {connectivity: 8, multiclass: true, number_of_tiles: 2, versus: :a, compress: {uniq: true, linear: true}}
+      ).process_info
+      expect(result.points).to match_expected_json store_data: true
+    end
   end
 end

@@ -130,7 +130,8 @@ module Contrek
                 eligibles = act_part.head.end_point.queues.select { |p| p.polyline.tile != act_part.polyline.tile }
                 eligibles.each do |dest_part|
                   dest_part_versus = dest_part.versus
-                  next if dest_part_versus != 0 && dest_part_versus == act_part.versus
+                  next if (dest_part_versus != 0 && dest_part_versus == act_part.versus) ||
+                    dest_part.polyline.class_id != act_part.polyline.class_id
 
                   tracked_end_points << act_part.head.end_point
                   shape = dest_part.polyline.shape

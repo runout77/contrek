@@ -156,11 +156,16 @@ void Cursor::traverse_inner(Part* act_part, std::vector<Part*>& all_parts, std::
           { EndPoint* current_end_point = static_cast<Position*>(act_part->head)->end_point();
             for (auto dest_part_p : current_end_point->queues()) {
               Part* dest_part = static_cast<Part*>(dest_part_p);
-              if (dest_part->polyline()->tile == act_part->polyline()->tile) {
+              auto* source_polyline = act_part->polyline();
+              auto* dest_polyline = dest_part->polyline();
+              if ((dest_polyline->tile == source_polyline->tile) ||
+                  dest_polyline->class_id() != source_polyline->class_id()) {
                 continue;
               }
               int dest_part_versus = dest_part->versus();
-              if (dest_part_versus != 0 && dest_part_versus == act_part->versus()) continue;
+              if (dest_part_versus != 0 && dest_part_versus == act_part->versus()) {
+                continue;
+              }
 
               tracked_end_points.push_back(current_end_point);
               Shape* shape = dest_part->polyline()->shape;

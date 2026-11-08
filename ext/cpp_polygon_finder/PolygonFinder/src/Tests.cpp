@@ -452,3 +452,72 @@ void Tests::test_l() {
   // stream_progressive_png_image("../images/test_20480x20480.png", 2000);
   std::cout << "Memory usage peak: " << get_peak_rss() << " MB" << std::endl;
 }
+
+ProcessResult* stream_progressive_png_image_to_geojson(const std::string& filepath, const std::string& geojson_filepath, uint32_t stripe_height) {
+  ProcessResult* merged_result = nullptr;
+
+  Options varguments = {
+    {"unsafe_mode", true},
+    {"compress", Options{
+      {"linear", true},
+    }},
+  };
+
+  PngSource source(filepath);
+  if (stripe_height >= source.height()) {
+    throw std::invalid_argument("stripe_height must be smaller than image height");
+  }
+
+  RasterStreamer streamer(source, stripe_height);
+  // allocates stripe buffer
+  RawBitmap stripe_bitmap(source.width(), stripe_height);
+
+  // allocates streaming buffer
+  std::ofstream shared_stream(geojson_filepath, std::ios::out | std::ios::binary);
+  if (!shared_stream) {
+    std::cerr << "Error: Unable creating output streaming file!" << std::endl;
+    return nullptr;
+  }
+
+  std::vector<char> buffer(4 * 1024 * 1024);  // Buffer (4MB)
+  shared_stream.rdbuf()->pubsetbuf(buffer.data(), buffer.size());
+  GeoJsonStreamingMerger vmerger(0, varguments, &shared_stream);
+
+  try {
+    uint32_t processed_rows = 0;
+    bool first = true;
+    int stripe_count = 0;
+    // main stripes loop
+    streamer.each(stripe_bitmap, [&](Bitmap& bitmap, uint32_t buffer_rows, std::size_t, std::size_t) {
+      // stripe contour tracing
+      Options finder_options = {
+        {"processing_height", static_cast<int>(buffer_rows)},
+        {"versus", Identifier{"a"}},
+        {"bounds", true},
+        {"multiclass", true},
+        {"connectivity", 8}
+      };
+      PolygonFinder polygon_finder(&bitmap, nullptr, nullptr, finder_options);
+      ProcessResult *result = polygon_finder.process_info();
+      if (result) {
+        std::cout << "stripe " << stripe_count << ": found polygons " << result->groups << std::endl;
+        processed_rows += buffer_rows - (first ? 0 : RasterStreamer::OVERLAP);
+        vmerger.add_tile(*result, processed_rows == source.height());
+        delete result;
+      }
+      stripe_count++;
+      first = false;
+    });
+    merged_result = vmerger.process_info();
+    std::cout << "total found polygons " << merged_result->groups << std::endl;
+  } catch (const std::exception& e) {
+    std::cerr << "\n[ERROR] Processing exception: " << e.what() << std::endl;
+    if (shared_stream.is_open()) shared_stream.close();
+  }
+  return merged_result;
+}
+
+void Tests::test_m() {
+  stream_progressive_png_image_to_geojson("../images/italy_1300x1300.png", "output.geojson", 100);
+  std::cout << "Memory usage peak: " << get_peak_rss() << " MB" << std::endl;
+}
