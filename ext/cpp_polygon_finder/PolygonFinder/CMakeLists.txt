@@ -23,6 +23,8 @@ else()
 endif()
 find_package(ZLIB REQUIRED)
 message(STATUS "Contrek: ZLIB path found at ${ZLIB_LIBRARIES}")
+find_package(TIFF REQUIRED)
+find_library(GEOTIFF_LIBRARY NAMES geotiff REQUIRED)
 file(GLOB_RECURSE CPP_SOURCES "*.cpp")
 file(GLOB_RECURSE C_SOURCES "*.c")
 list(FILTER CPP_SOURCES EXCLUDE REGEX "examples/.*\\.cpp")
@@ -37,8 +39,10 @@ target_include_directories(ContrekLib PUBLIC
     ${ALL_INCLUDE_DIRS}
     ${ZLIB_INCLUDE_DIRS}
 )
-target_link_libraries(ContrekLib PRIVATE
-    ${ZLIB_LIBRARIES}
+target_link_libraries(ContrekLib PUBLIC
+    ZLIB::ZLIB
+    TIFF::TIFF
+    ${GEOTIFF_LIBRARY}
     pthread
 )
 option(BUILD_EXAMPLES "Build the example application" OFF)

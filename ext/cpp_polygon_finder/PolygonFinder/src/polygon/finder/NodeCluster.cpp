@@ -214,7 +214,7 @@ void NodeCluster::plot(int versus) {
 
           if (next_node != nullptr)
           { inner_sequence.push_back(next_node->coords_entering_to(first, inner_v, Node::INNER));
-            Node* last_node = plot_inner_node(inner_sequence, next_node, inner_v, first, root_node);
+            Node* last_node = plot_inner_node(inner_sequence, next_node, inner_v, first, root_node, next_node);
             Point last_coord = last_node->coords_entering_to(first, versus_inverter[inner_v], Node::INNER);
             if (inner_sequence.back() != last_coord) {
               inner_sequence.push_back(last_coord);
@@ -283,7 +283,7 @@ std::pair<int, int> NodeCluster::test_in_hole_o(Node* node)
   return {-1, -1};
 }
 
-Node* NodeCluster::plot_inner_node(std::vector<Point>& sequence_coords, Node *node, int versus, Node *stop_at, Node *start_node) {
+Node* NodeCluster::plot_inner_node(std::vector<Point>& sequence_coords, Node *node, int versus, Node *stop_at, Node *start_node, Node *initial_node) {
   Node *current_node = node;
 
   while (current_node != nullptr) {
@@ -335,7 +335,7 @@ Node* NodeCluster::plot_inner_node(std::vector<Point>& sequence_coords, Node *no
     } else {
       inner_new->remove(current_node);
     }
-    if (next_node == stop_at) {
+    if (next_node == stop_at && stop_at->my_next_inner(current_node, versus) == initial_node) {
       if (plot) {
         next_node->assign_lateral_inner_index(current_node, stop_at, versus);
       }

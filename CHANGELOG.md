@@ -176,3 +176,7 @@ All notable changes to this project will be documented in this file.
 
 ## [1.4.7] - 2026-11-07
 - Added multiclass raster polygonization support, preserving class IDs throughout polygon extraction and tile merging, including streaming mergers.
+
+## [1.4.8] - 2026-11-11
+- Fixed premature inner contour termination with 8-connectivity.
+- Added TIFF and GeoTIFF build dependencies.

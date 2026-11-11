@@ -30,6 +30,7 @@
 #include "polygon/bitmaps/spng.h"
 #include "polygon/bitmaps/streaming/RasterStreamer.h"
 #include "polygon/bitmaps/streaming/PngSource.h"
+#include "polygon/bitmaps/streaming/TiffSource.h"
 #include "polygon/matchers/Matcher.h"
 #include "polygon/matchers/RGBMatcher.h"
 #include "polygon/matchers/RGBNotMatcher.h"
@@ -463,7 +464,7 @@ ProcessResult* stream_progressive_png_image_to_geojson(const std::string& filepa
     }},
   };
 
-  PngSource source(filepath);
+  TiffSource source(filepath);
   if (stripe_height >= source.height()) {
     throw std::invalid_argument("stripe_height must be smaller than image height");
   }
@@ -518,6 +519,6 @@ ProcessResult* stream_progressive_png_image_to_geojson(const std::string& filepa
 }
 
 void Tests::test_m() {
-  stream_progressive_png_image_to_geojson("../images/italy_1300x1300.png", "output.geojson", 100);
+  stream_progressive_png_image_to_geojson("../images/conus_clip_100x100.tif", "output.geojson", 20);
   std::cout << "Memory usage peak: " << get_peak_rss() << " MB" << std::endl;
 }

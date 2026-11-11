@@ -37,6 +37,7 @@ class TiffSource : public RasterSource {
   void read_model_transformation(double* matrix, uint16_t count);
   void read_crs();
   void convert_row(unsigned char* destination);
+  void load_tile_band(uint32_t tile_start);
   TIFF* tiff_;
   uint32_t width_;
   uint32_t height_;
@@ -48,4 +49,10 @@ class TiffSource : public RasterSource {
   uint32_t current_row_;
   std::vector<unsigned char> source_row_;
   GeoLocalization geo_localization_;
+  bool tiled_;
+  uint32_t tile_width_;
+  uint32_t tile_height_;
+  uint32_t cached_tile_start_;
+  bool tile_cache_valid_;
+  std::vector<unsigned char> tile_band_;
 };

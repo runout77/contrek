@@ -154,7 +154,7 @@ module Contrek
 
               if !next_node.nil?
                 @sequence_coords << next_node.coords_entering_to(first, inner_v, Contrek::Finder::Node::INNER)
-                last_node = plot_inner_node(next_node, inner_v, first, root_node)
+                last_node = plot_inner_node(next_node, inner_v, first, root_node, next_node)
                 last_coord = last_node.coords_entering_to(first, VERSUS_INVERTER[inner_v], Contrek::Finder::Node::INNER)
                 @sequence_coords << last_coord if @sequence_coords.last != last_coord
               end
@@ -232,7 +232,7 @@ module Contrek
       # inner way
       # nodes in @plot_sequence
       # coordinates in @sequence_coords
-      def plot_inner_node(node, versus, stop_at, start_node)
+      def plot_inner_node(node, versus, stop_at, start_node, initial_node)
         node.outer_index = start_node.outer_index
         @root_nodes.delete(node)
         @inner_plot.delete(node)
@@ -272,11 +272,11 @@ module Contrek
         else
           @inner_new.delete(node)
         end
-        if next_node == stop_at
+        if next_node == stop_at && stop_at.my_next(node, versus, :inner) == initial_node
           next_node.assign_lateral_inner_index(node, stop_at, versus) if plot
           return node
         end
-        plot_inner_node(next_node, versus, stop_at, start_node)
+        plot_inner_node(next_node, versus, stop_at, start_node, initial_node)
       end
 
       # contour tracing core logic loop

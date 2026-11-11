@@ -213,5 +213,40 @@ RSpec.shared_examples "multiclass" do
       ).process_info
       expect(result.points).to match_expected_json store_data: true
     end
+
+    it "multiclass scans case 14" do
+      chunk =
+        "222            22  2" \
+        "2     2       2    2" \
+        "2    222    222     " \
+        "2    222    222     " \
+        "2    2222222222     " \
+        "22222 22  2         " \
+        "2222    22          " \
+        "22222222222222222222"
+
+      result = @simple_polygon_finder.new(@bitmap_class.new(chunk, 20),
+        nil,
+        nil,
+        {multiclass: true, connectivity: 8, versus: :a, compress: {uniq: true, linear: true}}).process_info
+      expect(result.points).to match_expected_json
+    end
+
+    it "multiclass scans case 15" do
+      chunk =
+        "                    " \
+        "       22222        " \
+        "     22     22      " \
+        "       22222        " \
+        "     22     22      " \
+        "       22222        " \
+        "                    "
+
+      result = @simple_polygon_finder.new(@bitmap_class.new(chunk, 20),
+        nil,
+        nil,
+        {multiclass: true, connectivity: 8, versus: :a, compress: {uniq: true, linear: true}}).process_info
+      expect(result.points).to match_expected_json
+    end
   end
 end
