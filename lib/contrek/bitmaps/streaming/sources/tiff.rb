@@ -20,6 +20,7 @@ module Contrek
             TIFFTAG_PHOTOMETRIC = 262
             TIFFTAG_SAMPLESPERPIXEL = 277
             TIFFTAG_PLANARCONFIG = 284
+            TIFFTAG_COLORMAP = 320
             TIFFTAG_SAMPLEFORMAT = 339
             TIFFTAG_MODELPIXELSCALE = 33550
             TIFFTAG_MODELTIEPOINT = 33922
@@ -28,6 +29,7 @@ module Contrek
             PHOTOMETRIC_MINISWHITE = 0
             PHOTOMETRIC_MINISBLACK = 1
             PHOTOMETRIC_RGB = 2
+            PHOTOMETRIC_PALETTE = 3
 
             PLANARCONFIG_CONTIG = 1
 
@@ -77,6 +79,7 @@ module Contrek
             @sample_format = read_uint16(LibTiff::TIFFTAG_SAMPLEFORMAT, defaulted: true)
 
             validate_format
+            read_palette if @photometric == LibTiff::PHOTOMETRIC_PALETTE
 
             @source_row_size = LibTiff.TIFFScanlineSize64(@tiff)
             @source_row = FFI::MemoryPointer.new(:uint8, @source_row_size)
@@ -144,13 +147,50 @@ module Contrek
             unless [
               LibTiff::PHOTOMETRIC_MINISWHITE,
               LibTiff::PHOTOMETRIC_MINISBLACK,
-              LibTiff::PHOTOMETRIC_RGB
+              LibTiff::PHOTOMETRIC_RGB,
+              LibTiff::PHOTOMETRIC_PALETTE
             ].include?(@photometric)
               raise "Unsupported TIFF photometric: #{@photometric}"
+            end
+
+            if @photometric == LibTiff::PHOTOMETRIC_PALETTE &&
+                (@samples_per_pixel != 1 || @bits_per_sample != 8)
+              raise "Unsupported TIFF palette format"
+            end
+          end
+
+          def read_palette
+            red = FFI::MemoryPointer.new(:pointer)
+            green = FFI::MemoryPointer.new(:pointer)
+            blue = FFI::MemoryPointer.new(:pointer)
+
+            ret = LibTiff.TIFFGetField(
+              @tiff, LibTiff::TIFFTAG_COLORMAP,
+              :pointer, red, :pointer, green, :pointer, blue
+            )
+            raise "Unable to read TIFF color map" unless ret == 1
+
+            red_ptr = red.read_pointer
+            green_ptr = green.read_pointer
+            blue_ptr = blue.read_pointer
+
+            @palette = Array.new(256) do |i|
+              offset = i * 2
+              [
+                red_ptr.get_uint16(offset) >> 8,
+                green_ptr.get_uint16(offset) >> 8,
+                blue_ptr.get_uint16(offset) >> 8,
+                255
+              ]
             end
           end
 
           def convert_row(destination)
+            if @photometric == LibTiff::PHOTOMETRIC_PALETTE
+              convert_palette8_row(destination)
+              return
+            end
+
             case [@samples_per_pixel, @bits_per_sample]
             when [1, 8]
               convert_gray8_row(destination)
@@ -166,6 +206,19 @@ module Contrek
               convert_rgba16_row(destination)
             else
               raise "Unsupported TIFF pixel format"
+            end
+          end
+
+          def convert_palette8_row(dest)
+            @width.times do |x|
+              index = @source_row.get_uint8(x)
+              rgba = @palette[index]
+              dest_offset = x * 4
+
+              dest.put_uint8(dest_offset, rgba[0])
+              dest.put_uint8(dest_offset + 1, rgba[1])
+              dest.put_uint8(dest_offset + 2, rgba[2])
+              dest.put_uint8(dest_offset + 3, rgba[3])
             end
           end
 

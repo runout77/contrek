@@ -249,6 +249,50 @@ RSpec.shared_examples "streaming" do
       )
     end
 
+    it "streams by multiple parts geotiff EPSG:5070" do
+      skip unless @polygon_finder_class == CPPPolygonFinder
+      source = @tiff_source_class.new("./spec/files/images/noaa_crop_200.tif")
+      streamer = @raster_streamer_class.new(source, stripe_height: 50)
+      buffer_bitmap = @png_bitmap_class.new(source.width, streamer.stripe_height)
+
+      localization = source.geo_localization
+      expect(localization[:crs]).to eq({authority: "EPSG", code: 5070})
+
+      shared_stream = @streaming_file.new("output_noaa.geojson")
+
+      v_merger_options = {unsafe_mode: true, multiclass: true, geo_localization: localization, compress: {uniq: true, linear: true}}
+      geo_finder = @geo_json_streaming_merger.new(
+        options: v_merger_options,
+        stream_to: shared_stream
+      )
+
+      stripes_count = 0
+      total_height = 0
+      streamer.each(buffer_bitmap) do |bitmap, buffer_rows, buffer_size, rows_read|
+        tile = @polygon_finder_class.new(
+          bitmap,
+          nil,
+          nil,
+          {processing_height: buffer_rows, multiclass: true, versus: :o, bounds: true, compress: {uniq: true}}
+        ).process_info
+        total_height += rows_read
+        geo_finder.add_tile(tile, total_height == source.height)
+        stripes_count += 1
+      end
+
+      result = geo_finder.process_info
+      expect(result.metadata[:width]).to eq(200)
+      expect(result.metadata[:height]).to eq(200)
+      expect(result.points).to be_empty
+
+      shared_stream.rewind
+      expect(shared_stream.read).to match_expected_stream(
+        "test_epsg_5070",
+        extension: "geojson",
+        number_of_tiles: stripes_count
+      )
+    end
+
     it "streams by multiple parts multiclass png" do
       source = @png_source_class.new("./spec/files/images/gdal_multiclass_100x100.png")
       streamer = @raster_streamer_class.new(source, stripe_height: 20)

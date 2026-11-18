@@ -47,7 +47,7 @@ class GeoJsonStreamingMerger : public StreamingMerger {
 
     const std::string authority = crs->get<std::string>("authority", "");
     const auto code = crs->get("code", std::int64_t{0});
-    if (authority != "EPSG" || code != 4326) {
+    if (authority != "EPSG" || code <= 0) {
       throw std::invalid_argument("Unsupported CRS: " + authority + ":" + std::to_string(code));
     }
 
@@ -85,25 +85,25 @@ class GeoJsonStreamingMerger : public StreamingMerger {
 
     const double x = point.y;
     const double y = point.x;
-    const double lon = x_origin + x * x_pixel_size + y * x_row_offset;
-    const double lat = y_origin + x * y_column_offset + y * y_pixel_size;
+    const double geo_x = x_origin + x * x_pixel_size + y * x_row_offset;
+    const double geo_y = y_origin + x * y_column_offset + y * y_pixel_size;
 
     char buffer[128];
     char* ptr = buffer;
     char* const end = buffer + sizeof(buffer);
     *ptr++ = '[';
 
-    auto r1 = std::to_chars(ptr, end, lon, std::chars_format::fixed, 7);
+    auto r1 = std::to_chars(ptr, end, geo_x, std::chars_format::fixed, 7);
     if (r1.ec != std::errc{}) {
-      throw std::runtime_error("Failed to format longitude");
+      throw std::runtime_error("Failed to format geo x coordinate");
     }
 
     ptr = r1.ptr;
     *ptr++ = ',';
 
-    auto r2 = std::to_chars(ptr, end, lat, std::chars_format::fixed, 7);
+    auto r2 = std::to_chars(ptr, end, geo_y, std::chars_format::fixed, 7);
     if (r2.ec != std::errc{}) {
-      throw std::runtime_error("Failed to format latitude");
+      throw std::runtime_error("Failed to format geo y coordinate");
     }
 
     ptr = r2.ptr;
