@@ -180,3 +180,6 @@ All notable changes to this project will be documented in this file.
 ## [1.4.8] - 2026-11-11
 - Fixed premature inner contour termination with 8-connectivity.
 - Added TIFF and GeoTIFF build dependencies.
+
+## [1.4.9] - 2026-11-21
+- Support for georeferenced GeoJSON output for EPSG:5070 (NAD83 / Conus Albers).

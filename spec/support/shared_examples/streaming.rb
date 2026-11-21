@@ -260,7 +260,7 @@ RSpec.shared_examples "streaming" do
 
       shared_stream = @streaming_file.new("output_noaa.geojson")
 
-      v_merger_options = {unsafe_mode: true, multiclass: true, geo_localization: localization, compress: {uniq: true, linear: true}}
+      v_merger_options = {unsafe_mode: true, geo_localization: localization, compress: {uniq: true, linear: true}}
       geo_finder = @geo_json_streaming_merger.new(
         options: v_merger_options,
         stream_to: shared_stream
